@@ -1,0 +1,12 @@
+*.o
+*.idea
+*.bin
+*.img
+*.qcow2
+*.vmdk
+.idea/
+*.DS_Store
+*.iml
+/out/
+
+cmake-build-debug/

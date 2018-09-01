@@ -110,7 +110,6 @@ add_executable(anteojOS
         Userland/SampleCodeModule/_loader.o
         Userland/SampleCodeModule/clock.c
         Userland/SampleCodeModule/clock.h
-        Userland/SampleCodeModule/clock.o
         Userland/SampleCodeModule/Makefile
         Userland/SampleCodeModule/sampleCodeModule.c
         Userland/SampleCodeModule/sampleCodeModule.ld

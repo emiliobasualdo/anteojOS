@@ -1,0 +1,4 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS/cmake-build-debug

@@ -42,14 +42,14 @@ void keyboardInterpreter()
         {
             if ( (capsLock && !shift) || (!capsLock && shift) )
             {
-                c = c - ('a'-'A');
+                c = (char) (c - ('a' - 'A'));
             }
         }
         else if(shift)
         {
             c = keyboardShiftList[key];
         }
-        charToBuffer(c);
+        charToBuffer((unsigned char) c);
     }
 }
 
@@ -84,4 +84,11 @@ int newToRead()
         return 0;
     }
     return 1;
+}
+
+char getNextChar()
+{
+    if (!newToRead())
+        setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);
+    return returnNextChar();
 }

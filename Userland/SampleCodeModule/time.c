@@ -1,4 +1,4 @@
-#include "timezone.h"
+#include <time.h>
 
 int currentTimezone = DEFAULT_TIME_ZONE;
 

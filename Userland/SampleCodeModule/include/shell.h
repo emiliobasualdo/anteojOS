@@ -10,6 +10,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "eyeGlassesSmall.h"
+#include <stddef.h>
 
 #define RESET_BUFFER bufferPtr = 0; buffer[0]=0;resp = OK;
 
@@ -21,6 +22,7 @@
 #define EXIT_CMMD  -2
 #define ILLEGAL_INPUT -3
 #define BUFFER_OVERFLOW -4
+#define AMPRESAND_CMD -5
 
 #define FALSE 0
 #define TRUE  1
@@ -28,6 +30,7 @@
 #define OS_SHELL_LINE     "anteojOS:$ "
 #define NO_SUCH_CMMD_MSG  "No such command found, check your input."
 #define ILLEGAL_INPUT_MSG "Your input contains illegal values, only printable characters admitted. Check your input."
+#define AMPRESAND_MSG     "Process running in background"
 
 #define INITIAL      0
 #define IN_ARGUMENT  1
@@ -43,7 +46,7 @@ void shell();
 void turnOnOff();
 
 /* sets the coordinates for the presentation logo */
-void setPresentatonImageCoordinates(int *, int *,int , int );
+void setPresentationImageCoordinates(int *, int *, int, int);
 
 /* sets the logo presentation and exits */
 void doBeforeExit();

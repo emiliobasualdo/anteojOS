@@ -1,7 +1,7 @@
 #ifndef TIMEZONE_H
 #define TIMEZONE_H
 
-#include "scLib.h"
+#include <scLib.h>
 
 #define DEFAULT_TIME_ZONE -3
 

@@ -61,7 +61,7 @@ void doubleToAlpha(double value, char * buffer, unsigned base)
     }
 }
 
-int strlen(const char * s)
+int strlen(const char *s)
 {
     int length = 0;
     while (*(s++) != 0)

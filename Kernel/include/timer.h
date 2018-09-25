@@ -1,6 +1,8 @@
 #ifndef TIMEDRIVER_H_
 #define TIMEDRIVER_H_
 
+#include <dispatcher.h>
+
 #define TICKSPERSEC 18
 
 extern unsigned int getTime();
@@ -12,12 +14,12 @@ extern unsigned int getTimeSec();
 void timerHandler(void);
 
 /* returns the number of seconds instead of ticks */
-int ticksToSeconds(unsigned int ticks);
+unsigned long ticksToSeconds(void);
 
 /* returns the ticks count */
-int ticksElapsed(void);
+unsigned long ticksElapsed(void);
 
 /* returns the ticks count in form of seconds */
-int secondsElapsed(void);
+unsigned long secondsElapsed(void);
 
 #endif

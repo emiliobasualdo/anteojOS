@@ -1,6 +1,6 @@
-#include "videoDriver.h"
-#include "exceptions.h"
-#include "keyboardDriver.h"
+#include <videoDriver.h>
+#include <exceptions.h>
+#include <keyboardDriver.h>
 
 extern uint64_t rip;
 extern uint64_t stack;

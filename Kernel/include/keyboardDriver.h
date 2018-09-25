@@ -2,10 +2,10 @@
 #define _keyboardDriver_h
 
 #include <videoDriver.h>
+#include <process.h>
+#include <scheduler.h>
 
 #define BUFFERSIZE 1024
-#define TRUE  1
-#define FALSE 0
 
 /* gets the key pressed from stdout */
 extern int getKey(void);
@@ -21,5 +21,7 @@ char returnNextChar();
 
 /* returns a boolean value: 1 if there is a new character to read */
 int newToRead();
+
+char getNextChar();
 
 #endif

@@ -54,6 +54,11 @@ void drawCharWithColour ( char c, Colour fColour)
         {
             backSpace();
         }
+        if (c == '\t' )
+        {
+            drawChar(' ');
+            drawChar(' ');
+        }
     }
     else
     {
@@ -193,24 +198,9 @@ void clearCoordenate(unsigned int x, unsigned int y)
 
 void scroll ()
 {
-    Colour col;
-    char * pixelAddress;
-    for (int i=0; i<vbe->xResolution; i++)
-    {
-        for (int j=charHeight; j<vbe->yResolution; j++)
-        {
-            pixelAddress = (char *) ((uint64_t)(vbe->physBasePtr + vbe->pitch * j + i * (int)(vbe->bitsPerPixel/8)));
-            col.blue = pixelAddress[0];
-            col.green = pixelAddress[1];
-            col.red = pixelAddress[2];
-            drawAPixelWithColour(i, j-charHeight, col);
-        }
-    }
-    int j = vbe->yResolution - charHeight;
-    for (int i=0; i < vbe->xResolution; i++)
-    {
-        clearCoordenate(i, j);
-    }
+    memcpy((void *) (uint64_t)vbe->physBasePtr,
+           (const void *) (uint64_t)(vbe->physBasePtr + charHeight * vbe->pitch * (vbe->bitsPerPixel / charHeight)),
+           (uint64_t)((vbe->yResolution - charHeight) * vbe->pitch) * (vbe->bitsPerPixel/charWidth));
 }
 
 void newWindow ()

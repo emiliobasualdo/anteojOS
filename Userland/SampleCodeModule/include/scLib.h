@@ -22,9 +22,6 @@ int  getSecond();
 /* system call to make a beep sound */
 void kernelBeep();
 
-/* system call to get the seconds elapsed */
-void timeElapsed();
-
 /* system call to suspend the system for a determined time */
 void sleep();
 
@@ -36,9 +33,6 @@ void getResolutions(unsigned int * , unsigned int * );
 
 /* system call to set a new font colour */
 void setFontColour(uint8_t , uint8_t , uint8_t );
-
-/* system call to return if there is a new character to read from buffer */
-int newToRead();
 
 /* system call to exit and make a beep sound */
 int notifyExitRequest();
@@ -57,5 +51,25 @@ void setBackgroundColour(uint8_t , uint8_t , uint8_t );
 
 /* system call to change coordinates */
 void setCoordinates(unsigned int, unsigned int);
+
+void *userMalloc(uint64_t x);
+
+void userFree(uint64_t x);
+
+/* system call to print current process states
+ * x  = 0 prints Tree type
+ * x != 0 prints process queues
+ */
+void userPs(char x);
+
+/* not much to explain*/
+int userStartProcess(char *name, uint64_t instruct, int foreground);
+
+/* Can change between Running, Blocked, Dead*/
+int userKill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* Not much to explain*/
+int userProcessBomb();
+
 
 #endif

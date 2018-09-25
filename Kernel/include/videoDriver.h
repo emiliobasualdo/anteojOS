@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <font.h>
+#include <lib.h>
 
 #define charWidth 8
 #define charHeight 16

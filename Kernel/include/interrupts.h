@@ -9,6 +9,9 @@
 #define INTERRUPS_H_
 
 #include <idtLoader.h>
+#include <scheduler.h>
+
+void switchTo(uint64_t);
 
 void _irq00Handler(void);
 void _irq01Handler(void);

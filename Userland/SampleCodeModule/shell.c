@@ -1,6 +1,6 @@
-#include "shell.h"
+#include <shell.h>
 
-static int screenSaverStatus = TRUE;
+static int screenSaverStatus = FALSE;
 static unsigned int saverTime = DEFAULT_SAVER_TIME;
 static unsigned int inactivityCounter = 0;
 int secs = 0;
@@ -12,7 +12,6 @@ void shell()
     int run = TRUE;
     int resp = NULL_CMMD;
     char c;
-    turnOnOff();
     while(run)
     {
         c = 0;
@@ -20,42 +19,31 @@ void shell()
         printShellLine();
         while(c != '\n')
         {
-            refreshInactivityCounter();
-            if (inactivityCounter >= saverTime && screenSaverStatus)
+            c = getChar();
+            if (isGraph(c))
             {
-                showClock(SCREEN_SAVER_MODE);
-                inactivityCounter = 0;
-                newShell();
-                printShellLine();
+                buffer[bufferPtr++] = c;      // bufferPtr siempre apunta a donde agregar
+                putChar(c);
             }
-            if (newToRead())
+            else if (c == '\b' && bufferPtr > 0)  // no tendria sentido seguir borrando
             {
-                inactivityCounter = 0;
-                c = getChar();
-                if (isGraph(c))
+                removeChar();
+                bufferPtr--;
+            }
+            else if(c == '\n')
+            {
+                if (bufferPtr > 0)    //sino solamente imprimo una linea nueva pero no mando el comando
                 {
-                    buffer[bufferPtr++] = c;      // bufferPtr siempre apunta a donde agregar
+                    buffer[bufferPtr] = c; // para saber hasta donde leer
+                    NEW_LINE;
+                    resp = parseAndInterpret(buffer);
+                }
+                else
+                {
                     putChar(c);
                 }
-                else if (c == '\b' && bufferPtr > 0)  // no tendria sentido seguir borrando
-                {
-                    removeChar();
-                    bufferPtr--;
-                }
-                else if(c == '\n')
-                {
-                    if (bufferPtr > 0)    //sino solamente imprimo una linea nueva pero no mando el comando
-                    {
-                        buffer[bufferPtr] = c; // para saber hasta donde leer
-                        NEW_LINE;
-                        resp = parseAndInterpret(buffer);
-                    }
-                    else
-                    {
-                        putChar(c);
-                    }
-                }
             }
+
         }
         if (resp == EXIT_CMMD)
         {
@@ -69,6 +57,10 @@ void shell()
         {
             printF("%s\n",ILLEGAL_INPUT_MSG);
         }
+        else if (resp == AMPRESAND_CMD)
+        {
+            printF("%s\n",AMPRESAND_MSG);
+        }
     }
     doBeforeExit();
 }
@@ -80,10 +72,8 @@ void turnOnOff()
     newWindow();
     changeFontColour(getCurrentFontColour());
     changeBackgroundColour(getCurrentBackgroundColour());
-    setPresentatonImageCoordinates(&x,&y,GLASSESWIDTH, GLASSESWIDTH);
-    drawImageFromHexaMap(x, y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
-    sleep();
-    sleep();
+    setPresentationImageCoordinates(&x, &y, GLASSESWIDTH, GLASSESWIDTH);
+    drawImageFromHexaMap((unsigned int) x, (unsigned int) y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
     sleep();
     sleep();
     sleep();
@@ -189,7 +179,7 @@ int parseAndInterpret(const char *string) // se lee desde indice 0 hasta un \n
     return executeCommand(argIndex+1, argsVector);
 }
 
-void setPresentatonImageCoordinates(int *x, int*y,int width, int height)
+void setPresentationImageCoordinates(int *x, int *y, int width, int height)
 {
     unsigned int xRes, yRes;
     getResolutions(&xRes,&yRes);
@@ -226,4 +216,6 @@ void setSaverTime(int num)
 {
     saverTime = num;
 }
+
+
 

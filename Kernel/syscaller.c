@@ -2,10 +2,11 @@
 
 typedef uint64_t (*func_type)();
 
-func_type fList[NFUNCTIONS] = {write, read, getHour, getMin, getSec, beep, timeElapsed,
+func_type fList[NFUNCTIONS] = {write, read, getHour, getMin, getSec, beep,
                                sleep, userDrawPixel, getResolutions, changeFontColour,
-                               newCharInBuffer, exit, putChar, removeChar,
-                               changeBackgroundColour, setCoordinates };
+                               myExit, putChar, removeChar,
+                               changeBackgroundColour, setCoordinates, sysMalloc, sysFree,
+                               printProcess, startProcess, kill, procBomb};
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -21,7 +22,7 @@ uint64_t write(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t 
 }
 uint64_t read(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) returnNextChar();
+    return (uint64_t) getNextChar();
 }
 uint64_t getHour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -39,10 +40,6 @@ uint64_t beep(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r
 {
     motherBeep();
     return 0;
-}
-uint64_t timeElapsed(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
-{
-    return (uint64_t) secondsElapsed();
 }
 uint64_t sleep(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -67,11 +64,7 @@ uint64_t changeFontColour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
     setFontColour(col);
     return 0;
 }
-uint64_t newCharInBuffer(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
-{
-    return (uint64_t) newToRead();
-}
-uint64_t exit(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t myExit(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     motherBeep();
     return 0;
@@ -92,7 +85,41 @@ uint64_t changeBackgroundColour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64
     setBackgroundColour(colour);
     return 0;
 }
-uint64_t setCoordinates(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8){
+uint64_t setCoordinates(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
     setCoord(rdi, rsi);
     return 0;
+}
+uint64_t sysMalloc (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) my_malloc((unsigned int) rdi);
+}
+uint64_t sysFree (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    my_free((void *) rdi);
+    return 0;
+}
+uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    if (rdi == 'l')
+    {
+        printProcs();
+    }
+    else
+    {
+        printProcQueues();
+    }
+    return 0;
+}
+uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) createAndExecProcess((char *) rdi, rsi, (pPid) getCurrentProc()->pid, (boolean) rdx) ;
+}
+uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) setProcessState(rdi, rsi, rdx);
+}
+uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) processBomb();
 }

@@ -1,6 +1,6 @@
 #include "shellCommands.h"
 
-command commands[NUM_COMMANDS]={
+command commands[]={
         {"help",  "Shows the different commands available and their description.", help},
         {"echo",  "Prints on stdout the specified string/s. Strings without quotes are considered separated", echo},
         {"time",  "Prints the current system time with default Timezone. Timezone can be changed with 'timezone' command", time},
@@ -12,9 +12,13 @@ command commands[NUM_COMMANDS]={
         {"digital_clock","Displays a digital clock on screen", digital_clock},
         {"timezone", "Allows the user to change the current timezone. Usage: timezone [int]",timezone},
         {"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
-        {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester}
+        {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
+        {"ps", "Prints all process. Usage ps [l]", printPs},
+        {"proc_bomb", "Starts a process bomb", procBomb},
+        {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
+/** Funciones auxiliares*/
 int executeCommand(int argc, argVector argv)
 {
     int cmd = commandExists(argv[0]);
@@ -22,14 +26,19 @@ int executeCommand(int argc, argVector argv)
     {
         return NULL_CMMD;
     }
+    if (argv[argc-1][0] == '&')
+    {
+        backgroundProc(commands[cmd].name, (uint64_t) commands[cmd].fn);
+        return AMPRESAND_CMD;
+    }
     return (*commands[cmd].fn)(argc,argv);
 }
 
 int commandExists(const char *name)
 {
-    for (int i=0; i<NUM_COMMANDS; i++)
+    for (int i=0; commands[i].name; i++)
     {
-        if (strcmp((char *) name, commands[i].name))
+        if (strcmp((char *) name, commands[i].name) != 0)
         {
             return i;
         }
@@ -37,6 +46,12 @@ int commandExists(const char *name)
     return NULL_CMMD;
 }
 
+int backgroundProc(char *name, uint64_t intstruction)
+{
+    return userStartProcess(name, intstruction, FALSE);
+}
+
+/** A partir de aca van los comandos para el usuario*/
 int help (int argc, argVector argv)
 {
     if (argc > 1)
@@ -46,7 +61,7 @@ int help (int argc, argVector argv)
     }
     else
     {
-        for (int i=0; i<NUM_COMMANDS; i++)
+        for (int i=0; commands[i].name; i++)
         {
             printF("%s: %s\n",commands[i].name ,commands[i].description);
         }
@@ -171,27 +186,24 @@ int changeColour(void(*f)(Colour), int flag)
     Colour c2 = getCurrentBackgroundColour();
     while (ask)
     {
-        if (newToRead())
+        c = getChar();
+        if (c >= '1' && c <= '9')
         {
-            c = getChar();
-            if (c >= '1' && c <= '9')
+            Colour col = userColours[c-'0'];
+            if ((equalColour(col, c1) && flag == BACK)|| (equalColour(col, c2) && flag == FONT))
             {
-                Colour col = userColours[c-'0'];
-                if ((equalColour(col, c1) && flag == BACK)|| (equalColour(col, c2) && flag == FONT))
-                {
-                  printF("Choose another colour, one that makes everything better! \n");
-                }
-                else
-                {
-                  (*f)(col);
-                  ask = FALSE;
-                  changed = TRUE;
-                }
+              printF("Choose another colour, one that makes everything better! \n");
             }
-            else if(c == 'q')
+            else
             {
-                ask = FALSE;
+              (*f)(col);
+              ask = FALSE;
+              changed = TRUE;
             }
+        }
+        else if(c == 'q')
+        {
+            ask = FALSE;
         }
     }
     return changed;
@@ -291,4 +303,24 @@ int exceptionTester(int argc, argVector argv)
     printF("Wrong arguments\n");
   }
   return 1;
+}
+
+int printPs(int argc, argVector argv)
+{
+    userPs(argv[1][0]);
+    return 1;
+}
+
+int procBomb(int argc, argVector argv)
+{
+    return userProcessBomb();
+}
+
+int backgroundTest(int argc, argVector argv)
+{
+    printF("We will create and run a process in background\n");
+    printF("First we will print the current process list\n");
+    printPs('l',NULL);
+    //back
+    return userProcessBomb();
 }

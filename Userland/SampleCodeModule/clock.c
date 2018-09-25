@@ -21,7 +21,7 @@ void showClock(int mode)
             os = s;
         }
         drawClock(h,m,s,fColour, bColour);
-        if(newToRead())
+        /*if(newToRead())
         {
             c = getChar();
             if (c == 'q' || mode) // si es screen saver, mode = 1 entonces mata
@@ -40,7 +40,7 @@ void showClock(int mode)
                 printF("Press 'q' to exit or a number to change the clock's colour");
                 drawClock(h,m,s,fColour, bColour);
             }
-        }
+        }*/
     }
 }
 

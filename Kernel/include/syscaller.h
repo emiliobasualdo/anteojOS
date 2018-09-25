@@ -4,12 +4,12 @@
 #include <stdint.h>
 #include <videoDriver.h>
 #include <keyboardDriver.h>
-#include <timeDriver.h>
+#include <timer.h>
 #include <beepDriver.h>
-#include <videoDriver.h>
-#include "sleep.h"
+#include <sleep.h>
+#include <shellTests.h>
 
-#define NFUNCTIONS 18                             // number of functions
+#define NFUNCTIONS 24                             // number of functions
 
 /* eax = 1
 ** draws a string with a given string in rdi
@@ -41,11 +41,6 @@ uint64_t getSec(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t
 */
 uint64_t beep(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
-/* eax = 7
-** return the seconds elapsed
-*/
-uint64_t timeElapsed(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
-
 /* eax = 8
 ** suspends the system for a determined time
 */
@@ -66,15 +61,10 @@ uint64_t getResolutions(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, 
 */
 uint64_t changeFontColour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
-/* eax = 12
-** returns a boolean whether there is a new character to read or not
-*/
-uint64_t newCharInBuffer(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
-
 /* eax = 13
 ** makes a beep sound and exits
 */
-uint64_t exit(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+uint64_t myExit(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 14
 ** draws a character
@@ -95,5 +85,35 @@ uint64_t changeBackgroundColour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64
 ** sets current video driver coordinates to the given ones (x=rdi, y=rsi)
 */
 uint64_t setCoordinates(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 18
+** returns an address to the first page for a given size in rdi
+*/
+uint64_t sysMalloc(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 19
+** frees a given page (or pages) on address given in rdi
+*/
+uint64_t sysFree (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 20
+** prints all process queues
+*/
+uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 21
+** create and executes a process
+*/
+uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 22
+** Edits process state
+*/
+uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 23
+** Edits process state
+*/
+uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 #endif

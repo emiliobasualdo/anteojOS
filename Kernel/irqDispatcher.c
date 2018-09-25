@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include "keyboardDriver.h"
-#include "videoDriver.h"
-#include "timeDriver.h"
+#include <keyboardDriver.h>
+#include <videoDriver.h>
+#include <timer.h>
 
 static void int_20();
 static void int_21();
@@ -16,11 +16,11 @@ void irqDispatcher(uint64_t irq)
 		case 1:
 			int_21();
 			break;
+		default:break;
 	}
-	return;
 }
 
-void int_20()
+void int_20() // todo esto no lo estoy usando, solucionar
 {
 	timerHandler();
 }
@@ -28,4 +28,5 @@ void int_20()
 void int_21()
 {
 	keyboardInterpreter();
+    wakeUpBlocked(KEYBOARD);
 }

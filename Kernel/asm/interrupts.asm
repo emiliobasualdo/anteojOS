@@ -1,4 +1,3 @@
-
 GLOBAL _cli
 GLOBAL _sti
 GLOBAL picMasterMask
@@ -19,9 +18,13 @@ GLOBAL _exception6Handler
 GLOBAL rip
 GLOBAL stack
 GLOBAL getStack
+GLOBAL switchTo
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
+EXTERN getMyStack
+EXTERN dispatcher
+EXTERN printtt
 
 
 SECTION .text
@@ -44,7 +47,7 @@ SECTION .text
 	push r15
 %endmacro
 
-%macro popState 0
+%macro popState 0 ; todo me faltan dos registrto pelotdudo
 	pop r15
 	pop r14
 	pop r13
@@ -68,14 +71,11 @@ SECTION .text
 	mov rdi, %1 ; pasaje de parametro
 	call irqDispatcher
 
-	; signal pic EOI (End of Interrupt)
-	mov al, 20h
-	out 20h, al
+    endOfInt
 
 	popState
 	iretq
 %endmacro
-
 
 
 %macro exceptionHandler 1
@@ -88,12 +88,19 @@ SECTION .text
 	popState
 
 	mov rdi, [rip]
-	mov qword [rsp], rdi
+	mov qword [rsp], rdi ; pedro, esto no se que es pero lo ideal es que lo pongas como una macro todo
 	mov rdi, [stack]
 	mov qword [rsp+ 3*8], rdi
 	iretq
+
 %endmacro
 
+%macro endOfInt 0
+    ; signal pic EOI (End of Interrupt)
+    mov al, 20h
+    out 20h, al
+
+%endmacro
 
 _hlt:
 	sti
@@ -125,13 +132,34 @@ picSlaveMask:
     pop     rbp
     retn
 
-
 ;8254 Timer (Timer Tick)
-_irq00Handler:
-	irqHandlerMaster 0
+_irq00Handler: ; irqHandlerMaster 0 ; meto aca el que lleva la cuenta de cuantums todo
+    pushState
+
+    ;mov rax, rsp    ; Lo guardamos aca para despues pushearlo en el nuevo stack
+    ;mov rsp, stack  ; Cambiamos de stack por uno auxiliar para no pisar el del proceso con lo que viene ahora
+    ;push rax        ; Pushiamos el RSP
+
+    ;mov rdi, 0      ; pasaje de parametro
+    ;call irqDispatcher ; llamamos al irqDispatcher para que haga lo que quiera con el tick, ej: tick++
+    ;pop rdi         ; Popeamos el RSP y se lo pasamos como parametro al dispatcher
+
+    mov rdi, rsp    ;<------ esto es SOLO para la version sin el stack auxiliar
+    call dispatcher ; llamamos al dispatcher, para que guarde el RSP y nos mande el nuevo RSP
+    mov rsp, rax    ; colocamos el nuevo RPS
+
+    popState        ; levantamos el estado de registros anterior del proceso que queremos correr
+
+    endOfInt        ; notificamos el end of interrupt
+
+
+    iretq           ; levantamos lo que pusheó la int cuando se cortó el proceso que queremos ejecutar
+
 
 ;Keyboard
 _irq01Handler:
+    ;mov rdi,34
+    ;call printtt
 	irqHandlerMaster 1
 
 ;Cascade pic never called
@@ -169,9 +197,16 @@ getStack:
  mov rax, rsp
  ret
 
+switchTo:
+
+    mov rsp, rdi    ; levantamos el stack pointer
+    popState        ; porque nuestro stack tiene registros a pesar de que no nos importan
+    iretq           ; mentimos que hay una interrupcion
+
+
 
 
 SECTION .bss
 	aux: resq 1
 	rip: resq 1
-	stack: resq 1
+	stack: resb 800 ; suficiente para 100 quads todo chequear esto

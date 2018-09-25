@@ -8,7 +8,8 @@
 #include "scLib.h"
 #include "stdlib.h"
 #include "stdio.h"
-#include "timezone.h"
+#include "time.h"
+#include "userPrintf.h"
 
 #define MAX_BUFFER_SIZE 10000
 #define MAX_ARGS 10
@@ -42,6 +43,9 @@ int commandExists(const char *);
 
 /* executes a given command (the name is on argVector[0][]) */
 int executeCommand(int argc, argVector argv);
+
+/* executes a command in background*/
+int backgroundProc(char *name, uint64_t instruct);
 
 /* changes a determined colour, background or font */
 int changeColour(void(*f)(Colour), int flag);
@@ -87,5 +91,9 @@ extern void zeroDivisionException();
 
 /* calls an Invalid Opcode Exception*/
 extern void invalidOpcodeException();
+
+int printPs(int argc, argVector argv);
+
+int procBomb(int argc, argVector argv);
 
 #endif

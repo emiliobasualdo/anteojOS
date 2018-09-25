@@ -251,6 +251,12 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
     if (pid == getCurrentProc()->pid && (newState == BLOCKED || newState == DEAD))
     {
         _hlt();
+        // aca no se va a llegar nunca. cuando entre la interrupcion el RR va  cambiar de proceso
+        // y como este está muerto no lo va a levantar.... creo
+    }
+    if (newState == DEAD)
+    {
+        simple_printf("Kernel message: process %d is now dead\n",pid);
     }
     return TRUE;
 }
@@ -330,11 +336,8 @@ static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
 
 int bussyWaitingProc()
 {
-    simple_printf("!!!Bussy Wainting!!\n");
-    while (1)
-    {
-        _hlt();
-    }
+    //simple_printf("!!!Bussy Wainting!!\n");
+    STOP;
 }
 
 pcbPtr getBussyWaitingProcPcb()

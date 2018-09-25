@@ -66,10 +66,13 @@ void userPs(char x);
 int userStartProcess(char *name, uint64_t instruct, int foreground);
 
 /* Can change between Running, Blocked, Dead*/
-int userKill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+int userKill(uint64_t rdi);
 
 /* Not much to explain*/
 int userProcessBomb();
+
+/* returns the current process id*/
+int userGetCurrentPid();
 
 
 #endif

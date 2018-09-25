@@ -6,7 +6,6 @@
 #define PROCESOS_PROCESS_H
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 #include <pList.h>
 #include <system.h>

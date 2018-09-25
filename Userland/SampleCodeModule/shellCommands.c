@@ -13,8 +13,15 @@ command commands[]={
         {"timezone", "Allows the user to change the current timezone. Usage: timezone [int]",timezone},
         {"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
         {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
-        {"ps", "Prints all process. Usage ps [l]", printPs},
+        {"ps", "Prints all process. Usage ps [q]", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
+        {"back_test","Performs a test to prove the background/foreground usage", backgroundTest},
+        {"kill","Kill process. Usage: kill <pid>", kill},
+        {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
+};
+
+command aux_programs[]={
+        {"endLessLoop",  "while(1)", endLessLoop},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -28,7 +35,7 @@ int executeCommand(int argc, argVector argv)
     }
     if (argv[argc-1][0] == '&')
     {
-        backgroundProc(commands[cmd].name, (uint64_t) commands[cmd].fn);
+        execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn);
         return AMPRESAND_CMD;
     }
     return (*commands[cmd].fn)(argc,argv);
@@ -46,9 +53,14 @@ int commandExists(const char *name)
     return NULL_CMMD;
 }
 
-int backgroundProc(char *name, uint64_t intstruction)
+int execProcInBackground(char *name, uint64_t intstruction)
 {
-    return userStartProcess(name, intstruction, FALSE);
+    int pid = userStartProcess(name, intstruction, FALSE);
+    if (pid == -1)
+        printF("Error executing process in background\n");
+    else
+        printF("Process executed in background. Pid = %d\n", pid);
+    return pid;
 }
 
 /** A partir de aca van los comandos para el usuario*/
@@ -316,11 +328,48 @@ int procBomb(int argc, argVector argv)
     return userProcessBomb();
 }
 
+int kill(int argc, argVector argv)
+{
+    if (argc != 2)
+    {
+        printF("%s\n", ARGUMENTS_AMOUNT_ERROR("1"));
+        printF("Usage: kill <pid>\n");
+    }
+    int flag = 0;
+    int pid = 0;
+    toInt(argv[1],&pid,&flag);
+    return userKill((uint64_t) pid);
+}
+
 int backgroundTest(int argc, argVector argv)
 {
-    printF("We will create and run a process in background\n");
-    printF("First we will print the current process list\n");
-    printPs('l',NULL);
-    //back
-    return userProcessBomb();
+    argVector auxVec = {"ps", "l"};
+    printF("We will create and run a process in background. The process name is %s\n", aux_programs[0].name);
+    printF("First we will print the current process list so that you see that program is not currently running\n\n");
+    printPs(0,auxVec);
+    printF("\nPress any key to execute the program\n");
+    getChar();
+    execProcInBackground(aux_programs[0].name, (uint64_t) aux_programs[0].fn);
+    printF("We will print again the process list so that you see the process running\n\n");
+    printPs(0, auxVec);
+    printF("\nWe will leave the program running for you to decide what to do with it\n");
+    printF("Remember you can kill it with the command kill <pid>\n");
+    printF("Goodbye :)\n");
+    return TRUE;
+}
+
+/* Funciones auxiliares para los comandos de de usuario*/
+
+int endLessLoop()
+{
+    static long long counter = 0;
+    int pid = userGetCurrentPid();
+    printF("Hola! soy el proceso %d y estoy vivio!\n", pid);
+    while (1)
+    {
+        if (counter++ % 1000000000 == 0)
+        {
+            printF("Soy el proceso %d y sigo vivio! Matame si te animas\n", pid);
+        }
+    }
 }

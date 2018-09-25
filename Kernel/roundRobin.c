@@ -88,16 +88,17 @@ static boolean roundQueueAddNodeHead(rrNodePtr node, rrQueue *roundQueue)
 {
     if (rrIsEmpty(roundQueue))
     {
-        simple_printf("roundQueueAddNodeHead: rrEmpty\n");
+        //simple_printf("roundQueueAddNodeHead: rrEmpty\n");
+        resetQueue(roundQueue);
         roundQueue->head = roundQueue->tail = roundQueue->current = node;
-        roundQueue->count = 1;
+        roundQueue->head->next = roundQueue->head;
     }
     else
     {
         node->next = roundQueue->current->next;
         roundQueue->current->next = node;
-        roundQueue->count ++;
     }
+    roundQueue->count++;
     //simple_printf("roundQueueAddNodeHead: done.... imprimimos\n");
     //printRRQueues();
     return TRUE;
@@ -236,7 +237,7 @@ pcbPtr rrNextAvailableProcess()
                 break;
         }
     } while (curNode != NULL);
-    simple_printf("rrNextAvailableProcess: no había otro asi que retornamos NULL\n");
+    //simple_printf("Returning NULL\n");
     return NULL;
 }
 

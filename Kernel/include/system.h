@@ -12,8 +12,8 @@
 
 #define IRQ_OFF { asm volatile ("cli"); } //<- https://github.com/stevej/osdev/tree/master/kernel
 #define IRQ_RES { asm volatile ("sti"); }
-#define PAUSE   { asm volatile ("hlt"); }
-#define STOP while (1) { PAUSE; }
+#define HALT    { asm volatile ("hlt"); }
+#define STOP while (1) { HALT; }
 
 #define FALSE 0
 #define TRUE !FALSE

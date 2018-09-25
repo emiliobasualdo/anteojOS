@@ -58,9 +58,13 @@ static uint64_t schedulerNextRsp(uint64_t rsp)
     return nextProc->rsp;
 }
 
-static pcbPtr nextProcess() {
+/** Si no hay ningun proceso para correr nos quedamos
+ * loopeando infintamente
+ */
+static pcbPtr nextProcess()
+{
     current = rrNextAvailableProcess();
-    if (current == NULL)
+    if (!current)
     {
         current = getBussyWaitingProcPcb();
     }

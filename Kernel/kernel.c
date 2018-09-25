@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <string.h>
 #include <lib.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
@@ -117,40 +116,19 @@ int meAseguraQueSiempreHayaUnProcCorriendo()
     return 0;
 }
 
-int miShell()
-{
-
-    static int counter = 0;
-    while (1)
-    {
-        counter++;
-        if (counter % 10000000000 == 0)
-        {
-
-            printProcs();
-            printProcQueues();
-        }
-    }
-    return 1;
-}
 void theAllMighty(void)
 {
     simple_printf("The all mighty\n");
-    if (!createAndExecProcess("Asegurador", (uint64_t) meAseguraQueSiempreHayaUnProcCorriendo, getCurrentProc()->pid, FALSE))
+/*    if (!createAndExecProcess("Asegurador", (uint64_t) meAseguraQueSiempreHayaUnProcCorriendo, getCurrentProc()->pid, FALSE))
     {
         simple_printf("theAllMighty: ERROR: otro == NULL\n");
         return;
-    }
+    }*/
     if (!createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE))
     {
-        simple_printf("theAllMighty: ERROR: shel == NULL\n");
+        simple_printf("theAllMighty: ERROR: shell == NULL\n");
         return;
     }
-/*    if (!createAndExecProcess("miShell", (uint64_t) miShell, getCurrentProc()->pid, TRUE))
-    {
-        simple_printf("theAllMighty: ERROR: miputa == NULL\n");
-        return;
-    }*/
     loadIDT();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
 

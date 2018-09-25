@@ -2,11 +2,11 @@
 
 typedef uint64_t (*func_type)();
 
-func_type fList[NFUNCTIONS] = {write, read, getHour, getMin, getSec, beep,
+func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                sleep, userDrawPixel, getResolutions, changeFontColour,
                                myExit, putChar, removeChar,
                                changeBackgroundColour, setCoordinates, sysMalloc, sysFree,
-                               printProcess, startProcess, kill, procBomb};
+                               printProcess, startProcess, kill, procBomb, getCurrentPid};
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -101,13 +101,13 @@ uint64_t sysFree (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64
 }
 uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    if (rdi == 'l')
+    if (rdi == 'q')
     {
-        printProcs();
+        printProcQueues();
     }
     else
     {
-        printProcQueues();
+        printProcs();
     }
     return 0;
 }
@@ -117,9 +117,15 @@ uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
 }
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) setProcessState(rdi, rsi, rdx);
+    return (uint64_t) setProcessState((pPid) rdi, DEAD, NO_REASON);
 }
+
 uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t) processBomb();
+}
+
+uint64_t getCurrentPid(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) getCurrentProc()->pid;
 }

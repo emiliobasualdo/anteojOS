@@ -45,7 +45,7 @@ int commandExists(const char *);
 int executeCommand(int argc, argVector argv);
 
 /* executes a command in background*/
-int backgroundProc(char *name, uint64_t instruct);
+int execProcInBackground(char *name, uint64_t instruct);
 
 /* changes a determined colour, background or font */
 int changeColour(void(*f)(Colour), int flag);
@@ -95,5 +95,13 @@ extern void invalidOpcodeException();
 int printPs(int argc, argVector argv);
 
 int procBomb(int argc, argVector argv);
+
+int backgroundTest(int argc, argVector argv);
+
+int kill(int argc, argVector argv);
+
+
+/* Funciones auxiliares para las funciones de usuario*/
+int endLessLoop();
 
 #endif

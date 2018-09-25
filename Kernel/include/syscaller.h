@@ -9,7 +9,7 @@
 #include <sleep.h>
 #include <shellTests.h>
 
-#define NFUNCTIONS 24                             // number of functions
+#define NFUNCTIONS 30                             // number of functions
 
 /* eax = 1
 ** draws a string with a given string in rdi
@@ -116,4 +116,5 @@ uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r
 */
 uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
+uint64_t getCurrentPid(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 #endif

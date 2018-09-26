@@ -64,5 +64,5 @@
 
 int printF(char *fmt, ...);
 
-int simple_sprintf(char *buf, char *fmt, ...);
+int userSprintf(char *buf, char *fmt, ...);
 #endif /* __SIMPLE_USERPRINTF__ */

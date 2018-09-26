@@ -52,8 +52,8 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
         freeProcess(init);
         return NULL;
     }
-    bussyWaitingProcPcb = createProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, FALSE);
-    nextPid = INIT_PID + 1;
+    bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE);
+    nextPid = BUSSY_WAITING + 1;
     return init;
 }
 
@@ -256,7 +256,7 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
     }
     if (newState == DEAD)
     {
-        if (pid == INIT_PID && pid != getCurrentProc()->pid)
+        if (pid == INIT_PID && pid != getCurrentProc()->pid) // solo theAllMighty puede matar a theAllMighty
         {
             simple_printf("Kernel message: ERROR: You cannot kill %s process\n", array[INIT_PID]->name);
             return FALSE;
@@ -358,7 +358,8 @@ int bussyWaitingProc()
 
 pcbPtr getBussyWaitingProcPcb()
 {
-    return bussyWaitingProcPcb;
+    //return bussyWaitingProcPcb;
+    return bussyWaitingProcPcb ;//= newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE);
 }
 
 pcbPtr getPcbPtr(pPid pid)

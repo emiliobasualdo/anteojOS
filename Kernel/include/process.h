@@ -18,6 +18,7 @@
 
 #define MAX_PROC_NAME 70
 #define INIT_PID 0
+#define BUSSY_WAITING INIT_PID+1
 #define MAX_PROCS 100000
 #define PID_ERROR -1
 #define HEAP_STACK_SIZE 4000

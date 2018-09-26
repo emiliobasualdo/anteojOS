@@ -17,6 +17,8 @@ static boolean roundQueueAddNodeHead(rrNodePtr node, rrQueue *roundQueue);
 
 rrNodePtr normalQueuePop(rrQueue *queue);
 
+static void funcionAuxiliar(rrNodePtr node);
+
 /** Array estatico de la cola circular de los que están corriendo*/
 static rrQueue runningQueue;
 
@@ -285,12 +287,28 @@ static void changeToRespectiveQueue(rrNodePtr node)
             roundQueueAddNodeHead(node, &runningQueue);
             break;
         case BLOCKED:
-            normalQueueAddNodeTail(node, &blockedArr[node->pcbPtr->blockedReason]);
+            funcionAuxiliar(node);
             break;
         case DEAD:
             my_free(node);//process.c hará lo que quiera con el pcb
             break;
     }
+}
+
+/**
+ * Esta función es una patch de último minuto
+ * que resuelve un problema de comunicacíon que hubo
+ * entre los developers de RR(yo) y el de IPCs.
+ * Yo pense que YO me encargaba de TODOS los procesos bloqueados.
+ * Al final no, por ende no los guardo.
+ *  // todo mejorar para TP3
+ */
+static void funcionAuxiliar(rrNodePtr node)
+{
+    if(node->pcbPtr->blockedReason == MUTEX_BLOCK || node->pcbPtr->blockedReason == MESSAGE_PASSING)
+        my_free(node);
+    else
+        normalQueueAddNodeTail(node, &blockedArr[node->pcbPtr->blockedReason]);
 }
 
 /**

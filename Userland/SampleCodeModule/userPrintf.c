@@ -228,7 +228,7 @@ int printF(char *fmt, ...)
 	return r;
 }
 
-int simple_sprintf(char *buf, char *fmt, ...)
+int userSprintf(char *buf, char *fmt, ...)
 {
 	va_list ap;
 	int r;

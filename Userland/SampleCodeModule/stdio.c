@@ -122,3 +122,29 @@ char * toInt(char * string, int * k, int * resp)
     return string;
 }
 
+int getNum()
+{
+    char c;
+    char buffer[MAX_BUFFER];
+    int bufferIndex = 0;
+    while((c=getChar()) != '\n')
+    {
+        if(isDigit(c))
+        {
+            buffer[bufferIndex++] = c ;
+            putChar(c);
+        }
+        else if(c == '\b')
+        {
+            if (bufferIndex > 0)
+            {
+                removeChar();
+                bufferIndex--;
+            }
+        }
+    }
+    int num;
+    int flag;
+    toInt(buffer,&num, &flag);
+    return num;
+}

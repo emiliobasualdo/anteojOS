@@ -100,8 +100,13 @@ int backgroundTest(int argc, argVector argv);
 
 int kill(int argc, argVector argv);
 
+int multiProcTest(int count, argVector argv);
+
 
 /* Funciones auxiliares para las funciones de usuario*/
+
+int multiTest(int count, argVector argv);
+
 int endLessLoop();
 
 #endif

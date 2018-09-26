@@ -15,8 +15,9 @@ command commands[]={
         {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
         {"ps", "Prints all process. Usage ps [q]", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
-        {"back_test","Performs a test to prove the multiprocessing functionality", backgroundTest},
-        {"kill","Kill process. Usage: kill <pid>", kill},
+        {"back_test","Performs a test to prove the background functionality", backgroundTest},
+        {"multi_test","Performs a test to prove the multi-processing functionality",multiProcTest},
+        {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo>", kill},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -297,48 +298,83 @@ int procBomb(int argc, argVector argv)
 
 int kill(int argc, argVector argv)
 {
-    if (argc != 2)
+    int fromPid, toPid;
+    int flag = 0;
+    if (argc < 2)
     {
-        printF("%s\n", ARGUMENTS_AMOUNT_ERROR("1"));
-        printF("Usage: kill <pid>\n");
+        printF("Usage: kill <pid> or kill <pidFrom pidTo>\n");
         return FALSE;
     }
-    int flag = 0;
-    int pid = 0;
-    toInt(argv[1],&pid,&flag);
-    return userKill((uint64_t) pid);
-}
+    toInt(argv[1],&fromPid,&flag);
+    if (argc == 3)
+        toInt(argv[2],&toPid,&flag);
+    else
+        toPid = fromPid;
 
-int backgroundTest(int argc, argVector argv)
-{
-    argVector auxVec = {"ps", "l"};
-    printF("We will create and run a process in background so that you see that we are multi-processing\n.");
-    simple_sprintf("The process name is %s.\n", aux_programs[0].name);
-    printF("First we will print the current process list so that you see that program is not currently running\n\n");
-    printPs(0,auxVec);
-    printF("\nPress any key to execute the program\n");
-    getChar();
-    execProcInBackground(aux_programs[0].name, (uint64_t) aux_programs[0].fn);
-    printF("We will print again the process list so that you see the process running\n\n");
-    printPs(0, auxVec);
-    printF("\nWe will leave the program running for you to decide what to do with it\n");
-    printF("Remember you can kill it with the command kill <pid>\n");
-    printF("Goodbye :)\n");
+    for (int i = fromPid; i <= toPid; ++i) {
+        userKill((uint64_t) i);
+    }
     return TRUE;
 }
 
+int backgroundTest(int count, argVector argv)
+{
+    return multiTest(1, NULL);
+}
+
+int multiProcTest(int count, argVector argv)
+{
+    int num;
+    printF("This test will create many process and leave them running.\n");
+    printF("See how execution slows down as more process are running\n");
+    printF("How many process do you want to create?: ");
+    num = getNum();
+    printF("\n");
+    return multiTest(num, NULL);
+}
+
+
 /* Funciones auxiliares para los comandos de de usuario*/
+
+int multiTest(int count, argVector argv)
+{
+    char *message;
+    if (count == 1)
+        message = "running process in background";
+    else if(count < 1)
+        return FALSE;
+    else
+        message = "multi-processing";
+
+    argVector auxVec = {"ps", "l"};
+    printF("We will create and run %d process in background so that you see that we are %s.\n", count ,message);
+    printF("The process name is %s.\n", aux_programs[0].name);
+    printF("First we will print the current process list so that you see that program%s not currently running.\n\n", count==1?" is":"s are");
+    printPs(0,auxVec);
+    printF("\nPress any key to execute the program%s\n", count==1?"":"s");
+    getChar();
+    for (int i = 0; i < count; ++i) {
+        execProcInBackground(aux_programs[0].name, (uint64_t) aux_programs[0].fn);
+    }
+    printF("We will print again the process list so that you see the process %s running\n\n",count==1?"is":"are");
+    printPs(0, auxVec);
+    printF("\nWe will leave the program%s running for you to decide what to do with it\n",count==1?"":"s");
+    printF("Remember you can kill %s with the command kill <pid>\n",count==1?"it":"them");
+    printF("Goodbye :)\n");
+    return TRUE;
+}
 
 int endLessLoop()
 {
     static long long counter = 0;
     int pid = userGetCurrentPid();
-    printF("Hola! soy el proceso %d y estoy vivio!\n", pid);
+    printF("Hola! soy el proceso de pid:%d y estoy vivio!\n",pid);
     while (1)
     {
-        if (counter++ % 1000000000 == 0)
+        if (counter++ % 2000000000 == 0)
         {
             printF("Soy el proceso %d y sigo vivio! Matame si te animas\n", pid);
         }
     }
 }
+

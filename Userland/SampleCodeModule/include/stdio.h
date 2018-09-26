@@ -18,4 +18,6 @@ int scanF(char *, unsigned int, const char *,...);
 /* converts a string to integer */
 char * toInt(char *, int *, int *);
 
+int getNum();
+
 #endif

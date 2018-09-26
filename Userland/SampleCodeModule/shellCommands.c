@@ -334,6 +334,11 @@ int kill(int argc, argVector argv)
     else
         toPid = fromPid;
 
+    if(!flag)
+    {
+        printF("Usage: kill <pid> or kill <pidFrom pidTo>\n");
+        return FALSE;
+    }
     for (int i = fromPid; i <= toPid; ++i) {
         userKill((uint64_t) i);
     }
@@ -352,7 +357,8 @@ int multiProcTest(int count, argVector argv)
     printF("See how execution slows down as more process are running\n");
     printF("How many process do you want to create?: ");
     num = getNum();
-    printF("\n");
+    printF("%d\n", num);
+    return num;
     return multiTest(num, NULL);
 }
 
@@ -369,18 +375,17 @@ int multiTest(int count, argVector argv)
     else
         message = "multi-processing";
 
-    argVector auxVec = {"ps", "l"};
     printF("We will create and run %d process in background so that you see that we are %s.\n", count ,message);
     printF("The process name is %s.\n", aux_programs[0].name);
     printF("First we will print the current process list so that you see that program%s not currently running.\n\n", count==1?" is":"s are");
-    printPs(0,auxVec);
+    printPs(1,NULL);
     printF("\nPress any key to execute the program%s\n", count==1?"":"s");
     getChar();
     for (int i = 0; i < count; ++i) {
         execProcInBackground(aux_programs[0].name, (uint64_t) aux_programs[0].fn);
     }
     printF("We will print again the process list so that you see the process %s running\n\n",count==1?"is":"are");
-    printPs(0, auxVec);
+    printPs(1, NULL);
     printF("\nWe will leave the program%s running for you to decide what to do with it\n",count==1?"":"s");
     printF("Remember you can kill %s with the command kill <pid>\n",count==1?"it":"them");
     printF("Goodbye :)\n");

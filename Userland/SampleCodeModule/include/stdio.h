@@ -6,6 +6,7 @@
 #include "scLib.h"
 
 #define MAX_BUFFER 1024
+#define MAX_INT_DIGIT 20
 
 /* reads the buffer and returns the line written on stdin */
 char * reaDLine(char *, unsigned int);

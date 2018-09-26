@@ -82,11 +82,6 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
         simple_printf("ERROR: createProcess: newPcb = null\n");
         return NULL;
     }
-    if (!addChildToParentList(parentPid, newPcb->pid))
-    {
-        freeProcess(newPcb);
-        return NULL;
-    }
     //simple_printf("createProcess: ret=%d, name =%s\n", newPcb, newPcb->name);
     return newPcb;
 }
@@ -163,6 +158,16 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->stackFrame->rflags = RFLAGS_VALUE;
     newPcb->stackFrame->rsp = newPcb->rsp;
     newPcb->stackFrame->ss = SS_VALUE;
+
+    if(newPcb->pid != INIT_PID)
+    {
+        if (!addChildToParentList(parentPid, newPcb->pid))
+        {
+            simple_printf("Kernel message: No pudimos agregar este proceso como hijo\n");
+            freeProcess(newPcb);
+            return NULL;
+        }
+    }
 
     return newPcb;
 }

@@ -125,7 +125,7 @@ char * toInt(char * string, int * k, int * resp)
 int getNum()
 {
     char c;
-    char buffer[MAX_BUFFER];
+    char buffer[MAX_INT_DIGIT];
     int bufferIndex = 0;
     while((c=getChar()) != '\n')
     {
@@ -143,6 +143,7 @@ int getNum()
             }
         }
     }
+    buffer[bufferIndex] = 0;
     int num;
     int flag;
     toInt(buffer,&num, &flag);

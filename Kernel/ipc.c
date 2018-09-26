@@ -159,7 +159,7 @@ static void asyncReceive(msg_t * message);
 
 messageQueue * createNewMessageQueue()
 {
-    messageQueue * queue = my_malloc(sizeof(messageQueue));
+    messageQueue * queue = kernelMalloc(sizeof(messageQueue));
     queue->first = NULL;
     queue->last = NULL;
     queue->count = 0;
@@ -178,7 +178,7 @@ static void createNewMessage(messageQueue* queue, uint64_t pidSender, uint64_t p
     msg_t message;
     message.pidReceiver = pidReceiver;
     int length = strlen(messageBody);
-    message.content = my_malloc(length+1);
+    message.content = kernelMalloc(length+1);
     memcpy(message.content, messageBody,strlen(messageBody));
     message.content[length] = 0;
     message.pidSender = pidSender;
@@ -227,9 +227,9 @@ void enqueueMessage(messageQueue* queue, msg_t message)
     {
         return;
     }
-    messageNode * mNode = my_malloc(sizeof(messageNode));
+    messageNode * mNode = kernelMalloc(sizeof(messageNode));
     int length = strlen(message.content);
-    mNode->message.content = my_malloc(length+1);
+    mNode->message.content = kernelMalloc(length+1);
     mNode->message.content[length] = 0;
     mNode->next = NULL;
     mNode->message.pidSender = message.pidSender;
@@ -262,7 +262,7 @@ void dequeueMessage(messageQueue* queue, msg_t * message)
         message->pidSender = node->message.pidSender;
         message->pidReceiver = node->message.pidReceiver;
         int length = strlen(node->message.content);
-        message->content = my_malloc(strlen(node->message.content)+1);
+        message->content = kernelMalloc(strlen(node->message.content)+1);
         memcpy(message->content, node->message.content, strlen(node->message.content));
         message->content[length] = 0;
         queue->first = queue->first->next;
@@ -271,7 +271,7 @@ void dequeueMessage(messageQueue* queue, msg_t * message)
             queue->first = NULL;
             queue->last = NULL;
         }
-        my_free(node);
+        kernelFree(node);
     }
 }
 
@@ -385,7 +385,7 @@ uint64_t receiveMessage(char ** message, void (*function)(char*), boolean flag)/
     }
     asyncReceive(&aux);
     int length = strlen(aux.content);
-    *message = my_malloc(length+1);
+    *message = kernelMalloc(length+1);
     memcpy((*message), aux.content, length);
     (*message)[length] = 0;
     return 0;

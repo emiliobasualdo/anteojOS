@@ -1,15 +1,19 @@
-//
-// Created by Emilio Basualdo on 9/26/18.
-//
+#include "include/pageAllocator.h"
 
-#include <system.h>
-#include "pageAllocator.h"
+static uint64_t getPagesSize(size_t size);
 
-uint64_t start;
-boolean initAllocator(uint64_t firstMemPosition)
+void * pageAlloc(size_t size)
 {
-    start = firstMemPosition;
+    uint64_t pageSize = getPagesSize(size);
+    return alloc(pageSize);
+}
 
+static uint64_t getPagesSize(size_t size)
+{
+    return ((uint64_t)(size/PAGE_SIZE) + 1) * PAGE_SIZE;
+}
 
-    return TRUE;
+void pageFree (void * address)
+{
+    dealloc(address);
 }

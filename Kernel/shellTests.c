@@ -1,7 +1,3 @@
-//
-// Created by Emilio Basualdo on 9/24/18.
-//
-
 #include "shellTests.h"
 
 #define PROC_COUNT 30

@@ -52,7 +52,7 @@ void setBackgroundColour(uint8_t , uint8_t , uint8_t );
 /* system call to change coordinates */
 void setCoordinates(unsigned int, unsigned int);
 
-void *userMalloc(uint64_t x);
+void * userMalloc(uint64_t x);
 
 void userFree(uint64_t x);
 
@@ -74,5 +74,7 @@ int userProcessBomb();
 /* returns the current process id*/
 int userGetCurrentPid();
 
+/* runs the allocator test on kernel */
+void kernelAllocatorTest();
 
 #endif

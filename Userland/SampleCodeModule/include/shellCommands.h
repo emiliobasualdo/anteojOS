@@ -24,7 +24,6 @@
 
 #define FONT 2
 #define BACK 1
-#define NUM_COMMANDS 12           // cantidad de comandos disponibles
 
 typedef char argVector[MAX_ARGS][MAX_ARG_LENGTH];
 
@@ -101,6 +100,8 @@ int backgroundTest(int argc, argVector argv);
 int kill(int argc, argVector argv);
 
 int multiProcTest(int count, argVector argv);
+
+int allocatorTest(int count, argVector argv);
 
 
 /* Funciones auxiliares para las funciones de usuario*/

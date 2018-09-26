@@ -1,6 +1,3 @@
-//
-// Created by Emilio Basualdo on 9/4/18.
-
 #include <roundRobin.h>
 
 static boolean rrIsEmpty(rrQueue *pQueue);
@@ -36,7 +33,7 @@ static char *reasonNames[] = {"Keyboard", "No_Reason", "Mutex", "Message"}; // l
 boolean rrInit(pcbPtr pcbPtr)
 {
     simple_printf("rrInit: init\n");
-    rrNodePtr newNode = my_malloc(sizeof(rrNode));
+    rrNodePtr newNode = kernelMalloc(sizeof(rrNode));
 
     runningQueue.tail = runningQueue.current = runningQueue.head = newNode;
     newNode->pcbPtr = pcbPtr;
@@ -55,7 +52,7 @@ static boolean rrIsEmpty(rrQueue *pQueue)
 
 static boolean roundQueueAddTail(pcbPtr pcbPtr, rrQueue *roundQueue)
 {
-    rrNodePtr newNode = my_malloc(sizeof(rrNode));
+    rrNodePtr newNode = kernelMalloc(sizeof(rrNode));
     if (newNode == NULL)
     {
         simple_printf("roundQueueAddTail: ERROR: newNode == NULL\n");
@@ -290,7 +287,7 @@ static void changeToRespectiveQueue(rrNodePtr node)
             funcionAuxiliar(node);
             break;
         case DEAD:
-            my_free(node);//process.c hará lo que quiera con el pcb
+            kernelFree(node);       //process.c hará lo que quiera con el pcb
             break;
     }
 }
@@ -306,7 +303,7 @@ static void changeToRespectiveQueue(rrNodePtr node)
 static void funcionAuxiliar(rrNodePtr node)
 {
     if(node->pcbPtr->blockedReason == MUTEX_BLOCK || node->pcbPtr->blockedReason == MESSAGE_PASSING)
-        my_free(node);
+        kernelFree(node);
     else
         normalQueueAddNodeTail(node, &blockedArr[node->pcbPtr->blockedReason]);
 }
@@ -338,7 +335,8 @@ boolean rrUnblockWaiters(reasonT reason)
     return TRUE;
 }
 
-rrNodePtr normalQueuePop(rrQueue *queue) {
+rrNodePtr normalQueuePop(rrQueue *queue)
+{
     rrNodePtr node = queue->head;
     if (node)
     {
@@ -347,7 +345,9 @@ rrNodePtr normalQueuePop(rrQueue *queue) {
         queue->count--;
         // si era el ultimo
         if (queue->head == NULL || queue->count == 0)
+        {
             resetQueue(queue);
+        }
     }
     return node; // si es NULL lo retorna tambien
 }

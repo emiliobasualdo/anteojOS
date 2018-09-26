@@ -8,6 +8,7 @@
 #define charWidth 8
 #define charHeight 16
 #define SPACE_BETWEEN_LINES 4
+#define PADDING 40
 
 typedef struct Colour
 {

@@ -1,6 +1,3 @@
-//
-// Created by Emilio Basualdo on 9/14/18.
-//
 //https://www.geeksforgeeks.org/queue-set-1introduction-and-array-implementation/
 // C program for array implementation of queue
 #include <queue.h>
@@ -9,21 +6,25 @@
 // It initializes size of queue as 0
 struct Queue* createQueue(unsigned capacity)
 {
-    struct Queue* queue = (struct Queue*) my_malloc(sizeof(struct Queue));
+    struct Queue* queue = (struct Queue*) kernelMalloc(sizeof(struct Queue));
     queue->capacity = capacity;
     queue->front = queue->size = 0;
     queue->rear = capacity - 1;  // This is important, see the enqueue
-    queue->array = (int*) my_malloc(queue->capacity * sizeof(int));
+    queue->array = (int*) kernelMalloc(queue->capacity * sizeof(int));
     return queue;
 }
 
 // Queue is full when size becomes equal to the capacity
 int isFull(struct Queue* queue)
-{  return (queue->size == queue->capacity);  }
+{
+    return (queue->size == queue->capacity);
+}
 
 // Queue is empty when size is 0
 int isEmpty(struct Queue* queue)
-{  return (queue->size == 0); }
+{
+    return (queue->size == 0);
+}
 
 // Function to add an item to the queue.
 // It changes rear and size

@@ -2,7 +2,7 @@
 #define IPCSTRUCTS_H
 
 #include <stdint.h>
-#include "queue.h"
+#include <queue.h>
 
 typedef int pPid;
 

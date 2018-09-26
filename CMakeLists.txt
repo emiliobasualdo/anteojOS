@@ -9,12 +9,9 @@ include_directories(Userland/SampleCodeModule/include)
 
 add_executable(anteojos
         Bootloader
-        cmake-build-debug
         Kernel
         Toolchain
         Userland
-        docker.sh
         Dockerfile
         Makefile
-        run.sh
         Kernel/beepDriver.c)

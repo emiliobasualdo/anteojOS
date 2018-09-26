@@ -109,15 +109,6 @@
 		<Unit filename="/Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS/Userland">
 			<Option target="anteojos"/>
 		</Unit>
-		<Unit filename="/Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS/cmake-build-debug">
-			<Option target="anteojos"/>
-		</Unit>
-		<Unit filename="/Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS/docker.sh">
-			<Option target="anteojos"/>
-		</Unit>
-		<Unit filename="/Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS/run.sh">
-			<Option target="anteojos"/>
-		</Unit>
 		<Unit filename="/Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP2/anteojOS/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

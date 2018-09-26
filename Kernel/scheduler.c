@@ -103,7 +103,7 @@ static boolean schedulerAddProc(pcbPtr proc)
 {
     if(proc == NULL)
     {
-        simple_printf("createAndExecProcess: ERROR: proc == NULL\n");
+        simple_printf("createAndExecProcess: ERROR: proc1 == NULL\n");
         return FALSE;
     }
     boolean resp = rrAddProcess(proc);
@@ -126,7 +126,7 @@ void printtt(uint64_t num)
 void switchToNext()
 {
     pcbPtr proc = nextProcess();
-    //simple_printf("switchToNext: cambiando por: name=%s \n", proc->name);
+    //simple_printf("switchToNext: cambiando por: name=%s \n", proc1->name);
     switchTo(proc->rsp);
     simple_printf("!!!!!Volviendo de switchToNext..... No deberiamos estar aca!!!!!\n");
 }

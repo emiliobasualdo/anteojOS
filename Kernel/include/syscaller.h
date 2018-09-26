@@ -10,7 +10,7 @@
 #include <shellTests.h>
 #include "ipc.h"
 
-#define NFUNCTIONS 27                             // number of functions
+#define NFUNCTIONS 28                             // number of functions
 
 /* eax = 1
 ** draws a string with a given string in rdi
@@ -108,17 +108,17 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
 uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 20
-** Edits process state
+** kills a proces process state
 */
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 21
-** Edits process state
+** makes a process bomb
 */
 uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 22
- ** destroys a mutex
+ ** returns the current pid
  */
  uint64_t getCurrentPid(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
@@ -151,5 +151,6 @@ uint64_t unlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t
  ** destroys a mutex
  */
 uint64_t destroyMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
 
 #endif

@@ -50,8 +50,6 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
     if (!init) {
         simple_printf("ERROR: initProcessControl: Alguno es null\n");
         freeProcess(init);
-        my_free(array); // <--- no se si es necesario todo
-        simple_printf("ERROR: initProcessControl: liberamos\n");
         return NULL;
     }
     bussyWaitingProcPcb = createProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, FALSE);
@@ -179,7 +177,7 @@ boolean isValidPid(pPid pid) {
 
 static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca tengo que liberar todo
 {
-    if (proc && isValidPid(proc->pid))
+    if (proc)
     {
         int i;
         msg_t * msg = NULL;
@@ -189,7 +187,9 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
             my_free(msg->content);
         }
         my_free(proc->postBox);
-        array[proc->pid] = NULL;
+        if (isValidPid(proc->pid))
+            array[proc->pid] = NULL;
+        my_free((void *) proc->heapBase);
         my_free(proc);
     }
 }
@@ -231,7 +231,7 @@ static pPid getNextPid()
         }
         index = (index % maxPid )+1;
     }while (index != nextPid);
-    simple_printf("getNextPid: ERROR: no hay mas pids disponibles\n");
+    simple_printf("Kernel message: ERROR: no hay mas pids disponibles\n");
     return PID_ERROR; // pegue la vuelta completa
 }
 
@@ -264,9 +264,13 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
         else
             simple_printf("Kernel message: process %d is now dead\n",pid);
     }
+    // si es de background no quiero que tenga acceso al teclado
+    if (newState == BLOCKED && reason == KEYBOARD && array[pid]->foreground == FALSE)
+        newState = DEAD;
+
     array[pid]->state = newState;
     array[pid]->blockedReason = reason;
-    //simple_printf("setProcessState: proc=%s, state=%d\n", array[pid]->name, array[pid]->state);
+    //simple_printf("setProcessState: proc1=%s, state=%d\n", array[pid]->name, array[pid]->state);
     if (pid == getCurrentProc()->pid && (newState == BLOCKED || newState == DEAD))
     {
         _hlt();
@@ -306,10 +310,9 @@ void printProcs()
  * */
 int procContainer(uint64_t inst)
 {
-
     int(*func)(void) = (int (*)(void)) inst;
     int ret = func();
-    simple_printf("\nKernel Message: Process %s with pid %d died, with return=%d\n",getCurrentProc()->name, getCurrentProc()->pid, ret);
+    simple_printf("Kernel Message: Process %s with pid %d died, with return=%d\n",getCurrentProc()->name, getCurrentProc()->pid, ret);
 
     procsDeathCleanUp(getCurrentProc());
     switchToNext(); // cambio forzado de contexto sin esperar al timer tick
@@ -341,7 +344,6 @@ static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
         parent->childs[j] = parent->childs[i];
     }
     parent->childrenCount--;
-    pPid procPid = proc->pid;
     IRQ_OFF // si o si, porque no puede suceder una sin la otra
     proc->state = DEAD;
     freeProcess(proc);

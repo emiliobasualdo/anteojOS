@@ -20,7 +20,7 @@
 #define INIT_PID 0
 #define MAX_PROCS 100000
 #define PID_ERROR -1
-#define HEAP_STACK_SIZE 2000
+#define HEAP_STACK_SIZE 4000
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518

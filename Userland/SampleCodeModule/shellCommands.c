@@ -15,7 +15,7 @@ command commands[]={
         {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
         {"ps", "Prints all process. Usage ps [q]", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
-        {"back_test","Performs a test to prove the background/foreground usage", backgroundTest},
+        {"back_test","Performs a test to prove the multiprocessing functionality", backgroundTest},
         {"kill","Kill process. Usage: kill <pid>", kill},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
@@ -66,17 +66,9 @@ int execProcInBackground(char *name, uint64_t intstruction)
 /** A partir de aca van los comandos para el usuario*/
 int help (int argc, argVector argv)
 {
-    if (argc > 1)
+    for (int i=0; commands[i].name; i++)
     {
-        printF("%s\n", CERO_ARGUMENTS_ERROR);
-        return 0;
-    }
-    else
-    {
-        for (int i=0; commands[i].name; i++)
-        {
-            printF("%s: %s\n",commands[i].name ,commands[i].description);
-        }
+        printF("%s: %s\n",commands[i].name ,commands[i].description);
     }
     return 1;
 }
@@ -114,44 +106,24 @@ int echo (int argc, argVector argv)
 
 int time (int argc, argVector argv)
 {
-    if (argc > 1)
-    {
-        printF("%s\n", CERO_ARGUMENTS_ERROR);
-        return 0;
-    }
     printF("Current time: %d:%d:%d\n", getTimezoneHour(), getMinute(), getSecond());
     return 1;
 }
 
 int clear (int argc, argVector argv)
 {
-    if (argc > 1)
-    {
-        printF("%s\n", CERO_ARGUMENTS_ERROR);
-        return 0;
-    }
     newShell();
     return 1;
 }
 
 int beep (int argc, argVector argv)
 {
-    if (argc > 1)
-    {
-        printF("%s\n", CERO_ARGUMENTS_ERROR);
-        return 0;
-    }
     kernelBeep();
     return 1;
 }
 
 int exitShell (int argc, argVector argv)
 {
-    if (argc > 1)
-    {
-        printF("%s\n", CERO_ARGUMENTS_ERROR);
-        return 0;
-    }
     return EXIT_CMMD;
 }
 
@@ -223,11 +195,6 @@ int changeColour(void(*f)(Colour), int flag)
 
 int digital_clock(int argc, argVector argv)
 {
-    if (argc > 1)
-    {
-        printF("%s\n", CERO_ARGUMENTS_ERROR);
-        return 0;
-    }
     showClock(NORMAL_MODE);
     clear(argc,argv);
     return 1;
@@ -345,7 +312,8 @@ int kill(int argc, argVector argv)
 int backgroundTest(int argc, argVector argv)
 {
     argVector auxVec = {"ps", "l"};
-    printF("We will create and run a process in background. The process name is %s\n", aux_programs[0].name);
+    printF("We will create and run a process in background so that you see that we are multi-processing\n.");
+    simple_sprintf("The process name is %s.\n", aux_programs[0].name);
     printF("First we will print the current process list so that you see that program is not currently running\n\n");
     printPs(0,auxVec);
     printF("\nPress any key to execute the program\n");

@@ -7,7 +7,7 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                myExit, putChar, removeChar,
                                changeBackgroundColour, setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
-                               createMutex, lock, unlock, destroyMutex };
+                               createMutex, lock, unlock, destroyMutex};
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -159,3 +159,4 @@ uint64_t destroyMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
 {
     return destroyMutexK((int)rdi);
 }
+

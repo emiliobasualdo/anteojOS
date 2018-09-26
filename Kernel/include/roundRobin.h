@@ -31,5 +31,7 @@ boolean rrAddProcess(pcbPtr pcbPtr);
 pcbPtr rrNextAvailableProcess();
 boolean rrUnblockWaiters(reasonT reason);
 void printRRQueues();
+void setQuantum(int newQuantum);
+int getQuantum();
 
 #endif //PROCESOS_PDOUBLYLINKEDLIST_H

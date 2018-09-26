@@ -4,15 +4,57 @@
 
 #include "shellTests.h"
 
+#define PROC_COUNT 30
+/*
+
+#define COUNT MOD * 7
 #define MOD 100000000
-#define PROC_COUNT 20
+#define TIMES 4
+#define PROCS 2
+#define INCREMENT 7
 
+int proc2()
+{
+    long long counter = 0;
+    simple_printf("Soy %s pid=%d y naci\n",getCurrentProc()->name, getCurrentProc()->pid);
+    while (counter++ < COUNT)
+    {
+        if (counter % MOD == 0)
+            simple_printf("Soy %s pid=%d, llegúe a un múltiplo=%d\n",getCurrentProc()->name, getCurrentProc()->pid, counter);
+    }
+    return TRUE;
+}
 
-int proc()
+int multiProcessTest()
+{
+    simple_printf("\nVamos a ejecutar %d procesos simultaneamente\n", PROCS);
+    simple_printf("Los %d procesos cuentan hasta %d e imprimen un mensaje cada vez que llegan a un multiplo de %d\n",PROCS,COUNT, MOD);
+    simple_printf("Esto se va a hacer %d veces, y en cada ronda incrementaremos el Quantum del Round Robin en %d\n",TIMES, INCREMENT);
+    simple_printf("La idea es que puedas ver como corren los procesos en distintos tiempos de Round Robin\n");
+    simple_printf("!Cada vez que apretes una tecla se comenzará con la siguiente ronda. Apreta 'q' para salir!\n");
+    int quantum, initQuantum;
+    initQuantum = quantum = getQuantum();
+    char c = 0;
+    for (int j = 0; j < TIMES && c != 'q'; ++j) {
+        simple_printf("\nRonda Nº:%d , Quantum=%d. Apreta cualquier tecla para comenzar esta ronda\n",j, getQuantum());
+        c = getNextChar();
+        for (int i = 0; i < PROCS && c != 'q'; ++i) {
+            createAndExecProcess(NULL, (uint64_t) proc2, getCurrentProc()->pid, FALSE);
+        }
+        c = getNextChar();
+        quantum+=INCREMENT;
+        setQuantum(quantum);
+    }
+    setQuantum(initQuantum);
+    return TRUE;
+}
+*/
+
+int proc1()
 {
     simple_printf("Hola!! soy %s y estoy creando hijos\n", getCurrentProc()->name);
-    createAndExecProcess(NULL, (uint64_t)proc, getCurrentProc()-> pid, FALSE);
-    proc();
+    createAndExecProcess(NULL, (uint64_t) proc1, getCurrentProc()->pid, FALSE);
+    proc1();
     return -1;
 }
 
@@ -22,17 +64,18 @@ boolean processBomb()
     simple_printf("We will run a pseudo process-bomb.\n");
     simple_printf("Basicly we will create and execute %d process and see what happen.\n", PROC_COUNT);
     simple_printf("The process's code is:\n");
-    simple_printf("int proc()\n"
+    simple_printf("int proc1()\n"
                   "{\n"
                   "    simple_printf(\"Hola!! soy %s y estoy creando hijos\\n\", getCurrentProc()->name);\n"
-                  "    createAndExecProcess(NULL, (uint64_t)proc, getCurrentProc()-> pid, FALSE);\n"
-                  "    proc();\n"
+                  "    createAndExecProcess(NULL, (uint64_t) proc1, getCurrentProc()->pid, FALSE);\n"
+                  "    proc1();\n"
                   "    return -1;\n"
                   "}");
     simple_printf("\nPress any key to start\n");
     getNextChar();
+    getNextChar();
     simple_sprintf(name,"%sc","process_bomb");
-    createAndExecProcess(name, (uint64_t) proc, getCurrentProc()->pid, FALSE);
+    createAndExecProcess(name, (uint64_t) proc1, getCurrentProc()->pid, FALSE);
     simple_printf("If we got here is because this OS is the best at handling process bombs ;)\n");
     return TRUE;
 }

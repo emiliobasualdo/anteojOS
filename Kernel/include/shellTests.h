@@ -6,9 +6,12 @@
 #include <system.h>
 #include <keyboardDriver.h>
 #include "ipc.h"
+#include <roundRobin.h>
 
 boolean processBomb();
-int proc();
+int proc1();
+int proc2();
+int multiProcessTest();
 void mutexTest();
 void messageTest();
 

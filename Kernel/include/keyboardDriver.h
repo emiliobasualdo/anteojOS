@@ -6,12 +6,14 @@
 #include <scheduler.h>
 
 #define BUFFERSIZE 1024
+#define UP -2
+#define DOWN -3
 
 /* gets the key pressed from stdout */
 extern int getKey(void);
 
 /* interprets the key pressed to a character and adds it to the buffer */
-void keyboardInterpreter();
+int keyboardInterpreter();
 
 /* adds a character to the current buffer */
 void charToBuffer(unsigned char);

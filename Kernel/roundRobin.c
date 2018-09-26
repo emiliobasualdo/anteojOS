@@ -23,7 +23,7 @@ static rrQueue runningQueue;
 /** Array estatico de colas bloqueadas*/
 static rrQueue blockedArr[REASON_COUNT];
 
-static unsigned long rrQuantum = 4;
+static int rrQuantum = 3;
 
 static char *reasonNames[] = {"Keyboard", "No_Reason", "Mutex", "Message"}; // lo puse aca porque en el .h me tiraba problemas de include
 
@@ -169,7 +169,7 @@ static void printNormalQueue(rrQueue *queue)
 
 boolean rrAddProcess(pcbPtr pcbPtr)
 {
-    //simple_printf("rrAddProcess: adding. vamos a imprimir despues de agregar a proc=%s\n", pcbPtr->name);
+    //simple_printf("rrAddProcess: adding. vamos a imprimir despues de agregar a proc1=%s\n", pcbPtr->name);
     boolean resp = roundQueueAddTail(pcbPtr, &runningQueue);
     //printRRQueues();
     return resp;
@@ -288,7 +288,7 @@ static void changeToRespectiveQueue(rrNodePtr node)
             normalQueueAddNodeTail(node, &blockedArr[node->pcbPtr->blockedReason]);
             break;
         case DEAD:
-            my_free(node);
+            my_free(node);//process.c hará lo que quiera con el pcb
             break;
     }
 }
@@ -337,4 +337,14 @@ rrNodePtr normalQueuePop(rrQueue *queue) {
 static boolean validReason(reasonT reason)
 {
     return reason >= 0 && reason < REASON_COUNT;
+}
+
+void setQuantum(int newQuantum)
+{
+    rrQuantum = newQuantum;
+}
+
+int getQuantum()
+{
+    return rrQuantum;
 }

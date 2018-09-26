@@ -19,13 +19,14 @@ int bufferWrite = 0;
 int bufferRead = 0;
 int size = 0;
 
-void keyboardInterpreter()
+int keyboardInterpreter()
 {
     unsigned char key = (unsigned char) getKey();
     if (key & 0x80)
     {
         if(key == 0xAA || key == 0xB6)
             shift = 0;
+        return UP;
     }
     else
     {
@@ -50,6 +51,7 @@ void keyboardInterpreter()
             c = keyboardShiftList[key];
         }
         charToBuffer((unsigned char) c);
+        return DOWN;
     }
 }
 

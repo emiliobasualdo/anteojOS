@@ -147,3 +147,8 @@ void printProcQueues()
 {
     printRRQueues();
 }
+
+boolean schedulerAddProcPid(pPid proc)
+{
+    return schedulerAddProc(getPcbPtr(proc));
+}

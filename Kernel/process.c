@@ -155,6 +155,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->foreground = foreground;
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
+    newPcb->postBox = createNewMessageQueue();
 
     newPcb->stackFrame = (stackFrame_t *) newPcb->rsp;
     newPcb->stackFrame->rdi = instruction;
@@ -180,6 +181,14 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
 {
     if (proc && isValidPid(proc->pid))
     {
+        int i;
+        msg_t * msg = NULL;
+        for(i = 0; proc->postBox->count > 0;i++)
+        {
+            dequeueMessage(proc->postBox, msg);
+            my_free(msg->content);
+        }
+        my_free(proc->postBox);
         array[proc->pid] = NULL;
         my_free(proc);
     }
@@ -348,4 +357,13 @@ int bussyWaitingProc()
 pcbPtr getBussyWaitingProcPcb()
 {
     return bussyWaitingProcPcb;
+}
+
+pcbPtr getPcbPtr(pPid pid)
+{
+    if(isValidPid(pid))
+    {
+        return array[pid];
+    }
+    return NULL;
 }

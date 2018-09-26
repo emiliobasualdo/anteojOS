@@ -60,7 +60,6 @@ void setCoordinates(unsigned int x, unsigned int y)
 {
     syscall(15, (uint64_t)x, (uint64_t)y, 0, 0, 0);
 }
-
 void *userMalloc(uint64_t x)
 {
     return (void*)syscall(16, (uint64_t)x, 0, 0, 0, 0);
@@ -69,7 +68,6 @@ void userFree(uint64_t x)
 {
     syscall(17, (uint64_t)x, 0, 0, 0, 0);
 }
-
 void userPs(char x)
 {
     syscall(18, (uint64_t)x, 0, 0, 0, 0);

@@ -217,6 +217,3 @@ void setSaverTime(int num)
 {
     saverTime = num;
 }
-
-
-

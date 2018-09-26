@@ -6,7 +6,8 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                sleep, userDrawPixel, getResolutions, changeFontColour,
                                myExit, putChar, removeChar,
                                changeBackgroundColour, setCoordinates, sysMalloc, sysFree,
-                               printProcess, startProcess, kill, procBomb, getCurrentPid};
+                               printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
+                               createMutex, lock, unlock, destroyMutex };
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -124,8 +125,37 @@ uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64
 {
     return (uint64_t) processBomb();
 }
-
 uint64_t getCurrentPid(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t) getCurrentProc()->pid;
+}
+
+uint64_t send(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return sendMessage((pPid)rdi, (char *)rsi, (char *)rdx, (boolean)rcx);
+}
+
+uint64_t receive(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return receiveMessage((char **) rdi, NULL, 1);
+}
+
+uint64_t createMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return startMutex();
+}
+
+uint64_t lock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return lockMutex((int)rdi);
+}
+
+uint64_t unlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return unlockMutex((int)rdi);
+}
+
+uint64_t destroyMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return destroyMutexK((int)rdi);
 }

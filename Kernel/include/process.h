@@ -7,13 +7,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <pList.h>
 #include <system.h>
 #include <videoDriver.h>
 #include <myAlloc.h>
 #include <defs.h>
 #include <stdarg.h>
 #include <queue.h>
+#include "ipcStructs.h"
 
 
 #define MAX_PROC_NAME 70
@@ -30,7 +30,7 @@
 
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
-typedef enum {KEYBOARD=0, NO_REASON, REASON_COUNT}reasonT;
+typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;
 
 typedef int pPid;
 
@@ -82,6 +82,7 @@ typedef struct
     unsigned int childrenCount;
 
     int creationLimit;
+    messageQueue * postBox;
 }pcb;
 
 
@@ -101,5 +102,6 @@ boolean setProcessState(pPid pcbPtr, pState newState, reasonT reason);
 pcbPtr getBussyWaitingProcPcb();
 int bussyWaitingProc();
 void printProcs();
+pcbPtr getPcbPtr(pPid pid);
 
 #endif //PROCESOS_PROCESS_H

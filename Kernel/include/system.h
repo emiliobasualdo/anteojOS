@@ -20,4 +20,6 @@
 typedef int boolean;
 
 char *myStrncpy(char *dst, const char*src, unsigned int n);
+int strcmp(char *, char *);
+int strlen(char *);
 #endif //PROCESOS_SYSTEM_H

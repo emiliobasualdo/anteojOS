@@ -10,6 +10,8 @@
 #include <system.h>
 #include <sleep.h>
 #include <syscaller.h>
+#include "ipc.h"
+#include "shellTests.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -86,52 +88,16 @@ void * initializeKernelBinary() // todo ver clearBSS
     return getStackBase();
 }
 
-int process()
-{
-    simple_printf("hola soy %s y me estoy inciando\n", getCurrentProc()->name);
-    static unsigned long count = 0;
-    while (1)
-    {
-        count++;
-        if (count % 600000000 == 0)
-        {
-            simple_printf("Soy %s y la estoy quedando\n", getCurrentProc()->name);
-            return -11;
-        }
-    }
-    return 0;
-}
-
-int meAseguraQueSiempreHayaUnProcCorriendo()
-{
-    static unsigned long count = 0;
-    while (1)
-    {
-        count++;
-        if (count % 1000000000 == 0)
-        {
-            //simple_printf("Estoy vivo! mi pid=%d\n",getCurrentProc()->pid);
-        }
-    }
-    return 0;
-}
-
 void theAllMighty(void)
 {
     simple_printf("The all mighty\n");
-/*    if (!createAndExecProcess("Asegurador", (uint64_t) meAseguraQueSiempreHayaUnProcCorriendo, getCurrentProc()->pid, FALSE))
-    {
-        simple_printf("theAllMighty: ERROR: otro == NULL\n");
-        return;
-    }*/
-    if (!createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE))
+    if (createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE) == PID_ERROR)
     {
         simple_printf("theAllMighty: ERROR: shell == NULL\n");
         return;
     }
     loadIDT();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
-
     simple_printf("theAllMighty: despues de bloquearse\n");
     simple_printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
     simple_printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
@@ -140,7 +106,7 @@ void theAllMighty(void)
 
 int main()
 {
-    if (!initKernelAlloc(0x600000) )
+    if (!initKernelAlloc(0x600000))
     {
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;
@@ -158,4 +124,3 @@ int main()
     simple_printf("\nX////////////////////////////XX\n");
     return 0;
 }
-

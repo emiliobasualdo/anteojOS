@@ -19,5 +19,6 @@ void printtt(uint64_t num);
 void switchToNext();
 boolean wakeUpBlocked(reasonT reason);
 void printProcQueues();
+boolean schedulerAddProcPid(pPid proc);
 
 #endif //PROCESOS_SCHEDULER_H_H

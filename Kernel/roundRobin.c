@@ -25,7 +25,7 @@ static rrQueue blockedArr[REASON_COUNT];
 
 static unsigned long rrQuantum = 4;
 
-static char *reasonNames[] = {"Keyboard", "No_Reason"}; // lo puse aca porque en el .h me tiraba problemas de include
+static char *reasonNames[] = {"Keyboard", "No_Reason", "Mutex", "Message"}; // lo puse aca porque en el .h me tiraba problemas de include
 
 /**
  * siempre vamos a asumir que scheduler nos pasa
@@ -73,8 +73,6 @@ static boolean roundQueueAddNodeTail(rrNodePtr node, rrQueue *roundQueue)
         resetQueue(roundQueue);
         roundQueue->head = roundQueue->tail = roundQueue->current = node;
     }
-    //simple_printf("roundQueueAddNodeTail: node=%d roundQueue=%d\n", node, roundQueue);
-    //simple_printf("\nroundQueueAddNodeTail: tail=%d current=%d,tail->Next=%d  count=%d\n", roundQueue->tail, roundQueue->current, roundQueue->tail->next,  roundQueue->count);
     roundQueue->tail->next = node;
     roundQueue->tail = node;
     node->next = roundQueue->current;
@@ -200,10 +198,10 @@ pcbPtr rrNextAvailableProcess()
     {
         runningQueue.current->quantum = 0;
     }
-
     // no son null por el rrIsEmpty()
     rrNodePtr prevNode = runningQueue.current; // el que venia corriendo hasta recien
     rrNodePtr curNode = runningQueue.current->next; // el que apunta el de recien
+
     do
     {
         switch (curNode->pcbPtr->state)
@@ -217,7 +215,6 @@ pcbPtr rrNextAvailableProcess()
                 return runningQueue.current->pcbPtr;
             case BLOCKED: // lo mandamos a donde debería estar y lo sacamos de la lista
             case DEAD: // lo scamos de la lista
-                //simple_printf("rrNextAvailableProcess: name=%s esta blocked o dead\n", curNode->pcbPtr->name);
                 roundQueueRemoveNode(prevNode, curNode, &runningQueue);
                 changeToRespectiveQueue(curNode);
 
@@ -285,7 +282,6 @@ static void changeToRespectiveQueue(rrNodePtr node)
         case BORN:
         case READY:
         case RUNNING:
-            //roundQueueAddNodeTail(node, &runningQueue);
             roundQueueAddNodeHead(node, &runningQueue);
             break;
         case BLOCKED:

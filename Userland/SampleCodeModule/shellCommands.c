@@ -13,7 +13,7 @@ command commands[]={
         {"timezone", "Allows the user to change the current timezone. Usage: timezone [int]",timezone},
         //{"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
         {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
-        {"ps", "Prints all process. Usage ps [q]", printPs},
+        {"ps", "Prints all process. Usage ps or ps <q> or ps <p pid>", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
         {"back_test","Performs a test to prove the background functionality", backgroundTest},
         {"multi_test","Performs a test to prove the multi-processing functionality",multiProcTest},
@@ -287,8 +287,31 @@ int exceptionTester(int argc, argVector argv)
 
 int printPs(int argc, argVector argv)
 {
-    userPs(argv[1][0]);
-    return 1;
+    int pid = 0;
+    int flag;
+    switch (argc)
+    {
+        case 1:
+            userPs(0, 0);
+            break;
+        case 2:
+            if (argv[1][0] == 'q')
+                userPs('q', 0);
+            else
+                printF("Usage: Usage: ps or ps <q> or ps <p pid>\n");
+            break;
+        case 3:
+            toInt(argv[2], &pid, &flag);
+            if (flag)
+                userPs('p',pid);
+            else
+                printF("Usage: Usage: ps or ps <q> or ps <p pid>\n");
+            break;
+        default:
+            printF("Usage: Usage: ps or ps <q> or ps <p pid>\n");
+    }
+
+    return TRUE;
 }
 
 int procBomb(int argc, argVector argv)

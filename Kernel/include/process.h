@@ -102,8 +102,9 @@ boolean isValidPState(int state);
 boolean setProcessState(pPid pcbPtr, pState newState, reasonT reason);
 pcbPtr getBussyWaitingProcPcb();
 int bussyWaitingProc();
-void printProcs();
+void printAllProcs();
 pcbPtr getPcbPtr(pPid pid);
 boolean isAlive(pPid pid);
+void printSons(pPid parentPid);
 
 #endif //PROCESOS_PROCESS_H

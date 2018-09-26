@@ -13,6 +13,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
 static pPid arrayAdd(pcbPtr pcbPtr, int demandPid);
 static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
+static void printProc(pcbPtr pcb);
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -280,25 +281,49 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
     return TRUE;
 }
 
-void printProcs()
+void printAllProcs()
 {
     simple_printf(" PID - NAME - STATE - FOREGROUND - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n b=BORN, r=READY, R=RUNNING, B=BLOCKED, D=DEAD\n");
     Queue *queue = createQueue(MAX_PROCS);
     enqueue(queue, INIT_PID);
     pPid current = dequeue(queue);
-    simple_printf(" %d - %s - %s - %s - %d - %d\n", array[current]->pid, array[current]->name, statesNames[array[current]->state], array[current]->foreground == TRUE? "F":"B", array[current]->childrenCount, HEAP_STACK_SIZE);
+    printProc(array[current]);
     pcbPtr child;
     do
     {
         for(int i = 0; i < array[current]->childrenCount; ++i)
         {
             child = array[array[current]->childs[i]];
-            simple_printf(" %d - %s - %s - %s - %d - %d\n", child->pid, child->name, statesNames[child->state], child->foreground == TRUE? "F":"B" , child->childrenCount, HEAP_STACK_SIZE);
+            printProc(child);
             enqueue(queue, child->pid);
         }
         current = dequeue(queue);
     }while (current != PID_ERROR);
     simple_printf("\n");
+}
+
+static void printProc(pcbPtr pcb)
+{
+    simple_printf(" %d - %s - %s - %s - %d - %d\n", pcb->pid, pcb->name, statesNames[pcb->state], pcb->foreground == TRUE? "F":"B" , pcb->childrenCount, HEAP_STACK_SIZE);
+}
+
+void printSons(pPid parentPid)
+{
+    if (!procExists(parentPid))
+    {
+        simple_printf("Kernel message: no such process %d\n", parentPid);
+        return;
+    }
+    int childrenCount = array[parentPid]->childrenCount;
+    if(childrenCount<=0)
+    {
+        simple_printf("Kernel message: process with pid %d has no sons.\n", parentPid);
+        return;
+    }
+    simple_printf("Process %s has %d son%s\n", array[parentPid]->name, childrenCount, childrenCount==1?"":"s");
+    for (int i = 0; i < childrenCount; ++i) {
+        printProc(array[array[parentPid]->childs[i]]);
+    }
 }
 
 /**
@@ -373,7 +398,7 @@ pcbPtr getPcbPtr(pPid pid)
 
 boolean isAlive(pPid pid)
 {
-    if (!isValidPid(pid) || array[pid] == NULL)
+    if (!procExists(pid))
         return FALSE;
     return array[pid]->state != DEAD;
 }

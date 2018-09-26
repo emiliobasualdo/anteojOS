@@ -60,7 +60,7 @@ void userFree(uint64_t x);
  * x  = 0 prints Tree type
  * x != 0 prints process queues
  */
-void userPs(char x);
+void userPs(char type, int pid);
 
 /* not much to explain*/
 int userStartProcess(char *name, uint64_t instruct, int foreground);

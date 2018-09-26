@@ -106,10 +106,12 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
     {
         printProcQueues();
     }
-    else
+    else if(rdi == 'p')
     {
-        printProcs();
+        printSons((pPid) rsi);
     }
+    else
+        printAllProcs();
     return 0;
 }
 uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)

@@ -68,9 +68,9 @@ void userFree(uint64_t x)
 {
     syscall(17, (uint64_t)x, 0, 0, 0, 0);
 }
-void userPs(char x)
+void userPs(char type, int pid)
 {
-    syscall(18, (uint64_t)x, 0, 0, 0, 0);
+    syscall(18, (uint64_t)type, (uint64_t) pid, 0, 0, 0);
 }
 /**
  * rdi: char *name

@@ -181,7 +181,7 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
     if (proc && isValidPid(proc->pid))
     {
         array[proc->pid] = NULL;
-        freeProcess(proc);
+        my_free(proc);
     }
 }
 
@@ -242,8 +242,18 @@ boolean isValidPState(int state)
 boolean setProcessState(pPid pid, pState newState, reasonT reason)
 {
     if (!procExists(pid) || !isValidPState(newState)){
-        simple_printf("setProcessState: ERROR: psb=NUL o !isValidPState \n");
+        simple_printf("Kernel message: ERROR: pid is not valid \n");
         return FALSE;
+    }
+    if (newState == DEAD)
+    {
+        if (pid == INIT_PID && pid != getCurrentProc()->pid)
+        {
+            simple_printf("Kernel message: ERROR: You cannot kill %s process\n", array[INIT_PID]->name);
+            return FALSE;
+        }
+        else
+            simple_printf("Kernel message: process %d is now dead\n",pid);
     }
     array[pid]->state = newState;
     array[pid]->blockedReason = reason;
@@ -254,27 +264,23 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
         // aca no se va a llegar nunca. cuando entre la interrupcion el RR va  cambiar de proceso
         // y como este está muerto no lo va a levantar.... creo
     }
-    if (newState == DEAD)
-    {
-        simple_printf("Kernel message: process %d is now dead\n",pid);
-    }
     return TRUE;
 }
 
 void printProcs()
 {
-    simple_printf(" PID - NAME - STATE - CHILD_COUNT. b=BORN, r=READY, R=RUNNING, B=BLOCKED, D=DEAD\n");
+    simple_printf(" PID - NAME - STATE - FOREGROUND - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n b=BORN, r=READY, R=RUNNING, B=BLOCKED, D=DEAD\n");
     Queue *queue = createQueue(MAX_PROCS);
     enqueue(queue, INIT_PID);
     pPid current = dequeue(queue);
-    simple_printf(" %d - %s - %s - %d\n", array[current]->pid, array[current]->name, statesNames[array[current]->state],array[current]->childrenCount);
+    simple_printf(" %d - %s - %s - %s - %d - %d\n", array[current]->pid, array[current]->name, statesNames[array[current]->state], array[current]->foreground == TRUE? "F":"B", array[current]->childrenCount, HEAP_STACK_SIZE);
     pcbPtr child;
     do
     {
         for(int i = 0; i < array[current]->childrenCount; ++i)
         {
             child = array[array[current]->childs[i]];
-            simple_printf(" %d - %s - %s - %d\n", child->pid, child->name, statesNames[child->state], child->childrenCount);
+            simple_printf(" %d - %s - %s - %s - %d - %d\n", child->pid, child->name, statesNames[child->state], child->foreground == TRUE? "F":"B" , child->childrenCount, HEAP_STACK_SIZE);
             enqueue(queue, child->pid);
         }
         current = dequeue(queue);
@@ -294,7 +300,7 @@ int procContainer(uint64_t inst)
 
     int(*func)(void) = (int (*)(void)) inst;
     int ret = func();
-    simple_printf("\nKernel Message: Process with pid %d died, with return=%d\n",getCurrentProc()->pid, ret);
+    simple_printf("\nKernel Message: Process %s with pid %d died, with return=%d\n",getCurrentProc()->name, getCurrentProc()->pid, ret);
 
     procsDeathCleanUp(getCurrentProc());
     switchToNext(); // cambio forzado de contexto sin esperar al timer tick
@@ -328,10 +334,9 @@ static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
     parent->childrenCount--;
     pPid procPid = proc->pid;
     IRQ_OFF // si o si, porque no puede suceder una sin la otra
-    setProcessState(procPid, DEAD, NO_REASON);
+    proc->state = DEAD;
     freeProcess(proc);
     IRQ_RES;
-
 }
 
 int bussyWaitingProc()

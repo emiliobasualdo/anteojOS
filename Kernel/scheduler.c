@@ -126,9 +126,9 @@ void printtt(uint64_t num)
 void switchToNext()
 {
     pcbPtr proc = nextProcess();
-    simple_printf("switchToNext: cambiando por: name=%s \n", proc->name);
+    //simple_printf("switchToNext: cambiando por: name=%s \n", proc->name);
     switchTo(proc->rsp);
-    simple_printf("Volviendo de switchToNext\n");
+    simple_printf("!!!!!Volviendo de switchToNext..... No deberiamos estar aca!!!!!\n");
 }
 
 boolean wakeUpBlocked(reasonT reason)

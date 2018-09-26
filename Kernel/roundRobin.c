@@ -188,27 +188,22 @@ pcbPtr rrNextAvailableProcess()
 {
     if(rrIsEmpty(&runningQueue))
     {
-        //simple_printf("rrNextAvailableProcess: Running queue esta vacia\n");
         return NULL;
     }
     // si no cumplió su cuota que siga
     if(runningQueue.current->quantum < rrQuantum && runningQueue.current->pcbPtr->state < BLOCKED)
     {
-        //simple_printf("rrNextAvailableProcess: adentro y SIGUE corriendo\n");
         runningQueue.current->quantum++;
         return runningQueue.current->pcbPtr;
     }
     else
     {
-        //simple_printf("rrNextAvailableProcess: adentro y TERMINO de correr\n");
         runningQueue.current->quantum = 0;
     }
-    //simple_printf("rrNextAvailableProcess: imprimiendo:\n");
-    //printRRQueues();
+
     // no son null por el rrIsEmpty()
     rrNodePtr prevNode = runningQueue.current; // el que venia corriendo hasta recien
     rrNodePtr curNode = runningQueue.current->next; // el que apunta el de recien
-
     do
     {
         switch (curNode->pcbPtr->state)

@@ -9,9 +9,9 @@ command commands[]={
         {"exit", "Exits the terminal.", exitShell},
         {"font_colour", "Changes the font colour.", font_colour},
         {"background_colour", "Changes the background colour.", background_colour},
-        {"digital_clock","Displays a digital clock on screen", digital_clock},
+        //{"digital_clock","Displays a digital clock on screen", digital_clock},
         {"timezone", "Allows the user to change the current timezone. Usage: timezone [int]",timezone},
-        {"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
+        //{"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
         {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
         {"ps", "Prints all process. Usage ps [q]", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
@@ -334,6 +334,7 @@ int kill(int argc, argVector argv)
     {
         printF("%s\n", ARGUMENTS_AMOUNT_ERROR("1"));
         printF("Usage: kill <pid>\n");
+        return FALSE;
     }
     int flag = 0;
     int pid = 0;

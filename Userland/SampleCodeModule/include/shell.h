@@ -30,7 +30,7 @@
 #define OS_SHELL_LINE     "anteojOS:$ "
 #define NO_SUCH_CMMD_MSG  "No such command found, check your input."
 #define ILLEGAL_INPUT_MSG "Your input contains illegal values, only printable characters admitted. Check your input."
-#define AMPRESAND_MSG     "Process running in background"
+#define AMPRESAND_MSG     "Process is now running in background"
 
 #define INITIAL      0
 #define IN_ARGUMENT  1

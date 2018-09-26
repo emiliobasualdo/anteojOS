@@ -28,5 +28,5 @@ void int_20() // todo esto no lo estoy usando, solucionar
 void int_21()
 {
 	keyboardInterpreter();
-    wakeUpBlocked(KEYBOARD);
+	wakeUpBlocked(KEYBOARD);
 }

@@ -21,26 +21,22 @@ void showClock(int mode)
             os = s;
         }
         drawClock(h,m,s,fColour, bColour);
-        /*if(newToRead())
+        if (c == 'q' || mode) // si es screen saver, mode = 1 entonces mata
         {
-            c = getChar();
-            if (c == 'q' || mode) // si es screen saver, mode = 1 entonces mata
-            {
-                show = 0;
-            }
-            else if(c>= '1' && c<='9')
-            {
-                fColour = userColours[c -'0'];
-                drawClock(h,m,s,fColour, bColour);
-                kernelBeep();
-            }
-            else
-            {
-                newWindow();
-                printF("Press 'q' to exit or a number to change the clock's colour");
-                drawClock(h,m,s,fColour, bColour);
-            }
-        }*/
+            show = 0;
+        }
+        else if(c>= '1' && c<='9')
+        {
+            fColour = userColours[c -'0'];
+            drawClock(h,m,s,fColour, bColour);
+            kernelBeep();
+        }
+        else
+        {
+            newWindow();
+            printF("Press 'q' to exit or a number to change the clock's colour");
+            drawClock(h,m,s,fColour, bColour);
+        }
     }
 }
 

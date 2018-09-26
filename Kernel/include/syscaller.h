@@ -9,8 +9,8 @@
 #include <sleep.h>
 #include <shellTests.h>
 #include "ipc.h"
-
-#define NFUNCTIONS 28                             // number of functions
+#include "pageAllocator.h"
+#include "allocatorTest.h"
 
 /* eax = 1
 ** draws a string with a given string in rdi
@@ -151,6 +151,11 @@ uint64_t unlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t
  ** destroys a mutex
  */
 uint64_t destroyMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 29
+ ** runs a test to prove functionality of the allocator
+ */
+uint64_t sysAllocatorTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 
 #endif

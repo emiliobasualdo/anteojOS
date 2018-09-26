@@ -9,12 +9,11 @@
 #include <stdio.h>
 #include <system.h>
 #include <videoDriver.h>
-#include <myAlloc.h>
 #include <defs.h>
 #include <stdarg.h>
 #include <queue.h>
 #include "ipcStructs.h"
-
+#include "dinamicMemory.h"
 
 #define MAX_PROC_NAME 70
 #define INIT_PID 0
@@ -29,7 +28,6 @@
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
 #define DEFAULT_NAME "process"
-
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;

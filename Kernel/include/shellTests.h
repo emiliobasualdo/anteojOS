@@ -1,5 +1,5 @@
-#ifndef ANTEOJOS_SHELLTESTS_H
-#define ANTEOJOS_SHELLTESTS_H
+#ifndef SHELLTESTS_H
+#define SHELLTESTS_H
 
 #include <printf.h>
 #include <scheduler.h>
@@ -15,4 +15,4 @@ int multiProcessTest();
 void mutexTest();
 void messageTest();
 
-#endif //ANTEOJOS_SHELLTESTS_H
+#endif

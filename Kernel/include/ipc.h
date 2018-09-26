@@ -3,13 +3,13 @@
 
 
 #include <stddef.h>
-#include "myAlloc.h"
 #include "process.h"
 #include "ipcStructs.h"
 #include "scheduler.h"
 #include "printf.h"
 #include "system.h"
 #include "lib.h"
+#include "dinamicMemory.h"
 
 #define MAXMUTEXES 20
 #define MAXINQUEUE 10

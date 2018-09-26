@@ -129,7 +129,7 @@ static void reacursiveKillSons(pPid pid) {
  * */
 static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground)
 {
-    pcbPtr newPcb = my_malloc(sizeof(pcb));
+    pcbPtr newPcb = kernelMalloc(sizeof(pcb));
     if (newPcb == NULL)
     {
         simple_printf("ERROR: newProcess newPcb = NULL\n");
@@ -137,11 +137,11 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     }
 
     // le damos 2 página para su heap/stack // todo <--- lista de heaps
-    newPcb->heapBase = (uint64_t) my_malloc(HEAP_STACK_SIZE);
+    newPcb->heapBase = (uint64_t) kernelMalloc(HEAP_STACK_SIZE);
     if (!newPcb->heapBase)
     {
         simple_printf("ERROR: newProcess newPcb->heap = NULL\n");
-        my_free(newPcb);
+        kernelFree(newPcb);
         return NULL;
     }
     // apuntamos el stack a la direccion mas alta
@@ -207,13 +207,13 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
         for(i = 0; proc->postBox->count > 0;i++)
         {
             dequeueMessage(proc->postBox, msg);
-            my_free(msg->content);
+            kernelFree(msg->content);
         }
-        my_free(proc->postBox);
+        kernelFree(proc->postBox);
         if (isValidPid(proc->pid))
             array[proc->pid] = NULL;
-        my_free((void *) proc->heapBase);
-        my_free(proc);
+        kernelFree((void *) proc->heapBase);
+        kernelFree(proc);
     }
 }
 

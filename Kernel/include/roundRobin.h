@@ -1,15 +1,11 @@
-//
-// Created by Emilio Basualdo on 9/4/18.
-//
-
-#ifndef PROCESOS_PDOUBLYLINKEDLIST_H
-#define PROCESOS_PDOUBLYLINKEDLIST_H
+#ifndef ROUNDROBIN_H
+#define ROUNDROBIN_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <process.h>
 #include <system.h>
-#include <myAlloc.h>
+#include "dinamicMemory.h"
 
 typedef struct rrNode *rrNodePtr;
 
@@ -34,4 +30,4 @@ void printRRQueues();
 void setQuantum(int newQuantum);
 int getQuantum();
 
-#endif //PROCESOS_PDOUBLYLINKEDLIST_H
+#endif

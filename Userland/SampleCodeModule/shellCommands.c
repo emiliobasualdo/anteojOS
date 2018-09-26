@@ -18,6 +18,7 @@ command commands[]={
         {"back_test","Performs a test to prove the background functionality", backgroundTest},
         {"multi_test","Performs a test to prove the multi-processing functionality",multiProcTest},
         {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo>", kill},
+        {"allocatorTest", "Performs a test to prove the physical memory management functionality", allocatorTest},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -360,6 +361,11 @@ int multiProcTest(int count, argVector argv)
     return multiTest(num, NULL);
 }
 
+int allocatorTest(int count, argVector argv)
+{
+    kernelAllocatorTest();
+    return 1;
+}
 
 /* Funciones auxiliares para los comandos de de usuario*/
 

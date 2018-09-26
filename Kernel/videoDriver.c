@@ -1,29 +1,14 @@
 #include <videoDriver.h>
 
-void drawAPixelWithColour(int x, int y, Colour col);
-void drawAPixel(unsigned int x, unsigned int y);
-void drawCharWithColour(const char c, Colour fColour);
-void drawChar(const char c);
-void drawStringWithColour(const char * string,  Colour fColour);
-void drawString(const char * string);
-void enter();
-void backSpace();
-void refreshCoordenates();
-void clearCoordenate(unsigned int x, unsigned int y);
-void scroll ();
-void newWindow ();
-void paintWindow(Colour col);
-void setBackgroundColour(Colour col);
-void setFontColour(Colour col);
-int getXResolution();
-int getYResolution();
-
+static void refreshCoordinates();
+static void clearCoordenate(unsigned int x, unsigned int y);
+static void scroll ();
 
 modeInfoVBE vbe = (modeInfoVBE)0x5C00;        /*------> taken from /Bootloader/Pure64/src/sysvar.asm */
 unsigned int currentX = 0;
 unsigned int currentY = 0;
-unsigned int enterXCoordenates[300];
-unsigned int enterYCoordenates[300];
+unsigned int enterXCoordinates[300];
+unsigned int enterYCoordinates[300];
 unsigned int sizeEnter = 0;
 Colour backgroundColour = {0, 0, 0};
 Colour fontColour = {242, 213, 96};
@@ -43,7 +28,7 @@ void drawAPixel(unsigned int x, unsigned int y)
 
 void drawCharWithColour ( char c, Colour fColour)
 {
-    refreshCoordenates();
+    refreshCoordinates();
     if (c < 31)						   // entonces no es un caracter dentro del font.c
     {
         if ( c == '\n')
@@ -53,11 +38,6 @@ void drawCharWithColour ( char c, Colour fColour)
         if (c == '\b' )
         {
             backSpace();
-        }
-        if (c == '\t' )
-        {
-            drawChar(' ');
-            drawChar(' ');
         }
     }
     else
@@ -112,16 +92,14 @@ void enter()
 {
     if (sizeEnter == 0)
     {
-        int i=0;
-        while ( i < vbe->yResolution )
+        for ( int i=0; i < vbe->yResolution; i++ )
         {
-            enterXCoordenates[i]=0;
-            enterYCoordenates[i]=0;
-            i++;
+            enterXCoordinates[i]=0;
+            enterYCoordinates[i]=0;
         }
     }
-    enterXCoordenates[sizeEnter] = currentX;
-    enterYCoordenates[sizeEnter++] = currentY;
+    enterXCoordinates[sizeEnter] = currentX;
+    enterYCoordinates[sizeEnter++] = currentY;
 
     currentX = 0;
     currentY += charHeight;
@@ -137,9 +115,9 @@ void backSpace()
     if (currentX == 0 && currentY!=0)
     {
         sizeEnter--;
-        currentX = enterXCoordenates[sizeEnter];
-        currentY = enterYCoordenates[sizeEnter];
-        enterXCoordenates[sizeEnter] = enterYCoordenates[sizeEnter] = 0;
+        currentX = enterXCoordinates[sizeEnter];
+        currentY = enterYCoordinates[sizeEnter];
+        enterXCoordinates[sizeEnter] = enterYCoordinates[sizeEnter] = 0;
     }
     else
     {
@@ -154,25 +132,25 @@ void backSpace()
             }
             else
             {
-                currentX = vbe->xResolution - charWidth;
+                currentX = (unsigned int) (vbe->xResolution - charWidth);
             }
         }
     }
     clearCoordenate(currentX, currentY);
 }
 
-void refreshCoordenates()
+static void refreshCoordinates()
 {
     if (currentX >= vbe->xResolution)
     {
-        enterXCoordenates[sizeEnter] = currentX-charWidth;
+        enterXCoordinates[sizeEnter] = currentX-charWidth;
         if (currentY < vbe->yResolution)
         {
-            enterYCoordenates[sizeEnter++] = currentY;
+            enterYCoordinates[sizeEnter++] = currentY;
         }
         else
         {
-            enterYCoordenates[sizeEnter++] = currentY - charHeight;
+            enterYCoordinates[sizeEnter++] = currentY - charHeight;
         }
         currentX = 0;
         currentY += charHeight;
@@ -185,7 +163,7 @@ void refreshCoordenates()
     }
 }
 
-void clearCoordenate(unsigned int x, unsigned int y)
+static void clearCoordenate(unsigned int x, unsigned int y)
 {
     for (int i = 0; i < charWidth; i++)
     {
@@ -196,11 +174,17 @@ void clearCoordenate(unsigned int x, unsigned int y)
     }
 }
 
-void scroll ()
+static void scroll ()
 {
     memcpy((void *) (uint64_t)vbe->physBasePtr,
-           (const void *) (uint64_t)(vbe->physBasePtr + charHeight * vbe->pitch * (vbe->bitsPerPixel / charHeight)),
-           (uint64_t)((vbe->yResolution - charHeight) * vbe->pitch) * (vbe->bitsPerPixel/charWidth));
+           (const void *) (uint64_t)(vbe->physBasePtr + charHeight * vbe->pitch * (vbe->bitsPerPixel / CHAR_HEIGHT)),
+           (uint64_t)((vbe->yResolution - charHeight) * vbe->pitch) * (vbe->bitsPerPixel/CHAR_WIDTH));
+
+    int j= vbe->yResolution - charHeight;
+    for (int i=0; i<vbe->xResolution; i++)
+    {
+        clearCoordenate(i, j);
+    }
 }
 
 void newWindow ()
@@ -217,7 +201,7 @@ void newWindow ()
 
 void resetCoordinates()
 {
-    currentY = currentX = 0;
+    currentX = currentY = 0;
 }
 
 void paintWindow(Colour col)
@@ -253,7 +237,7 @@ int getYResolution()
 
 void drawImage(unsigned int ox, unsigned int oy, const unsigned short *hexaMap, unsigned int width, unsigned int height)
 {
-    refreshCoordenates();
+    refreshCoordinates();
     Colour b;
     for (int i = 0; i < height; ++i)
     {
@@ -272,7 +256,7 @@ void drawHexa(uint64_t reg)
 {
 	char buffer[64];
 	toHexa(buffer, reg);
-  drawString("0x");
+    drawString("0x");
 	drawString(buffer);
 }
 

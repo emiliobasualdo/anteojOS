@@ -1,8 +1,4 @@
-//
-// Created by Emilio Basualdo on 9/3/18.
-//
 #include <scheduler.h>
-
 
 static uint64_t schedulerNextRsp(uint64_t rsp);
 static boolean  schedulerAddProc(pcbPtr proc);

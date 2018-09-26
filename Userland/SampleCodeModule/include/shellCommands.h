@@ -10,6 +10,7 @@
 #include "stdio.h"
 #include "time.h"
 #include "userPrintf.h"
+#include "prodcons.h"
 
 #define MAX_BUFFER_SIZE 10000
 #define MAX_ARGS 10
@@ -21,6 +22,7 @@
 #define TIMEZONE_ERROR_MSG        "Error: Only numbers and '-' are allowed in timezone format. Please re-enter your timezone."
 #define TIMEZONE_SUCCES_MSG       "Timezone has been set to:"
 #define ARGUMENTS_AMOUNT_ERROR(x) "Error: Function takes "x" argument"
+#define PRODCONS_ERROR_MSG        "Error: arguments must be numbers"
 
 #define FONT 2
 #define BACK 1
@@ -100,8 +102,8 @@ int backgroundTest(int argc, argVector argv);
 
 int kill(int argc, argVector argv);
 
+int prodCons(int argc, argVector argv);
 int multiProcTest(int count, argVector argv);
-
 
 /* Funciones auxiliares para las funciones de usuario*/
 

@@ -13,6 +13,9 @@
 static mutex_t mutexList[MAXMUTEXES];
 int positionMutexArray = 0;
 static mutex_t messageMutex;
+static pPid blockedByReceive[MAXINQUEUE];
+static int numberBlockedReceiveArray = 0;
+
 
 int initIPCS()
 {
@@ -20,13 +23,87 @@ int initIPCS()
     for(i = 0; i < MAXMUTEXES; i++)
     {
         mutexList[i].value = -1;
-        mutexList[i].nextProcessInLine = *(createQueue(MAXINQUEUE));
     }
     messageMutex.value = 0;
-    messageMutex.nextProcessInLine = *(createQueue(MAXINQUEUE));
+    messageMutex.nextProcessInLine = createQueue(MAXINQUEUE);
+    for(i = 0;i < MAXINQUEUE;i++)
+    {
+        blockedByReceive[i] = 0;
+    }
     return TRUE;
 }
 
+static void changeBlockedReceiveArray(pPid pid, int state)
+{
+    int i = 0;
+    if(state)
+    {
+        numberBlockedReceiveArray--;
+        while(blockedByReceive[i] != pid)
+        {
+            i++;
+        }
+        blockedByReceive[i] = 0;
+    }
+    else
+    {
+        numberBlockedReceiveArray++;
+        while(blockedByReceive[i] == 0)
+        {
+            i++;
+        }
+        blockedByReceive[i] = pid;
+    }
+}
+
+static void printMutexList(int mutex)
+{
+    if(mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
+    {
+        return;
+    }
+    simple_printf("Mutex %d Queue = ", mutex);
+    int i;
+    for(i = 0; i < mutexList[mutex].nextProcessInLine->size; i++)
+    {
+        simple_printf("-> %d ",mutexList[mutex].nextProcessInLine->array[(mutexList[mutex].nextProcessInLine->front+i)%MAXINQUEUE]);
+    }
+    simple_printf("\n");
+}
+
+void printIpcsQueues()
+{
+    int i;
+    for(i = 0; i < positionMutexArray; i++)
+    {
+        if(mutexList[i].value == 1 || mutexList[i].value == 0)
+        {
+            printMutexList(i);
+        }
+    }
+
+    simple_printf("Message Mutex Queue = ");
+    for(i = 0; i <= messageMutex.nextProcessInLine->size; i++)
+    {
+        simple_printf("-> %d ",messageMutex.nextProcessInLine->array[(messageMutex.nextProcessInLine->front+i)%MAXINQUEUE]);
+    }
+    simple_printf("\n");
+
+    simple_printf("Received Bloqued List = ");
+    int aux = numberBlockedReceiveArray;
+    for(i = 0; i < MAXINQUEUE && aux; i++)
+    {
+        if(blockedByReceive[i] != 0)
+        {
+            simple_printf("-> %d ",blockedByReceive[i]);
+            aux--;
+        }
+    }
+    simple_printf("\n");
+}
+/**
+ * MUTEX
+ */
 
 /**
  * le doy el ID de su mutex
@@ -42,6 +119,7 @@ int startMutex()
             if(mutexList[positionMutexArray].value == -1)
             {
                 mutexList[positionMutexArray].value = 0;
+                mutexList[positionMutexArray].nextProcessInLine = createQueue(MAXINQUEUE);
                 return i;
             }
         }
@@ -50,6 +128,7 @@ int startMutex()
     else
     {
         mutexList[positionMutexArray].value = 0;
+        mutexList[positionMutexArray].nextProcessInLine = createQueue(MAXINQUEUE);
         positionMutexArray++;
         return positionMutexArray - 1;
     }
@@ -59,17 +138,20 @@ int startMutex()
 
 int lockMutex(int mutex)
 {
-    if (mutex < 0 || mutex > positionMutexArray)
+    //printMutexList(mutex);
+    pPid process = getCurrentProc()->pid;
+    //simple_printf("%d\n", process);
+    if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
         return -1;
     }
     if(lockMutexASM(&(mutexList[mutex].value)))
     {
-        if(!isFull(&(mutexList[mutex].nextProcessInLine)))
+        if(!isFull(mutexList[mutex].nextProcessInLine))
         {
-            pPid process = getCurrentProc()->pid;
-            enqueue(&(mutexList[mutex].nextProcessInLine), (int)process);
-
+            enqueue(mutexList[mutex].nextProcessInLine, process);
+            //simple_printf("este es el valor de mi pid que puse en la cola: %d\n\n", process);
+            //printMutexList(mutex);
             setProcessState(process, BLOCKED, MUTEX_BLOCK);
 
         }
@@ -79,20 +161,20 @@ int lockMutex(int mutex)
 
 int unlockMutex(int mutex)
 {
-    if (mutex < 0 || mutex > positionMutexArray)
+    if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
         return -1;
     }
     else
     {
-        if(!isEmpty(&(mutexList[mutex].nextProcessInLine)))
+        if(!isEmpty(mutexList[mutex].nextProcessInLine))
         {
-            pPid process = dequeue(&(mutexList[mutex].nextProcessInLine));
+            pPid process = dequeue(mutexList[mutex].nextProcessInLine);
 
             setProcessState(process, READY, MUTEX_BLOCK);
 
             schedulerAddProcPid(process);
-
+            //printMutexList(mutex);
         }
         else
         {
@@ -108,10 +190,10 @@ static int messageMutexLock()
 {
     if(lockMutexASM(&(messageMutex.value)))
     {
-        if(!isFull(&(messageMutex.nextProcessInLine)))
+        if(!isFull(messageMutex.nextProcessInLine))
         {
             pPid process = getCurrentProc()->pid;
-            enqueue(&(messageMutex.nextProcessInLine), (int)process);
+            enqueue(messageMutex.nextProcessInLine, (int)process);
             setProcessState(process, BLOCKED, MESSAGE_PASSING);
         }
         return 1;
@@ -121,7 +203,7 @@ static int messageMutexLock()
 
 static int messageMutexUnlock()
 {
-    pPid process = dequeue(&(messageMutex.nextProcessInLine));
+    pPid process = dequeue(messageMutex.nextProcessInLine);
     if(process != EMPTY_QUEUE)
     {
         setProcessState(process, READY, MESSAGE_PASSING);
@@ -138,10 +220,11 @@ static int messageMutexUnlock()
 
 int destroyMutexK(int mutex)
 {
-    if(mutex < 0 || !isEmpty(&(mutexList[mutex].nextProcessInLine)))
+    if(mutex < 0 || mutexList[mutex].value == -1 || mutexList[mutex].value == 1)
     {
         return -1;
     }
+    my_free(messageMutex.nextProcessInLine);
     mutexList[mutex].value = -1;
     return 1;
 }
@@ -304,6 +387,7 @@ static void asyncSend(pPid from, pPid to, char * body)
 
             if(getPcbPtr(processNumber)->postBox->count == 1) //desbloqueo el proceso pq tengo un msj
             {
+                changeBlockedReceiveArray(to, SND);
                 setProcessState(to, READY, MESSAGE_PASSING);
                 schedulerAddProcPid(to);
             }
@@ -316,12 +400,11 @@ static void asyncSend(pPid from, pPid to, char * body)
     return;
 }
 
-static msg_t * syncSend(pPid from, pPid to, char * body)
+static void syncSend(pPid from, pPid to, char * body, msg_t * answer)
 {
     asyncSend(from, to, body);
-    msg_t * msg = NULL;
-    asyncReceive(msg);
-    return msg;
+    asyncReceive(answer);
+    return;
 }
 
 
@@ -341,6 +424,7 @@ static void asyncReceive(msg_t * message)
         {
             if(isEmptyMessageQueue(getPcbPtr(processNumber)->postBox))
             {
+                changeBlockedReceiveArray(pid, REC);
                 setProcessState(pid, BLOCKED, MESSAGE_PASSING);
             }
             dequeueMessage(getPcbPtr(processNumber)->postBox, message);
@@ -362,16 +446,20 @@ static void syncReceive(msg_t * message, void (*function)(char*))
  * si flag = 0 async
  * retorno NULL si async
  */
-uint64_t sendMessage(pPid receiver, char * content, char * answer, boolean flag)
+uint64_t sendMessage(pPid receiver, char * content, char ** answer, boolean flag)
 {
     pPid pid = getCurrentProc()->pid;
     if(!flag || answer == NULL)
     {
         asyncSend(pid, receiver, content);
-        return 0;
+        return 1;
     }
-    msg_t * msg = syncSend(pid, receiver, content);
-    answer = msg->content;
+    msg_t aux;
+    syncSend(pid, receiver, content, &aux);
+    int length = strlen(aux.content);
+    *answer = my_malloc(length+1);
+    memcpy((*answer),aux.content, length);
+    (*answer)[length] = 0;
     return 0;
 }
 
@@ -388,5 +476,5 @@ uint64_t receiveMessage(char ** message, void (*function)(char*), boolean flag)/
     *message = my_malloc(length+1);
     memcpy((*message), aux.content, length);
     (*message)[length] = 0;
-    return 0;
+    return 1;
 }

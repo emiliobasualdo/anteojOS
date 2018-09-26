@@ -34,4 +34,10 @@ int isGraph(char );
 /* returns a boolean if the given character represents a quote (in ascii) */
 int isQuote(char );
 
+/*return a random int */
+int rand(void);
+
+/*changes seed value for rand*/
+void srand(unsigned int seed);
+
 #endif

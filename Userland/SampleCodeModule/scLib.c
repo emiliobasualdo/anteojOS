@@ -96,3 +96,33 @@ int userGetCurrentPid()
 {
     return (int) syscall(22, 0, 0, 0, 0 , 0);
 }
+
+int send(uint64_t receiver, char * content,  char ** answer, uint8_t flag)
+{
+    return (int) syscall(23, (uint64_t)receiver, (uint64_t)content, (uint64_t)(answer), (uint64_t)flag, 0);
+}
+
+int receive(char ** message)
+{
+    return (int) syscall(24, (uint64_t) message, 0, 0, 0 , 0);
+}
+
+int newMutex()
+{
+    return (int) syscall(25, 0, 0, 0, 0 , 0);
+}
+
+int lock(int mutex)
+{
+    return (int) syscall(26,(uint64_t) mutex, 0, 0, 0 , 0);
+}
+
+int unlock(int mutex)
+{
+    return (int) syscall(27,(uint64_t) mutex, 0, 0, 0 , 0);
+}
+
+int destroyMutex(int mutex)
+{
+    return (int) syscall(28,(uint64_t) mutex, 0, 0, 0 , 0);
+}

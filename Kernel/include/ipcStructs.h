@@ -17,7 +17,7 @@ typedef struct message_t
 typedef struct mutex_t
 {
     int value;
-    Queue nextProcessInLine;
+    Queue * nextProcessInLine;
 }mutex_t;
 
 typedef struct messageNode
@@ -42,5 +42,10 @@ int isEmptyMessageQueue(messageQueue* queue);
 void enqueueMessage(messageQueue* queue, msg_t message);
 void dequeueMessage(messageQueue* queue, msg_t * message);
 
+/**
+ * impresion
+ */
+
+void printIpcsQueues();
 
 #endif

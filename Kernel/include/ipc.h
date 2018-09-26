@@ -12,8 +12,10 @@
 #include "lib.h"
 
 #define MAXMUTEXES 20
-#define MAXINQUEUE 10
+#define MAXINQUEUE 20
 
+#define SND 1
+#define REC 0
 
 
 
@@ -42,6 +44,6 @@ int destroyMutexK(int mutex);
  */
 
 //void createNewMessage(messageQueue* queue, uint64_t pidSender, uint64_t pidReceiver, char * messageBody);
-uint64_t sendMessage(pPid receiver, char * content, char * answer, boolean flag);
+uint64_t sendMessage(pPid receiver, char * content, char ** answer, boolean flag);
 uint64_t receiveMessage(char ** message, void (*function)(char*), boolean flag);
 #endif

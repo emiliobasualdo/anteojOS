@@ -74,5 +74,23 @@ int userProcessBomb();
 /* returns the current process id*/
 int userGetCurrentPid();
 
+/*sends message in between processes. Flag changes sync, being 0 async */
+int send(uint64_t receiver, char * content,  char ** answer, uint8_t flag);
+
+/*receives message from postBox. Blocks process if postBox is empty*/
+int receive(char ** message);
+
+/*creates a mutex. Return value is the mutex Number, used to lock,unlock*/
+int newMutex();
+
+
+/*tries to lock if mutex available. If not, it blocks until it is unlocked by the process that locked it*/
+int lock(int mutex);
+
+/*unlocks mutex, changing the state of the next process in the mutex line to ready*/
+int unlock(int mutex);
+
+/*makes unlockMutex not able to be used unless started*/
+int destroyMutex(int mutex);
 
 #endif

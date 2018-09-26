@@ -1,7 +1,3 @@
-//
-// Created by Emilio Basualdo on 9/3/18.
-//
-
 #ifndef PROCESOS_PROCESS_H
 #define PROCESOS_PROCESS_H
 
@@ -20,7 +16,7 @@
 #define INIT_PID 0
 #define BUSSY_WAITING INIT_PID+1
 #define MAX_PROCS 100000
-#define MAX_CHILDREN 10
+#define MAX_CHILDREN 30
 #define MAX_SECURITY_LIMITAION 3
 #define PID_ERROR -1
 #define HEAP_STACK_SIZE 4000

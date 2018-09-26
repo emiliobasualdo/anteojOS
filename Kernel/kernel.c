@@ -96,6 +96,11 @@ void theAllMighty(void)
         simple_printf("theAllMighty: ERROR: shell == NULL\n");
         return;
     }
+    // if (createAndExecProcess("mutexTest", (uint64_t) mutexTest, getCurrentProc()->pid, FALSE) == PID_ERROR)
+    // {
+    //     simple_printf("mutexTest: ERROR: shell == NULL\n");
+    //     return;
+    // }
     loadIDT();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
     simple_printf("theAllMighty: despues de bloquearse\n");

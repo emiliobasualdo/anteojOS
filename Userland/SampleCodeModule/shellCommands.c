@@ -18,6 +18,7 @@ command commands[]={
         {"back_test","Performs a test to prove the background functionality", backgroundTest},
         {"multi_test","Performs a test to prove the multi-processing functionality",multiProcTest},
         {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo>", kill},
+        {"prodCons", "Simulates de Producer Consumer Problem", prodCons},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -400,6 +401,35 @@ int endLessLoop()
         if (counter++ % 2000000000 == 0)
         {
             printF("Soy el proceso %d y sigo vivio! Matame si te animas\n", pid);
+        }
+    }
+}
+int prodCons(int argc, argVector argv)
+{
+    if (argc != 3)
+    {
+        printF("%s\n", ARGUMENTS_AMOUNT_ERROR("2"));
+        return 0;
+    }
+    int numProducers = 0, numConsumers = 0, flag = 0;
+    toInt(argv[1], &numProducers, &flag);
+    if (!flag)
+    {
+        printF("%s\n", PRODCONS_ERROR_MSG);
+        return 0;
+    }
+    else
+    {
+        flag = 0;
+        toInt(argv[2], &numConsumers, &flag);
+        if (!flag)
+        {
+            printF("%s\n", PRODCONS_ERROR_MSG);
+            return 0;
+        }
+        else
+        {
+            return producerConsumer(numProducers, numConsumers);
         }
     }
 }

@@ -1,4 +1,5 @@
 #include <syscaller.h>
+#include "printf.h"
 
 typedef uint64_t (*func_type)();
 
@@ -7,7 +8,7 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                myExit, putChar, removeChar,
                                changeBackgroundColour, setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
-                               createMutex, lock, unlock, destroyMutex};
+                               createMutex, kernelLock, kernelUnlock, destroyMutexKernel};
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -138,7 +139,7 @@ uint64_t getCurrentPid(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, u
 
 uint64_t send(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return sendMessage((pPid)rdi, (char *)rsi, (char *)rdx, (boolean)rcx);
+    return sendMessage((pPid)rdi, (char *)rsi, (char **)rdx, (boolean)rcx);
 }
 
 uint64_t receive(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -151,18 +152,17 @@ uint64_t createMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uin
     return startMutex();
 }
 
-uint64_t lock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t kernelLock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return lockMutex((int)rdi);
 }
 
-uint64_t unlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t kernelUnlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return unlockMutex((int)rdi);
 }
 
-uint64_t destroyMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t destroyMutexKernel(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return destroyMutexK((int)rdi);
 }
-

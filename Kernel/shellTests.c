@@ -6,13 +6,11 @@
 
 #define PROC_COUNT 30
 /*
-
 #define COUNT MOD * 7
 #define MOD 100000000
 #define TIMES 4
 #define PROCS 2
 #define INCREMENT 7
-
 int proc2()
 {
     long long counter = 0;
@@ -24,7 +22,6 @@ int proc2()
     }
     return TRUE;
 }
-
 int multiProcessTest()
 {
     simple_printf("\nVamos a ejecutar %d procesos simultaneamente\n", PROCS);
@@ -57,6 +54,7 @@ int proc1()
     proc1();
     return -1;
 }
+
 
 boolean processBomb()
 {
@@ -142,6 +140,20 @@ void mutexTest()
         simple_printf("f2: ERROR: otro == NULL\n");
         return;
     }
+    long ifff = 0;
+    while (ifff < 100000000) {
+
+        ifff++;
+    }
+
+    while(destroyMutexK(mutex) == -1)
+    {
+        ifff = 0;
+        while (ifff < 45)
+        {
+        ifff++;
+        }
+    }
 
     simple_printf("i final = %d\n", i);
 }
@@ -156,7 +168,6 @@ static void m1()
     {
         simple_printf("m1 kernel msg: %s\n", aux);
         sendMessage(meuPid, aux, NULL ,1);
-        //simple_printf("m1 kernel post sendMessage");
         aux[0]++;
     }
     simple_printf("termino m1!!\n");
@@ -183,7 +194,6 @@ static void m3()
     {
         simple_printf("m3 kernel msg: %s\n", aux);
         sendMessage(meuPid, aux, NULL ,1);
-        //simple_printf("m1 kernel post sendMessage");
         aux[0]++;
     }
     simple_printf("termino m1!!\n");
@@ -208,5 +218,6 @@ void messageTest()
         simple_printf("m3: ERROR: otro == NULL\n");
         return;
     }
+
 
 }

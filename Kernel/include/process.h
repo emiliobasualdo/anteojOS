@@ -20,14 +20,15 @@
 #define INIT_PID 0
 #define BUSSY_WAITING INIT_PID+1
 #define MAX_PROCS 100000
+#define MAX_CHILDREN 20
 #define PID_ERROR -1
 #define HEAP_STACK_SIZE 4000
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
-#define MAX_SECURITY_LIMITAION 4
-#define DEFAULT_NAME "proc"
+#define MAX_SECURITY_LIMITAION 2
+#define DEFAULT_NAME "process"
 
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
@@ -79,7 +80,7 @@ typedef struct
     uint64_t stackBase;     // } aca entre estos dos tenemos X paginas reservadas
     uint64_t heapBase;      // } stack apunta a la parte "de arriba"/alta, heap a la parte "de abajo"/baja
 
-    pPid childs[MAX_PROCS];
+    pPid childs[MAX_CHILDREN];
     unsigned int childrenCount;
 
     int creationLimit;

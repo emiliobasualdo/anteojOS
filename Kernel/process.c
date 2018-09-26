@@ -15,6 +15,8 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 
+static void reacursiveKill(pPid pid);
+
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
 static unsigned int arrSize;
@@ -45,7 +47,7 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
 
     // iniciamos el array de pcbPtrs
     arrSize = MAX_PROCS;
-    maxPid = MAX_PROCS-1; // cond dinamica tiene sentido, aca no todo
+    maxPid = arrSize-1; // cond dinamica tiene sentido, aca no todo
     // creamos el nuevo proceso
     pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, FALSE);
     if (!init) {
@@ -91,13 +93,16 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
  */
 static boolean addChildToParentList(pPid parentPid, pPid childPid) {
     pcbPtr parent = array[parentPid];
-    if (parent->childrenCount >= MAX_PROCS)
+    if (parent->childrenCount >= MAX_CHILDREN)
     {
         //programacion defensiva;
         parent->creationLimit++;
         if(parent->creationLimit > MAX_SECURITY_LIMITAION)
         {
-            simple_printf("Kernel: Matamos este procesos porque parece mailcioso para el OS\n");
+            IRQ_OFF;
+            reacursiveKill(parentPid);
+            simple_printf("!Kernel: Matamos este proceso y sus hijos porque parece malicioso para el OS!!\n");
+            IRQ_RES;
             setProcessState(parentPid, DEAD, NO_REASON);
         }
         simple_printf("addChildToParentList: ERROR: parent has already reached kids limit.... stop fornicating\n");
@@ -105,6 +110,16 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
     }
     parent->childs[parent->childrenCount++] = childPid;
     return TRUE;
+}
+
+static void reacursiveKill(pPid pid) {
+    if (!procExists(pid))
+        return;
+    pcbPtr proc = array[pid];
+    for (int i = 0; i < proc->childrenCount; ++i) {
+        reacursiveKill(array[proc->childs[i]]->pid);
+    }
+    proc->state = DEAD;
 }
 
 /**

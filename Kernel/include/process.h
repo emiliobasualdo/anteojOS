@@ -104,5 +104,6 @@ pcbPtr getBussyWaitingProcPcb();
 int bussyWaitingProc();
 void printProcs();
 pcbPtr getPcbPtr(pPid pid);
+boolean isAlive(pPid pid);
 
 #endif //PROCESOS_PROCESS_H

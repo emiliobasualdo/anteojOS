@@ -370,3 +370,10 @@ pcbPtr getPcbPtr(pPid pid)
     }
     return NULL;
 }
+
+boolean isAlive(pPid pid)
+{
+    if (!isValidPid(pid) || array[pid] == NULL)
+        return FALSE;
+    return array[pid]->state != DEAD;
+}

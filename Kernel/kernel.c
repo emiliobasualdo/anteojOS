@@ -12,6 +12,7 @@
 #include <syscaller.h>
 #include "ipc.h"
 #include "shellTests.h"
+#include <pageAllocator.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -106,7 +107,7 @@ void theAllMighty(void)
 
 int main()
 {
-    if (!initKernelAlloc(0x600000))
+    /*if (!initKernelAlloc(0x600000))
     {
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;
@@ -118,7 +119,14 @@ int main()
         return 0;
     }
     simple_printf("kernel: switchdinggg\n");
-    switchToNext();
+    switchToNext();*/
+    initAllocator((uint64_t)&endOfKernel);
+    int amount = 10;
+    void * page;
+    for (int i = 0; i < amount; ++i) {
+        page = requestPage();
+        freePage(page);
+    }
     simple_printf("kernel: volviendo de switch\n");
     simple_printf("\nX////////////////////////////XX\n");
     simple_printf("\nX////////////////////////////XX\n");

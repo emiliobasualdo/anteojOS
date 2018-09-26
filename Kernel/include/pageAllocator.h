@@ -7,5 +7,9 @@
 
 #include <system.h>
 
+boolean initAllocator(uint64_t firstMemPosition);
 
+void *requestPage();
+
+void freePage(void *memPtr);
 #endif //ANTEOJOS_PAGEALLOCATOR_H

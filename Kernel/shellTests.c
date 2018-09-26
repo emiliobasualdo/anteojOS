@@ -61,8 +61,8 @@ int proc1()
 boolean processBomb()
 {
     char name[MAX_PROC_NAME];
-    simple_printf("We will run a pseudo process-bomb.\n");
-    simple_printf("Basicly we will create and execute %d process and see what happen.\n", PROC_COUNT);
+    simple_printf("We will run a process-bomb.\n");
+    simple_printf("Basically we will create and execute a recursive process and see what happen.\n");
     simple_printf("The process's code is:\n");
     simple_printf("int proc1()\n"
                   "{\n"

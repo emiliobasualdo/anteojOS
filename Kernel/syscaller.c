@@ -114,15 +114,19 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
         printAllProcs();
     return 0;
 }
-uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) createAndExecProcess((char *) rdi, rsi, (pPid) getCurrentProc()->pid, (boolean) rdx) ;
+    return (uint64_t) createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) rdx) ;
 }
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) setProcessState((pPid) rdi, DEAD, NO_REASON);
+    boolean ret = TRUE;
+    for (int i = (int) rdi; i <= rsi; ++i)
+    {
+        ret = ret && setProcessState((pPid) i, DEAD, NO_REASON);
+    }
+    return ret;
 }
-
 uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t) processBomb();

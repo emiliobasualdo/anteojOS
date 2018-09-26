@@ -58,9 +58,9 @@ int execProcInBackground(char *name, uint64_t intstruction)
 {
     int pid = userStartProcess(name, intstruction, FALSE);
     if (pid == -1)
-        printF("Error executing process in background\n");
+        printF("Shell: Error executing process in background\n");
     else
-        printF("Process executed in background. Pid = %d\n", pid);
+        printF("Shell: Process executed in background.\n");
     return pid;
 }
 
@@ -339,9 +339,7 @@ int kill(int argc, argVector argv)
         printF("Usage: kill <pid> or kill <pidFrom pidTo>\n");
         return FALSE;
     }
-    for (int i = fromPid; i <= toPid; ++i) {
-        userKill((uint64_t) i);
-    }
+    userKill(fromPid, toPid);
     return TRUE;
 }
 
@@ -355,10 +353,10 @@ int multiProcTest(int count, argVector argv)
     int num;
     printF("This test will create many process and leave them running.\n");
     printF("See how execution slows down as more process are running\n");
+    printF("!If you create many sons the OS might kill you!\n");
     printF("How many process do you want to create?: ");
     num = getNum();
-    printF("%d\n", num);
-    return num;
+    printF("\n");
     return multiTest(num, NULL);
 }
 

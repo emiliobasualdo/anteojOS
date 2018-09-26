@@ -14,8 +14,7 @@ static pPid arrayAdd(pcbPtr pcbPtr, int demandPid);
 static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
-
-static void reacursiveKill(pPid pid);
+static void reacursiveKillSons(pPid pid);
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -75,13 +74,14 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
     }
     if (!procExists(parentPid) )
     {
+        simple_printf("%s", name);
         simple_printf("ERROR: createProcess: no es valid parent pid=%d\n",parentPid);
         return NULL;
     }
     pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground);
     if (!newPcb)
     {
-        simple_printf("ERROR: createProcess: newPcb = null\n");
+        //simple_printf("ERROR: createProcess: newPcb = null\n");
         return NULL;
     }
     //simple_printf("createProcess: ret=%d, name =%s\n", newPcb, newPcb->name);
@@ -95,31 +95,33 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
     pcbPtr parent = array[parentPid];
     if (parent->childrenCount >= MAX_CHILDREN)
     {
+        simple_printf("Kernel Message: ERROR: parent has already reached kids limit.... stop fornicating\n");
         //programacion defensiva;
         parent->creationLimit++;
         if(parent->creationLimit > MAX_SECURITY_LIMITAION)
         {
-            IRQ_OFF;
-            reacursiveKill(parentPid);
-            simple_printf("!Kernel: Matamos este proceso y sus hijos porque parece malicioso para el OS!!\n");
-            IRQ_RES;
-            setProcessState(parentPid, DEAD, NO_REASON);
+            simple_printf("!Kernel: killing process's %s sons because it seems harmfull to the OS!!\n", array[parentPid]->name);
+            reacursiveKillSons(parentPid);
         }
-        simple_printf("addChildToParentList: ERROR: parent has already reached kids limit.... stop fornicating\n");
         return FALSE;
     }
     parent->childs[parent->childrenCount++] = childPid;
     return TRUE;
 }
 
-static void reacursiveKill(pPid pid) {
+/**
+ * Asume que las interrupciones estan apagadas*/
+static void reacursiveKillSons(pPid pid) {
     if (!procExists(pid))
         return;
+    pPid childPid;
     pcbPtr proc = array[pid];
     for (int i = 0; i < proc->childrenCount; ++i) {
-        reacursiveKill(array[proc->childs[i]]->pid);
+        reacursiveKillSons(array[proc->childs[i]]->pid);
+        childPid = proc->childs[i];
+        if(procExists(childPid))
+            setProcessState(childPid,DEAD, NO_REASON);
     }
-    proc->state = DEAD;
 }
 
 /**
@@ -178,7 +180,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     {
         if (!addChildToParentList(parentPid, newPcb->pid))
         {
-            simple_printf("Kernel message: No pudimos agregar este proceso como hijo\n");
+            simple_printf("Kernel message: Unable to create son for process %s\n", array[parentPid]->name);
             freeProcess(newPcb);
             return NULL;
         }
@@ -389,10 +391,7 @@ static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
         parent->childs[j] = parent->childs[i];
     }
     parent->childrenCount--;
-    IRQ_OFF // si o si, porque no puede suceder una sin la otra
-    proc->state = DEAD;
-    freeProcess(proc);
-    IRQ_RES;
+    setProcessState(proc->pid,DEAD,NO_REASON);
 }
 
 int bussyWaitingProc()

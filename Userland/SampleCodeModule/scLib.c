@@ -82,9 +82,9 @@ int userStartProcess(char *name, uint64_t instruct, int foreground)
     return (int) syscall(19, (uint64_t) name, instruct, (uint64_t) foreground, 0, 0);
 }
 
-int userKill(uint64_t pid)
+int userKill(int fromPid, int toPid)
 {
-    return syscall(20, pid,0,0, 0 ,0);
+    return (int) syscall(20, (uint64_t) fromPid, (uint64_t) toPid, 0, 0 , 0);
 }
 
 int userProcessBomb()

@@ -66,7 +66,7 @@ void userPs(char type, int pid);
 int userStartProcess(char *name, uint64_t instruct, int foreground);
 
 /* Can change between Running, Blocked, Dead*/
-int userKill(uint64_t rdi);
+int userKill(int rdi, int toPid);
 
 /* Not much to explain*/
 int userProcessBomb();

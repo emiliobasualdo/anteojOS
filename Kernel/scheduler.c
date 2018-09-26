@@ -87,7 +87,7 @@ pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean
     pcbPtr newProc = createProcess(name, instruction, parent, foreground);
     if(!newProc)
     {
-        simple_printf("createAndExecProcess: !newProc\n");
+        //simple_printf("createAndExecProcess: !newProc\n");
         return PID_ERROR;
     }
 

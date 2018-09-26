@@ -20,14 +20,14 @@
 #define INIT_PID 0
 #define BUSSY_WAITING INIT_PID+1
 #define MAX_PROCS 100000
-#define MAX_CHILDREN 20
+#define MAX_CHILDREN 10
+#define MAX_SECURITY_LIMITAION 3
 #define PID_ERROR -1
 #define HEAP_STACK_SIZE 4000
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
-#define MAX_SECURITY_LIMITAION 2
 #define DEFAULT_NAME "process"
 
 

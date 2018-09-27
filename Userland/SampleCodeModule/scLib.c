@@ -81,23 +81,20 @@ int userStartProcess(char *name, uint64_t instruct, int foreground)
 {
     return (int) syscall(19, (uint64_t) name, instruct, (uint64_t) foreground, 0, 0);
 }
-
 int userKill(int fromPid, int toPid)
 {
     return (int) syscall(20, (uint64_t) fromPid, (uint64_t) toPid, 0, 0 , 0);
 }
-
 int userProcessBomb()
 {
     return (int) syscall(21, 0, 0, 0, 0 , 0);
 }
-
 int userGetCurrentPid()
 {
     return (int) syscall(22, 0, 0, 0, 0 , 0);
 }
 
-int send(uint64_t receiver, char * content,  char ** answer, uint8_t flag)
+int send(int receiver, char * content,  char ** answer, uint8_t flag)
 {
     return (int) syscall(23, (uint64_t)receiver, (uint64_t)content, (uint64_t)(answer), (uint64_t)flag, 0);
 }
@@ -125,4 +122,8 @@ int unlock(int mutex)
 int destroyMutex(int mutex)
 {
     return (int) syscall(28,(uint64_t) mutex, 0, 0, 0 , 0);
+}
+void kernelAllocatorTest()
+{
+    syscall(29, 0, 0, 0, 0, 0);
 }

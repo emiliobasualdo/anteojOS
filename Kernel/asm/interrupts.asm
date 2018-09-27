@@ -136,15 +136,17 @@ picSlaveMask:
 _irq00Handler: ; irqHandlerMaster 0 ; meto aca el que lleva la cuenta de cuantums todo
     pushState
 
-    ;mov rax, rsp    ; Lo guardamos aca para despues pushearlo en el nuevo stack
-    ;mov rsp, stack  ; Cambiamos de stack por uno auxiliar para no pisar el del proceso con lo que viene ahora
-    ;push rax        ; Pushiamos el RSP
+    mov rax, rsp    ; Lo guardamos aca para despues pushearlo en el nuevo stack
+    mov rbx, stack
+    sub rbx, 100
+    mov rsp, rbx  ; Cambiamos de stack por uno auxiliar para no pisar el del proceso con lo que viene ahora
+    push rax        ; Pushiamos el RSP
 
-    ;mov rdi, 0      ; pasaje de parametro
-    ;call irqDispatcher ; llamamos al irqDispatcher para que haga lo que quiera con el tick, ej: tick++
-    ;pop rdi         ; Popeamos el RSP y se lo pasamos como parametro al dispatcher
+    mov rdi, 0      ; pasaje de parametro
+    call irqDispatcher ; llamamos al irqDispatcher para que haga lo que quiera con el tick, ej: tick++
+    pop rdi         ; Popeamos el RSP y se lo pasamos como parametro al dispatcher
 
-    mov rdi, rsp    ;<------ esto es SOLO para la version sin el stack auxiliar
+    ;mov rdi, rsp    ;<------ esto es SOLO para la version sin el stack auxiliar
     call dispatcher ; llamamos al dispatcher, para que guarde el RSP y nos mande el nuevo RSP
     mov rsp, rax    ; colocamos el nuevo RPS
 
@@ -209,4 +211,4 @@ switchTo:
 SECTION .bss
 	aux: resq 1
 	rip: resq 1
-	stack: resb 800 ; suficiente para 100 quads todo chequear esto
+	stack: resb 100 ; suficiente para 100 quads todo chequear esto

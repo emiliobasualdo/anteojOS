@@ -52,7 +52,7 @@ void setBackgroundColour(uint8_t , uint8_t , uint8_t );
 /* system call to change coordinates */
 void setCoordinates(unsigned int, unsigned int);
 
-void *userMalloc(uint64_t x);
+void * userMalloc(uint64_t x);
 
 void userFree(uint64_t x);
 
@@ -75,7 +75,7 @@ int userProcessBomb();
 int userGetCurrentPid();
 
 /*sends message in between processes. Flag changes sync, being 0 async */
-int send(uint64_t receiver, char * content,  char ** answer, uint8_t flag);
+int send(int receiver, char * content,  char ** answer, uint8_t flag);
 
 /*receives message from postBox. Blocks process if postBox is empty*/
 int receive(char ** message);
@@ -92,5 +92,8 @@ int unlock(int mutex);
 
 /*makes unlockMutex not able to be used unless started*/
 int destroyMutex(int mutex);
+
+/* runs the allocator test on kernel */
+void kernelAllocatorTest();
 
 #endif

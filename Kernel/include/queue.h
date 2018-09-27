@@ -1,16 +1,11 @@
-//
-// Created by Emilio Basualdo on 9/14/18.
-//
-
-#ifndef ANTEOJOS_QUEUE_H
-#define ANTEOJOS_QUEUE_H
+#ifndef QUEUE_H
+#define QUEUE_H
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <myAlloc.h>
+#include "dinamicMemory.h"
 
 #define EMPTY_QUEUE -1
-
 
 // A structure to represent a queue
 typedef struct Queue
@@ -18,7 +13,7 @@ typedef struct Queue
     int front, rear, size;
     unsigned capacity;
     int* array;
-}Queue;
+} Queue;
 
 struct Queue* createQueue(unsigned capacity);
 // Queue is full when size becomes equal to the capacity
@@ -36,4 +31,4 @@ int front(struct Queue* queue);
 // Function to get rear of queue
 int rear(struct Queue* queue);
 
-#endif //ANTEOJOS_QUEUE_H
+#endif

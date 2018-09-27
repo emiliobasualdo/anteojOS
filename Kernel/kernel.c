@@ -5,13 +5,15 @@
 #include <videoDriver.h>
 #include <idtLoader.h>
 #include <timer.h>
-#include <myAlloc.h>
 #include <scheduler.h>
 #include <system.h>
 #include <sleep.h>
 #include <syscaller.h>
 #include "ipc.h"
 #include "shellTests.h"
+#include "allocator.h"
+#include "dinamicMemory.h"
+#include "pageAllocator.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -111,7 +113,7 @@ void theAllMighty(void)
 
 int main()
 {
-    if (!initKernelAlloc(0x600000))
+    if (!initializeAllocator())
     {
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;

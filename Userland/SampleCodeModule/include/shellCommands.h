@@ -11,6 +11,7 @@
 #include "time.h"
 #include "userPrintf.h"
 #include "prodcons.h"
+#include "messageTest.h"
 
 #define MAX_BUFFER_SIZE 10000
 #define MAX_ARGS 10
@@ -26,7 +27,6 @@
 
 #define FONT 2
 #define BACK 1
-#define NUM_COMMANDS 12           // cantidad de comandos disponibles
 
 typedef char argVector[MAX_ARGS][MAX_ARG_LENGTH];
 
@@ -105,10 +105,14 @@ int kill(int argc, argVector argv);
 int prodCons(int argc, argVector argv);
 int multiProcTest(int count, argVector argv);
 
+int allocatorTest(int count, argVector argv);
+
 /* Funciones auxiliares para las funciones de usuario*/
 
 int multiTest(int count, argVector argv);
 
 int endLessLoop();
+
+int messageTesting();
 
 #endif

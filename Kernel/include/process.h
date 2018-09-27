@@ -5,12 +5,11 @@
 #include <stdio.h>
 #include <system.h>
 #include <videoDriver.h>
-#include <myAlloc.h>
 #include <defs.h>
 #include <stdarg.h>
 #include <queue.h>
 #include "ipcStructs.h"
-
+#include "dinamicMemory.h"
 
 #define MAX_PROC_NAME 70
 #define INIT_PID 0
@@ -19,13 +18,12 @@
 #define MAX_CHILDREN 30
 #define MAX_SECURITY_LIMITAION 3
 #define PID_ERROR -1
-#define HEAP_STACK_SIZE 4000
+#define HEAP_STACK_SIZE 4096
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
 #define DEFAULT_NAME "process"
-
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;

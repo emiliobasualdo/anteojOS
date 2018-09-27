@@ -9,7 +9,8 @@
 
 const char * getNumber(int num, int i);
 
-static const char numbers[11][50][32] = {
+static const char numbers[1][1][1];
+/*static const char numbers[11][50][32] = {
         {
 
 "00000000000000000000000000000000",
@@ -582,6 +583,6 @@ static const char numbers[11][50][32] = {
 "00000000000000000000000000000000",
 "00000000000000000000000000000000",
 "00000000000000000000000000000000"}
-};
+};*/
 
 #endif

@@ -1,11 +1,11 @@
-//
-// Created by Emilio Basualdo on 9/26/18.
-//
+#ifndef PAGEALLOCATOR_H
+#define PAGEALLOCATOR_H
 
-#ifndef ANTEOJOS_PAGEALLOCATOR_H
-#define ANTEOJOS_PAGEALLOCATOR_H
+#include "allocator.h"
 
-#include <system.h>
+#define PAGE_SIZE 4096                  /** --> = 4 KiB */
 
+void * pageAlloc(size_t size);
+void pageFree (void * address);
 
-#endif //ANTEOJOS_PAGEALLOCATOR_H
+#endif

@@ -1,9 +1,5 @@
-//
-// Created by Emilio Basualdo on 9/4/18.
-//
-
-#ifndef PROCESOS_SCHEDULER_H_H
-#define PROCESOS_SCHEDULER_H_H
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 #include <roundRobin.h>
 #include <stdint.h>
@@ -21,4 +17,4 @@ boolean wakeUpBlocked(reasonT reason);
 void printProcQueues();
 boolean schedulerAddProcPid(pPid proc);
 
-#endif //PROCESOS_SCHEDULER_H_H
+#endif

@@ -123,7 +123,13 @@ int destroyMutex(int mutex)
 {
     return (int) syscall(28,(uint64_t) mutex, 0, 0, 0 , 0);
 }
+
 void kernelAllocatorTest()
 {
     syscall(29, 0, 0, 0, 0, 0);
+}
+
+void kernelNice(int pid, int niceValue)
+{
+    syscall(30, (uint64_t) pid, (uint64_t) niceValue, 0, 0, 0);
 }

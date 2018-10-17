@@ -15,6 +15,7 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static void reacursiveKillSons(pPid pid);
+static boolean isValidPriority(int priority);
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -167,6 +168,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
     newPcb->postBox = createNewMessageQueue();
+    newPcb->priority = DEFAULT_PRIORITY;
 
     newPcb->stackFrame = (stackFrame_t *) newPcb->rsp;
     newPcb->stackFrame->rdi = instruction;
@@ -273,6 +275,7 @@ boolean isValidPState(int state)
  * hacer respecto al estado del proceso. */
 boolean setProcessState(pPid pid, pState newState, reasonT reason)
 {
+    //simple_printf("pid=%d, name=%s, pid=%d, newState=%d, reason=%d\n",getCurrentProc()->pid, getCurrentProc()->name,pid,newState, reason);
     if (!procExists(pid) || !isValidPState(newState)){
         simple_printf("Kernel message: ERROR: pid is not valid \n");
         return FALSE;
@@ -293,9 +296,12 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
 
     array[pid]->state = newState;
     array[pid]->blockedReason = reason;
-    //simple_printf("setProcessState: proc1=%s, state=%d\n", array[pid]->name, array[pid]->state);
+    //simple_printf("setProcessState: notificamos\n");
+    schedulerNotifyProcessStateChange(pid);
+    //simple_printf("setProcessState: proc=%s, state=%d\n", array[pid]->name, array[pid]->state);
     if (pid == getCurrentProc()->pid && (newState == BLOCKED || newState == DEAD))
     {
+        //simple_printf("setProcessState: blocking/Deading el current\n");
         _hlt();
         // aca no se va a llegar nunca. cuando entre la interrupcion el RR va  cambiar de proceso
         // y como este está muerto no lo va a levantar.... creo
@@ -303,9 +309,21 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
     return TRUE;
 }
 
+/** Lo cambia casi sin chequeos ni notificaciones
+ * HAY QUE TENER CUIDADO CUANDO LA USAMOS!!!!!! PUEDE EXPLOTAR TODO
+ */
+boolean directSetProcessState(pPid pid, pState newState, reasonT reason)
+{
+    if (!procExists(pid) || !isValidPState(newState)){
+        simple_printf("Kernel message: ERROR: pid is not valid \n");
+        return FALSE;
+    }
+    array[pid]->state = newState;
+    array[pid]->blockedReason = reason;
+}
 void printAllProcs()
 {
-    simple_printf(" PID - NAME - STATE - FOREGROUND - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n b=BORN, r=READY, R=RUNNING, B=BLOCKED, D=DEAD\n");
+    simple_printf(" PID - NAME - STATE - FOREGROUND - PRIORITY - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n b=BORN, r=READY, R=RUNNING, B=BLOCKED, D=DEAD\n");
     Queue *queue = createQueue(MAX_PROCS);
     enqueue(queue, INIT_PID);
     pPid current = dequeue(queue);
@@ -326,7 +344,7 @@ void printAllProcs()
 
 static void printProc(pcbPtr pcb)
 {
-    simple_printf(" %d - %s - %s - %s - %d - %d\n", pcb->pid, pcb->name, statesNames[pcb->state], pcb->foreground == TRUE? "F":"B" , pcb->childrenCount, HEAP_STACK_SIZE);
+    simple_printf(" %d - %s - %s - %s - %d - %d - %d\n", pcb->pid, pcb->name, statesNames[pcb->state], pcb->foreground == TRUE? "F":"B" , pcb->priority,pcb->childrenCount, HEAP_STACK_SIZE);
 }
 
 void printSons(pPid parentPid)
@@ -415,9 +433,23 @@ pcbPtr getPcbPtr(pPid pid)
     return NULL;
 }
 
-boolean isAlive(pPid pid)
+boolean validReason(int reason)
 {
-    if (!procExists(pid))
+    return reason >= 0 && reason < REASON_COUNT;
+}
+
+boolean setProcessPriority(pPid pid, int newPriority)
+{
+    if(!procExists(pid) || !isValidPriority(newPriority))
+    {
+        simple_printf("Kernel: ERROR either pid does not exist or wrong priority\n");
         return FALSE;
-    return array[pid]->state != DEAD;
+    }
+    array[pid]->priority = newPriority;
+    schedulerNotifyProcessPriorityChange(pid);
+    return TRUE;
+}
+
+static boolean isValidPriority(int priority) {
+    return priority >= 0 && priority <= MAX_PRIORITY;
 }

@@ -7,7 +7,8 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                myExit, putChar, removeChar, changeBackgroundColour,
                                setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
-                               createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest};
+                               createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
+                               nice };
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -147,17 +148,14 @@ uint64_t createMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uin
 {
     return (uint64_t ) startMutex();
 }
-
 uint64_t kernelLock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t ) lockMutex((int)rdi);
 }
-
 uint64_t kernelUnlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t ) unlockMutex((int)rdi);
 }
-
 uint64_t destroyMutexKernel(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t ) destroyMutexK((int)rdi);
@@ -166,4 +164,8 @@ uint64_t sysAllocatorTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 {
     runAllocatorTest();
     return 1;
+}
+uint64_t nice(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) setProcessPriority((pPid) rdi, (int) rsi);
 }

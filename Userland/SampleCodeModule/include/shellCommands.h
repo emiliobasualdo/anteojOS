@@ -103,9 +103,12 @@ int backgroundTest(int argc, argVector argv);
 int kill(int argc, argVector argv);
 
 int prodCons(int argc, argVector argv);
+
 int multiProcTest(int count, argVector argv);
 
 int allocatorTest(int count, argVector argv);
+
+int nice(int count, argVector argv);
 
 /* Funciones auxiliares para las funciones de usuario*/
 

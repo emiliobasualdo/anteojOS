@@ -14,7 +14,7 @@
 #define MAX_PROC_NAME 70
 #define INIT_PID 0
 #define BUSSY_WAITING INIT_PID+1
-#define MAX_PROCS 100000
+#define MAX_PROCS 1000
 #define MAX_CHILDREN 30
 #define MAX_SECURITY_LIMITAION 3
 #define PID_ERROR -1
@@ -24,6 +24,9 @@
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
 #define DEFAULT_NAME "process"
+#define PRIORITY_LEVELS 5
+#define DEFAULT_PRIORITY (PRIORITY_LEVELS/2)
+#define MAX_PRIORITY (PRIORITY_LEVELS-1)
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;
@@ -66,6 +69,7 @@ typedef struct
     reasonT blockedReason;
 
     boolean foreground;
+    int priority;           // 0 prioridad más alta, PRIORITY_LEVELS-1 la más baja
 
     uint64_t rsp;
 
@@ -99,7 +103,9 @@ pcbPtr getBussyWaitingProcPcb();
 int bussyWaitingProc();
 void printAllProcs();
 pcbPtr getPcbPtr(pPid pid);
-boolean isAlive(pPid pid);
 void printSons(pPid parentPid);
+boolean validReason(int reason);
+boolean directSetProcessState(pPid pid, pState newState, reasonT reason);
+boolean setProcessPriority(pPid pid, int newPriority);
 
 #endif //PROCESOS_PROCESS_H

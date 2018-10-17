@@ -90,6 +90,7 @@ int newToRead()
 
 char getNextChar()
 {
+    //simple_printf("getNextChar: entrandoentrandoentrandoentrandoentrando\n");
     if (!newToRead())
         setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);
     return returnNextChar();

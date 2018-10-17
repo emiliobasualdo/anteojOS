@@ -21,6 +21,7 @@ command commands[]={
         {"prod_cons", "Simulates de Producer Consumer Problem", prodCons},
         {"allocator_test", "Performs a test to prove the physical memory management functionality", allocatorTest},
         {"message_test","Performs a test of Message Passing", messageTesting},
+        {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -366,6 +367,20 @@ int multiProcTest(int count, argVector argv)
 int allocatorTest(int count, argVector argv)
 {
     kernelAllocatorTest();
+    return 1;
+}
+
+int nice(int argc, argVector argv)
+{
+    if(argc != 3)
+    {
+        printF("Usage: nice <pid> <0-4>\n");
+        return FALSE;
+    }
+    int flag = 0, pid, niceValue;
+    toInt(argv[1], &pid, &flag);
+    toInt(argv[2], &niceValue, &flag);
+    kernelNice(pid, niceValue);
     return 1;
 }
 

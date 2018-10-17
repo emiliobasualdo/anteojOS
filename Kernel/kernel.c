@@ -9,11 +9,11 @@
 #include <system.h>
 #include <sleep.h>
 #include <syscaller.h>
-#include "ipc.h"
-#include "shellTests.h"
-#include "allocator.h"
-#include "dinamicMemory.h"
-#include "pageAllocator.h"
+#include <ipc.h>
+#include <shellTests.h>
+#include <allocator.h>
+#include <dinamicMemory.h>
+#include <pageAllocator.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -90,7 +90,7 @@ void * initializeKernelBinary() // todo ver clearBSS
     return getStackBase();
 }
 
-void theAllMighty(void)
+void theAllMighty()
 {
     simple_printf("The all mighty\n");
     if (createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE) == PID_ERROR)
@@ -98,11 +98,7 @@ void theAllMighty(void)
         simple_printf("theAllMighty: ERROR: shell == NULL\n");
         return;
     }
-    // if (createAndExecProcess("mutexTest", (uint64_t) mutexTest, getCurrentProc()->pid, FALSE) == PID_ERROR)
-    // {
-    //     simple_printf("mutexTest: ERROR: shell == NULL\n");
-    //     return;
-    // }
+    simple_printf("theAllMighty: cargando IDT\n");
     loadIDT();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
     simple_printf("theAllMighty: despues de bloquearse\n");

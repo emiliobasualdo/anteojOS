@@ -5,29 +5,32 @@
 #include <stdlib.h>
 #include <process.h>
 #include <system.h>
-#include "dinamicMemory.h"
+#include <dinamicMemory.h>
+
+#define INVALID -1
 
 typedef struct rrNode *rrNodePtr;
 
 typedef struct rrNode{
     pcbPtr pcbPtr;
-    struct rrNode *next;
+    rrNodePtr next;
+    rrNodePtr prev;
     unsigned long quantum;
 }rrNode;
 
 typedef struct rrQueue{
-    rrNodePtr head;
-    rrNodePtr tail;
-    rrNodePtr current;
-    long unsigned count;
+    rrNode head;
+    rrNode tail;
 }rrQueue;
+
+typedef rrQueue *rrQueuePtr;
 
 boolean rrInit(pcbPtr pcbPtr);
 boolean rrAddProcess(pcbPtr pcbPtr);
 pcbPtr rrNextAvailableProcess();
-boolean rrUnblockWaiters(reasonT reason);
+boolean rrUnblockWaiters(int reason);
 void printRRQueues();
-void setQuantum(int newQuantum);
-int getQuantum();
+void rrNotifyProcessStateChange(pPid pid);
+void rrNotifyProcessPriorityChange(pPid pid);
 
 #endif

@@ -16,5 +16,7 @@ void switchToNext();
 boolean wakeUpBlocked(reasonT reason);
 void printProcQueues();
 boolean schedulerAddProcPid(pPid proc);
+void schedulerNotifyProcessStateChange(pPid pid);
+void schedulerNotifyProcessPriorityChange(pPid pid);
 
 #endif

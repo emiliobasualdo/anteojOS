@@ -62,6 +62,7 @@ static pcbPtr nextProcess()
     current = rrNextAvailableProcess();
     if (!current)
     {
+        //simple_printf("nextProcess: NULL\n");
         current = getBussyWaitingProcPcb();
     }
     return current;
@@ -129,6 +130,7 @@ void switchToNext()
 
 boolean wakeUpBlocked(reasonT reason)
 {
+    //simple_printf("wakeUpBlocked: reason=%d\n", reason);
     switch (reason) // todo limpiar esto
     {
         case KEYBOARD:
@@ -147,4 +149,14 @@ void printProcQueues()
 boolean schedulerAddProcPid(pPid proc)
 {
     return schedulerAddProc(getPcbPtr(proc));
+}
+
+void schedulerNotifyProcessStateChange(pPid pid)
+{
+    rrNotifyProcessStateChange(pid);
+}
+
+void schedulerNotifyProcessPriorityChange(pPid pid)
+{
+    rrNotifyProcessPriorityChange(pid);
 }

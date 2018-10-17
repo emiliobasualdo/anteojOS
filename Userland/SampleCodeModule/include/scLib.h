@@ -96,4 +96,8 @@ int destroyMutex(int mutex);
 /* runs the allocator test on kernel */
 void kernelAllocatorTest();
 
+/* Changes the prioriy of the process*/
+void kernelNice(int i, int i1);
+
+
 #endif

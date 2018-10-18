@@ -69,16 +69,16 @@ void shell()
 void turnOnOff()
 {
     int x, y;
-    kernelBeep();
-    newWindow();
+    //kernelBeep();
+    //newWindow();
     changeFontColour(getCurrentFontColour());
     changeBackgroundColour(getCurrentBackgroundColour());
     setPresentationImageCoordinates(&x, &y, GLASSESWIDTH, GLASSESWIDTH);
-    drawImageFromHexaMap((unsigned int) x, (unsigned int) y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
-    sleep();
-    sleep();
-    sleep();
-    newWindow();
+    //drawImageFromHexaMap((unsigned int) x, (unsigned int) y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
+    //sleep();
+    //sleep();
+    //sleep();
+    //newWindow();
 }
 
 void newShell()

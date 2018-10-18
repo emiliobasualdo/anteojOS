@@ -79,9 +79,9 @@ pcbPtr getCurrentProc()
     return current;
 }
 
-pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground)
+pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority)
 {
-    pcbPtr newProc = createProcess(name, instruction, parent, foreground);
+    pcbPtr newProc = createProcess(name, instruction, parent, foreground, priority);
     if(!newProc)
     {
         //simple_printf("createAndExecProcess: !newProc\n");
@@ -159,4 +159,9 @@ void schedulerNotifyProcessStateChange(pPid pid)
 void schedulerNotifyProcessPriorityChange(pPid pid)
 {
     rrNotifyProcessPriorityChange(pid);
+}
+
+unsigned long long getProcRunTime(pPid pid)
+{
+    return getRRRunTime(pid);
 }

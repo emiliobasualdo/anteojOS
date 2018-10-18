@@ -389,6 +389,7 @@ int nice(int argc, argVector argv)
 int multiTest(int count, argVector argv)
 {
     char *message;
+    char name[20];
     if (count == 1)
         message = "running process in background";
     else if(count < 1)
@@ -398,18 +399,15 @@ int multiTest(int count, argVector argv)
 
     printF("We will create and run %d process in background so that you see that we are %s.\n", count ,message);
     printF("The process name is %s.\n", aux_programs[0].name);
-    printF("First we will print the current process list so that you see that program%s not currently running.\n\n", count==1?" is":"s are");
-    printPs(1,NULL);
     printF("\nPress any key to execute the program%s\n", count==1?"":"s");
     getChar();
-    for (int i = 0; i < count; ++i) {
-        execProcInBackground(aux_programs[0].name, (uint64_t) aux_programs[0].fn);
+    for (int i = 0; i < count; ++i)
+    {
+        userSprintf(name, "%s-%d",aux_programs[0].name, i);
+        execProcInBackground(name, (uint64_t) aux_programs[0].fn);
     }
-    printF("We will print again the process list so that you see the process %s running\n\n",count==1?"is":"are");
-    printPs(1, NULL);
     printF("\nWe will leave the program%s running for you to decide what to do with it\n",count==1?"":"s");
     printF("Remember you can kill %s with the command kill <pid>\n",count==1?"it":"them");
-    printF("Goodbye :)\n");
     return TRUE;
 }
 
@@ -426,6 +424,7 @@ int endLessLoop()
         }
     }
 }
+
 int prodCons(int argc, argVector argv)
 {
     if (argc != 3)

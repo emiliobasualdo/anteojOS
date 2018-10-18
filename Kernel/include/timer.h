@@ -1,6 +1,8 @@
 #ifndef TIMEDRIVER_H_
 #define TIMEDRIVER_H_
 
+#include <printf.h>
+
 #define TICKSPERSEC 18
 
 extern unsigned int getTime();

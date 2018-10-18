@@ -14,6 +14,7 @@
 #define IRQ_RES { asm volatile ("sti"); }
 #define HALT    { asm volatile ("hlt"); }
 #define STOP while (1) { HALT; }
+#define DEBUG
 
 #define FALSE 0
 #define TRUE !FALSE

@@ -6,8 +6,9 @@
 #include <process.h>
 #include <system.h>
 #include <dinamicMemory.h>
+#include <timer.h>
 
-#define INVALID -1
+#define MAX_TURNS_PER_PRIORITY 50
 
 typedef struct rrNode *rrNodePtr;
 
@@ -15,7 +16,8 @@ typedef struct rrNode{
     pcbPtr pcbPtr;
     rrNodePtr next;
     rrNodePtr prev;
-    unsigned long quantum;
+    int quantum;
+    unsigned long long rrTurns; // Cantidadd de veces que estuvo en procesador
 }rrNode;
 
 typedef struct rrQueue{
@@ -32,5 +34,6 @@ boolean rrUnblockWaiters(int reason);
 void printRRQueues();
 void rrNotifyProcessStateChange(pPid pid);
 void rrNotifyProcessPriorityChange(pPid pid);
+unsigned long long getRRRunTime(pPid pid);
 
 #endif

@@ -24,9 +24,13 @@
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
 #define DEFAULT_NAME "process"
+#define DO_NOT_CHANGE -3
+#define INTERACTIVE -2
+#define NORMAL -1
 #define PRIORITY_LEVELS 5
-#define DEFAULT_PRIORITY (PRIORITY_LEVELS/2)
-#define MAX_PRIORITY (PRIORITY_LEVELS-1)
+#define MAX_PRIORITY 0
+#define MIN_PRIORITY (PRIORITY_LEVELS-1)
+#define DEFAULT_PRIORITY MAX_PRIORITY
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;
@@ -69,7 +73,8 @@ typedef struct
     reasonT blockedReason;
 
     boolean foreground;
-    int priority;           // 0 prioridad más alta, PRIORITY_LEVELS-1 la más baja
+    short priority;           // 0 prioridad más alta, PRIORITY_LEVELS-1 la más baja
+    short priorityType;
 
     uint64_t rsp;
 
@@ -92,7 +97,7 @@ typedef pcbPtr *pArray;
 
 
 int procContainer(uint64_t inst);
-pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground);
+pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short i);
 pcbPtr initProcessControl(char *name, uint64_t instruction);
 boolean procExists(pPid pid);
 void arrayAddInit(pArray array, pcbPtr init);
@@ -106,6 +111,7 @@ pcbPtr getPcbPtr(pPid pid);
 void printSons(pPid parentPid);
 boolean validReason(int reason);
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason);
-boolean setProcessPriority(pPid pid, int newPriority);
+boolean setProcessPriority(pPid pid, short newPriority);
+boolean reduceProcessPriority(pPid pid);
 
 #endif //PROCESOS_PROCESS_H

@@ -16,10 +16,13 @@ static void switchStructures();
 static struct rrQueue* getNextQueue();
 static rrNodePtr handleCurrent();
 static rrNodePtr getNextReadyNode();
-static void refreshLHPA(int priority);
 static void removeNode(rrNodePtr node);
 static void normalQueueRemoveNode(rrNodePtr node);
 static void printStructure(rrQueue *pQueue);
+static void normalQueueAddNodeHead(rrNodePtr newNode, rrQueue *pQueue);
+static void preemptProcess(rrNodePtr pNode);
+static void setQuantum(rrNodePtr pNode);
+static void updatePriority(rrNodePtr pNode);
 
 /** Arrays estaticos de los vectores de colas.
 * Se los accede con punteros y se usan como estructuras para
@@ -39,9 +42,6 @@ static rrNodePtr process[MAX_PROCS];
 /** Array estatico de colas bloqueadas*/
 static rrQueue blockedArr[REASON_COUNT];
 
-/** Flag para eficiencia de elegido. lHPA = last Higher Priority Added*/
-static int lHPA = INVALID;
-
 /** No es constante porque planeaba hacerlo cambiar en el tiempo*/
 static int rrQuantum = 3;
 
@@ -58,7 +58,7 @@ boolean rrInit(pcbPtr pcbPtr)
 {
     simple_printf("rrInit: init\n");
     resetAllQueues();
-    current = normalQueueAddTail(pcbPtr, &(runningQueques[pcbPtr->priority]));
+    normalQueueAddTail(pcbPtr, &(runningQueques[pcbPtr->priority]));
 
     simple_printf("rrInit: inicializamos pid=%d, name=%s priority=%d\n", pcbPtr->pid, pcbPtr->name, pcbPtr->priority);
     printRRQueues();
@@ -75,35 +75,29 @@ boolean rrAddProcess(pcbPtr pcbPtr)
     return changeToRespectiveQueue(newNode);
 }
 
-/** Dado que RR nunca edita una priority, no chequeamos que es
- * válida, asumimos que lo es
- */
-static void refreshLHPA(int priority)
-{
-    lHPA = priority > lHPA? priority: lHPA;
-}
-
 /** Primero cheuqemos si el current todavia tiene tiempo, si tiene lo retornamos
  * si no tiene tiempo lo metemos donde debe y buscamos otro, si no hay nada retornamos null
  */
 pcbPtr rrNextAvailableProcess()
 {
-    //simple_printf("rrNextAvailableProcess: entrando\n");
-    rrNodePtr ret = handleCurrent();
-    // si no usamos current buscamos otro
-    if(!ret)
-    {
-        //simple_printf("rrNextAvailableProcess: NOT current\n");
+    rrNodePtr ret = handleCurrent(); // o retorna null o retorna current
+
+    if(ret) // es current, lo retorno
+        return ret->pcbPtr;
+    else // es null, busco otro
         ret = getNextReadyNode();
-    }
-    //simple_printf("rrNextAvailableProcess: returning node=%d name=%s\n",ret, ret->pcbPtr->name);
-    current = ret;
-    if(ret == NULL) // no es un error
+
+    if(ret == NULL) // no es un error, puede ser que current se haya bloqueado y no hay otro
     {
-        //simple_printf("rrNextAvailableProcess: ret == NULL\n");
+        current = NULL;
         return NULL;
     }
+    // si llegamos hasta aca, es porque hay un proceso para correr
+    // pero este NO es el current de antes, por ende, es un proceso
+    // que estaba en estado ready y con un quantum viejo, hay que cambiarloss
+    setQuantum(ret);
     directSetProcessState(ret->pcbPtr->pid, RUNNING, NO_REASON);
+    current = ret;
     return ret->pcbPtr;
 }
 
@@ -118,14 +112,15 @@ static rrNodePtr getNextReadyNode()
     rrQueue *pQueue = getNextQueue();
     if(!pQueue) // estan todas vacias
     {
-        //simple_printf("getNextReadyNode: no hay queues con datos\n");
         return NULL;
     }
     // Popeamos el primer nodo FCFS
     resp = normalQueuePop(pQueue);
     while (resp)
     {
-        if(resp->pcbPtr->state >= BLOCKED)  // no debería pasar que haya uno blocked... dead si
+        // Este caso no debería o currir. Solo ocurre si se usa
+        // directChangeProcessState de forma erronea
+        if(resp->pcbPtr->state >= BLOCKED)
         {
             changeToRespectiveQueue(resp);
             resp = normalQueuePop(pQueue);
@@ -140,13 +135,15 @@ static rrNodePtr getNextReadyNode()
     return getNextReadyNode();
 }
 
-/** Elige si seguimos corriendo el current o si lo pasamos a otra estructura*/
+/** Elige si seguimos corriendo el current o si lo pasamos a otra estructura
+ * Retorna NULL o current, ninguna otra opcion
+ */
 static rrNodePtr handleCurrent()
 {
     if(current != NULL) // si, current puede ser null
     {
         // Caso BLOKED/DEAD no es un error. puede pasar:
-        // 1) lo bloqeuan/matan 2) se llama a rr pero era el current
+        // 1) lo bloqeuan/matan y se llama a rr pero era el current
         if(current->pcbPtr->state >= BLOCKED) // todo borrar este caso
         {
             //simple_printf("handleCurrent: Current blocked/dead\n");
@@ -155,19 +152,43 @@ static rrNodePtr handleCurrent()
         else
         {
             // todavia le queda para correr y no está bloqueado
-            if (current->quantum < rrQuantum) // no deberia pasar que esté bloqued?
+            if (current->quantum > 0)
             {
-                current->quantum++;
+                current->quantum--;
                 return current;
             }
-            // Ya no puede correr más -> lo pasamos a la estructura de los terminados
-            if(current->quantum >= rrQuantum)
+            else if(current->quantum <= 0) // no podes correr más
             {
+                //incrementamos su cantidad de vueltas
+                updatePriority(current);
+                directSetProcessState(current->pcbPtr->pid, READY,NO_REASON);
                 changeToRespectiveStructure(current, finishedQueques);
             }
         }
     }
     return NULL;
+}
+
+/** Tomamos un decisión sobre que hacer con la prioridad basado en la cantidad de tiempo
+ * que se estuvo ejecutando EN PROCESADOR
+ * Los marcados como iteractivos o DO_NOT_CHANGE son proces que no "envejecen"
+ */
+static void updatePriority(rrNodePtr pNode)
+{
+    pNode->rrTurns++;
+    // esos dos estados no prioridad no se alteran en prioridad
+    if(pNode->pcbPtr->priorityType == NORMAL)
+    {
+        if (pNode->rrTurns % MAX_TURNS_PER_PRIORITY == 0) // creo que rrTurns nunca va a estar en 0
+        {
+            reduceProcessPriority(pNode->pcbPtr->pid);
+        }
+    }
+}
+
+static void setQuantum(rrNodePtr pNode)
+{
+    pNode->quantum = rrQuantum + (MIN_PRIORITY - pNode->pcbPtr->priority)/2;
 }
 
 /** Hacemos el cambio entre puntero de estructuras de running y de finished*/
@@ -176,7 +197,6 @@ static void switchStructures()
     rrQueuePtr aux = runningQueques;
     runningQueques = finishedQueques;
     finishedQueques = aux;
-    lHPA = INVALID; // porque nos fuimos pal otro lado, ya no agregamos más aca
 }
 
 /** Mete un nodo en la estructura que se le pasa, en su respectiva cola,
@@ -190,8 +210,6 @@ static void changeToRespectiveStructure(rrNodePtr pNode, rrQueuePtr qsVector)
 /** Elige detro de la estructura de running la siguiente cola a utilizar*/
 static rrQueue *getNextQueueAux()
 {
-    if(lHPA != INVALID && !rrIsEmpty(&(runningQueques[lHPA])))
-        return &(runningQueques[lHPA]);
     for (int i = 0; i < PRIORITY_LEVELS; ++i) {
         if(!rrIsEmpty(&(runningQueques[i])))
             return &(runningQueques[i]);
@@ -225,13 +243,15 @@ static boolean changeToRespectiveQueue(rrNodePtr node)
     switch (node->pcbPtr->state)
     {
         case BORN:
+            directSetProcessState(node->pcbPtr->pid, READY, NO_REASON);
         case READY:
-        case RUNNING:
             return normalQueueAddNodeTail(node, &(runningQueques[node->pcbPtr->priority]));
+        case RUNNING:
+            simple_printf("changeToRespectiveQueue(): Error: case Running:\n");
+            return FALSE;
         case BLOCKED:
             return funcionAuxiliar(node);
         case DEAD:
-            //simple_printf("changeToRespectiveQueue(): Error: case DEAD:\n");
             removeNode(node);
             return TRUE;
     }
@@ -272,8 +292,8 @@ static boolean funcionAuxiliar(rrNodePtr node)
  */
 boolean rrUnblockWaiters(int reason)
 {
-    //simple_printf("rrUnblockWaiters: reason=%d. Imprimimos antes de despertar\n", reason);
-    //printRRQueues();
+    DEBUG //simple_printf("rrUnblockWaiters: reason=%d. Imprimimos antes de despertar\n", reason);
+    DEBUG //printRRQueues();
 
     if (!validReason(reason))
     {
@@ -283,37 +303,67 @@ boolean rrUnblockWaiters(int reason)
     rrNodePtr node = normalQueuePop(&blockedArr[reason]);
     if (node == NULL)
     {
-        //simple_printf("rrUnblockWaiters: NO habia nadie a despertar\n");
+        DEBUG //simple_printf("rrUnblockWaiters: NO habia nadie a despertar\n");
         return FALSE;
     }
-    directSetProcessState(node->pcbPtr->pid, READY, NO_REASON);
-    changeToRespectiveQueue(node);
+    // si alguien lo mató, lo tenemos que eliminar
+    if(node->pcbPtr->state == DEAD)
+        changeToRespectiveQueue(node);
+    else
+    {
+        if(reason == KEYBOARD) //  en caso de ser KEYBOARD lo ejecutamos
+        {
+            DEBUG //simple_printf("rrUnblockWaiters: reason == KEYBOARD\n");
+            preemptProcess(node);
+        }
+        else
+        {
+            DEBUG //simple_printf("rrUnblockWaiters: reason != KEYBOARD\n");
+            directSetProcessState(node->pcbPtr->pid, READY, NO_REASON);
+            changeToRespectiveQueue(node);
+        }
+    }
+    DEBUG //printRRQueues();
     return TRUE;
 }
 
+/** Pseudo preeemptivo. Cuando suene el siguiente timmer tick lo levantan
+ * Al que venia antes no le contamos el rrTurns porque sería injusto ,no terminó la vuelta*/
+static void preemptProcess(rrNodePtr pNode)
+{
+    // al que venia corriendo lo ponemos primero en su cola para asegurarnos que se corra
+    if(current != NULL)
+    {
+        directSetProcessState(current->pcbPtr->pid, READY, NO_REASON);
+        normalQueueAddNodeHead(current, &(runningQueques[current->pcbPtr->priority]));
+    }
+    directSetProcessState(pNode->pcbPtr->pid, RUNNING, NO_REASON);
+    setQuantum(pNode);
+    current = pNode;
+}
+
 /** Patch para que externamente nos avizen si un proceso cambio de estado y
- * de esa forma nosotros poder cambirlo en nuestras estructuras
+ * de esa forma nosotros poder cambirlo en nuestras estructuras.
+ * Asumimos que SOLO se nos llama si hay un cambio NETO no cuando se pasa
+ * un proceso de ej: ready a ready
  */
 void rrNotifyProcessStateChange(pPid pid)
 {
-    //simple_printf("rrNotifyProcessStateChange: entrando -------------------------- name=%s state=%d\n", process[pid]->pcbPtr->name, process[pid]->pcbPtr->state);
     if(process[pid] == NULL)
     {
         // lo creamos y se agrega a process
-        if(!createNewNode(getPcbPtr(pid)))
+        if(!createNewNode(getPcbPtr(pid))) // si no se pudo....
             return;
     }
-    else // si ya está lo sacamos
+    else // si ya está lo sacamos de donde sea que esté
         normalQueueRemoveNode(process[pid]);
-    //simple_printf("rrNotifyProcessStateChange: vamos a cambiar %s\n",process[pid]->pcbPtr->name);
     changeToRespectiveQueue(process[pid]);
-    // si es el current tengo que tomar una decicion
-    if(process[pid] == current)
+    if(process[pid] == current) // si es el current tengo que tomar una decicion
     {
-        //simple_printf("rrNotifyProcessStateChange: Igual a current\n");
+        // aumentamos la cantidad de veces que estuvo en el procesador
+        updatePriority(current);
         current = NULL;
     }
-    //printRRQueues();
 }
 
 /** Se nos notifica si un proceso cambio de prioridad para
@@ -336,10 +386,16 @@ void rrNotifyProcessPriorityChange(pPid pid)
     }
 }
 
+unsigned long long getRRRunTime(pPid pid)
+{
+    if(process[pid])
+        return process[pid]->rrTurns;
+    return 0;
+}
 
-/**************************/
-/** Métodos de las queues */
-/**************************/
+/***************************/
+/** Métodos de las queues **/
+/***************************/
 static void resetAllQueues()
 {
     for (int i = 0; i < PRIORITY_LEVELS; ++i) {
@@ -408,11 +464,7 @@ static rrNodePtr normalQueueAddTail(pcbPtr pcbPtr, rrQueue *pQueue)
 static boolean normalQueueAddNodeTail(rrNodePtr newNode, rrQueue *pQueue)
 {
     if(rrIsEmpty(pQueue))
-    {
-        pQueue->head.next = pQueue->tail.prev = newNode;
-        newNode->prev = &pQueue->head;
-        newNode->next = &pQueue->tail;
-    }
+        normalQueueAddNodeHead(newNode,pQueue);
     else
     {
         newNode->prev = pQueue->tail.prev;
@@ -420,7 +472,6 @@ static boolean normalQueueAddNodeTail(rrNodePtr newNode, rrQueue *pQueue)
         pQueue->tail.prev = newNode;
         newNode->next = &pQueue->tail;
     }
-    refreshLHPA(newNode->pcbPtr->priority);
     return TRUE;
 }
 
@@ -437,7 +488,8 @@ static rrNodePtr createNewNode(pcbPtr pcbPtr)
 
     ret->pcbPtr = pcbPtr;
     process[pcbPtr->pid] = ret;
-    ret->quantum = 0;
+    setQuantum(ret);
+    ret->rrTurns = 0;
     return ret;
 }
 
@@ -479,3 +531,19 @@ static void removeNode(rrNodePtr node)
     kernelFree(node);
 }
 
+static void normalQueueAddNodeHead(rrNodePtr newNode, rrQueue *pQueue)
+{
+    if(rrIsEmpty(pQueue))
+    {
+        pQueue->head.next = pQueue->tail.prev = newNode;
+        newNode->prev = &pQueue->head;
+        newNode->next = &pQueue->tail;
+    }
+    else
+    {
+        pQueue->head.next->prev = newNode;
+        newNode->next = pQueue->head.next;
+        pQueue->head.next = newNode;
+        newNode->prev = &pQueue->head;
+    }
+}

@@ -27,6 +27,6 @@ void int_20() // todo esto no lo estoy usando, solucionar
 
 void int_21()
 {
-	if (keyboardInterpreter() == DOWN)
+	if (keyboardInterpreter())
 		wakeUpBlocked(KEYBOARD);
 }

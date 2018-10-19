@@ -23,4 +23,6 @@ typedef int boolean;
 char *myStrncpy(char *dst, const char*src, unsigned int n);
 int strcmp(char *, char *);
 int strlen(char *);
+int kernelIsDigit(char c);
+char * kernelToInt(char * string, int * k, int * resp);
 #endif //PROCESOS_SYSTEM_H

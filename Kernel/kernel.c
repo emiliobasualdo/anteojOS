@@ -14,6 +14,7 @@
 #include <allocator.h>
 #include <dinamicMemory.h>
 #include <pageAllocator.h>
+#include <shellTests.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -104,6 +105,7 @@ void theAllMighty()
     simple_printf("theAllMighty: despues de bloquearse\n");
     simple_printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
     simple_printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+
     STOP;
 }
 

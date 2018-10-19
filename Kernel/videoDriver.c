@@ -187,7 +187,7 @@ static void scroll ()
     }
 }
 
-void newWindow ()
+void clearWindow()
 {
     for (int j=0; j<vbe->yResolution; j++)
     {

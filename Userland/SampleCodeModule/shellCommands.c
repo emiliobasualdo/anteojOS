@@ -22,6 +22,7 @@ command commands[]={
         {"allocator_test", "Performs a test to prove the physical memory management functionality", allocatorTest},
         {"message_test","Performs a test of Message Passing", messageTesting},
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
+        {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -382,6 +383,33 @@ int nice(int argc, argVector argv)
     toInt(argv[2], &niceValue, &flag);
     kernelNice(pid, niceValue);
     return 1;
+}
+
+int columnTest(int argc, argVector argv)
+{
+    printF("In this test we will prove that we are running a scheduler with priorities\n");
+    printF("How many process do you want to execute?: ");
+    int num;
+    while ((num = getNum()) < 0 || num > 40 )
+    {
+        printF("\nPlease type a number between 0 and 40: ");
+    }
+    printF("\n");
+    char agening;
+    printF("Know you must decide if you wish to see the process loosing priority while getting older o or not\n");
+    printF("This decision does not affect the scheduler, it simply marks the created process as 'un-ageing', they do not get old\n");
+    printF("Set ageing? [y=TRUE][n=FALSE]: ");
+    while ((agening=getChar()) != 'y' && agening != 'n')
+    {
+        printF("\n [y=TRUE][n=FALSE]: ");
+    }
+    printF("\n");
+    printF("All right, we can now start the test. ¡REMEMBER you can always exit the test by typing 'q'!\n");
+    printF("Press any key to start!\n");
+    getChar();
+    kernelColumnTest(num, agening=='y');
+    newShell();
+    return TRUE;
 }
 
 /* Funciones auxiliares para los comandos de de usuario*/

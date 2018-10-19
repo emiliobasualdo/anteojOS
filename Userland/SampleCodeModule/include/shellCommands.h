@@ -118,4 +118,6 @@ int endLessLoop();
 
 int messageTesting();
 
+int columnTest(int argc, argVector argv);
+
 #endif

@@ -31,14 +31,14 @@ void exceptionDispatcher(uint64_t exception, uint64_t * rsp)
 
 static void zeroDivision()
 {
-		newWindow();
-		drawString("\n Cannot divide by 0\n");
+	clearWindow();
+	drawString("\n Cannot divide by 0\n");
 }
 
 static void invalidOpcode()
 {
-		newWindow();
-		drawString("\n No such function\n");
+	clearWindow();
+	drawString("\n No such function\n");
 }
 
 void printRegisters(uint64_t * stack)

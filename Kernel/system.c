@@ -45,3 +45,41 @@ int strlen(char *str)
     }
     return(len);
 }
+
+int kernelIsDigit(char c)
+{
+    return c>='0' && c<='9' ? 1 : 0 ;
+}
+
+char * kernelToInt(char * string, int * k, int * resp)
+{
+    *k = 0;
+    int sgn = 1, c;
+    *resp = 1;
+    if (!(*string == '-' || kernelIsDigit(*string)))
+    {
+        *resp = 0;
+        return string;
+    }
+    if(*string == '-')
+    {
+        if (kernelIsDigit(*(string + 1)))
+        {
+            string++;
+            sgn = -1;
+            *k = (*string - '0') * sgn;
+            string++;
+        }
+        else
+        {
+            return string;
+
+        }
+    }
+    while (kernelIsDigit(c = *string))
+    {
+        *k = (*k) * 10 + (c-'0') * sgn;
+        string++;
+    }
+    return string;
+}

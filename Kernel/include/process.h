@@ -15,7 +15,7 @@
 #define INIT_PID 0
 #define BUSSY_WAITING INIT_PID+1
 #define MAX_PROCS 1000
-#define MAX_CHILDREN 30
+#define MAX_CHILDREN 60
 #define MAX_SECURITY_LIMITAION 3
 #define PID_ERROR -1
 #define HEAP_STACK_SIZE 4096
@@ -113,5 +113,6 @@ boolean validReason(int reason);
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason);
 boolean setProcessPriority(pPid pid, short newPriority);
 boolean reduceProcessPriority(pPid pid);
+void killAllDescendants(pPid pid);
 
 #endif //PROCESOS_PROCESS_H

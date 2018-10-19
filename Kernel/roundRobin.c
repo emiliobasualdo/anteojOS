@@ -188,7 +188,7 @@ static void updatePriority(rrNodePtr pNode)
 
 static void setQuantum(rrNodePtr pNode)
 {
-    pNode->quantum = rrQuantum + (MIN_PRIORITY - pNode->pcbPtr->priority)/2;
+    pNode->quantum = rrQuantum + (MIN_PRIORITY - pNode->pcbPtr->priority);
 }
 
 /** Hacemos el cambio entre puntero de estructuras de running y de finished*/

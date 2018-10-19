@@ -8,7 +8,7 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
                                createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
-                               nice };
+                               nice, kernelColumnTest };
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -167,5 +167,11 @@ uint64_t sysAllocatorTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 }
 uint64_t nice(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) setProcessPriority((pPid) rdi, (int) rsi);
+    return (uint64_t) setProcessPriority((pPid) rdi, (short) (int) rsi);
 }
+uint64_t kernelColumnTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    columnTest((short) rdi, (boolean) rsi);
+    return TRUE;
+}
+

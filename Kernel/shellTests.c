@@ -1,5 +1,107 @@
 #include <shellTests.h>
 
+#define NAME "proc"
+#define MAX 40
+#define END 1000000000 // velocidad
+#define CANT_BLOCKS 50
+#define LEVEL (END/CANT_BLOCKS)
+#define PAD 10
+
+short cantProcess;
+int xRes,yRes, xInit, yInit;
+int cantRows ;
+int rowHeight;
+int blockWidth;
+
+
+void printBlock(int, int, short priority);
+
+void setVariables(short procsCant);
+
+void drawLoop()
+{
+    //simple_printf("%d %d %s\n", getCurrentProc()->priority,getCurrentProc()->priorityType, getCurrentProc()->name);
+    unsigned long long counter = 0;
+    while(counter != END)
+    {
+        counter++;
+        if(counter % LEVEL == 0) // por cada nivel imprimimos un bloque
+        {
+            //simple_printf("loopeando\n");
+            int flag, procNum;
+            kernelToInt(getCurrentProc()->name, &procNum, &flag);
+            printBlock((int) ((counter / LEVEL) * 2), procNum*2 +1 , getCurrentProc()->priority);
+        }
+    }
+    setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
+}
+
+void printBlock(int i, int j, short priority)
+{
+    int x2Init = xInit + blockWidth*i;
+    int y2Init = yInit + rowHeight*j;
+
+/*    for (int k = 0; k < blockWidth; ++k)
+    {
+        for (int l = 0; l < rowHeight; ++l)
+        {
+            drawAPixel((unsigned int) k, (unsigned int) l+y2Init);
+        }
+    }*/
+    setCoord((unsigned int) (xInit + ((blockWidth / 2) - (CHAR_WIDTH / 2))),
+             (unsigned int) (yInit + ((rowHeight / 2) - (charHeight / 2)) + j * rowHeight));
+    drawChar((char) (priority + '0'));
+
+    for (int k = 0; k < blockWidth; ++k)
+    {
+        for (int l = 0; l < rowHeight; ++l)
+        {
+            drawAPixel((unsigned int) k+x2Init, (unsigned int) l+y2Init);
+        }
+    }
+}
+
+void columnTest(short cantProcs, boolean ageing)
+{
+    if(cantProcs < 1 || cantProcs > MAX)
+    {
+        simple_printf("Kernel ERROR: max is %d!!\n", MAX);
+        return;
+    }
+
+    clearWindow();
+
+    char name[20];
+    short priority;
+
+    setVariables(cantProcs);
+
+    for (int i = 0; i < cantProcs; ++i)
+    {
+        priority = (short) (i % PRIORITY_LEVELS);
+        simple_sprintf(name,"%d-%s-%d", i, NAME, priority); // la congurencia nunca va a quedar 5
+        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority);
+        if(!ageing)
+            setProcessPriority(pid, priority);
+    }
+    // agregar que pueda cambiar el cuantum con teclas
+    while (getNextChar() != 'q'){}
+    killAllDescendants(getCurrentProc()->pid);
+    clearWindow();
+}
+
+void setVariables(short procsCant)
+{
+    cantProcess = procsCant;
+    xRes = getXResolution();
+    yRes = getYResolution();
+    xInit = 0;
+    yInit = 0;
+    cantRows = (2*cantProcess)+1;
+    rowHeight = yRes/cantRows;
+    blockWidth = xRes / (CANT_BLOCKS*2);
+    //simple_printf("xRes=%d yRes=%d cantRows=%d rowHeight=%d blockHeight=%d\n",xRes, yRes,cantRows, rowHeight, blockHeight);
+}
 
 
 int proc1()

@@ -9,12 +9,11 @@
 static boolean isValidPid(pPid pid);
 static void freeProcess(pcbPtr proc);
 static pPid getNextPid();
-static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short i);
+static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority);
 static pPid arrayAdd(pcbPtr pcbPtr, int demandPid);
 static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
-static void reacursiveKillSons(pPid pid);
 static boolean isValidPriority(int priority);
 
 /** arraya de punteros a pcbs */
@@ -106,7 +105,7 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
         if(parent->creationLimit > MAX_SECURITY_LIMITAION)
         {
             simple_printf("!Kernel: killing process's %s sons because it seems harmfull to the OS!!\n", array[parentPid]->name);
-            reacursiveKillSons(parentPid);
+            killAllDescendants(parentPid);
         }
         return FALSE;
     }
@@ -116,13 +115,13 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
 
 /**
  * Asume que las interrupciones estan apagadas*/
-static void reacursiveKillSons(pPid pid) {
+void killAllDescendants(pPid pid) {
     if (!procExists(pid))
         return;
     pPid childPid;
     pcbPtr proc = array[pid];
     for (int i = 0; i < proc->childrenCount; ++i) {
-        reacursiveKillSons(array[proc->childs[i]]->pid);
+        killAllDescendants(array[proc->childs[i]]->pid);
         childPid = proc->childs[i];
         if(procExists(childPid))
             setProcessState(childPid,DEAD, NO_REASON);
@@ -180,6 +179,11 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     {
         newPcb->priorityType = INTERACTIVE;
         newPcb->priority = MAX_PRIORITY;
+    }
+    else if(priority == DO_NOT_CHANGE)
+    {
+        newPcb->priorityType = DO_NOT_CHANGE;
+        newPcb->priority = priority;
     }
     else
     {
@@ -476,9 +480,14 @@ boolean validReason(int reason)
 
 boolean setProcessPriority(pPid pid, short newPriority)
 {
-    if(!procExists(pid) || !isValidPriority(newPriority))
+    if(!procExists(pid))
     {
-        simple_printf("Kernel: ERROR either pid does not exist or wrong priority\n");
+        simple_printf("Kernel: ERROR pid does not exist\n");
+        return FALSE;
+    }
+    if(!isValidPriority(newPriority))
+    {
+        simple_printf("Kernel: ERROR invalid priority %d\n", newPriority);
         return FALSE;
     }
     array[pid]->priority = newPriority;
@@ -489,8 +498,10 @@ boolean setProcessPriority(pPid pid, short newPriority)
 }
 
 static boolean isValidPriority(int priority) {
-    return (priority >= 0 && priority <= MAX_PRIORITY) ||
-            priority == INTERACTIVE ;
+    return (priority >= 0 && priority < PRIORITY_LEVELS) ||
+            priority == INTERACTIVE ||
+            priority == NORMAL ||
+            priority == DO_NOT_CHANGE;
 }
 
 /** Si es posible reducimos la prioridad en 1*/

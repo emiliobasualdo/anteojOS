@@ -133,3 +133,8 @@ void kernelNice(int pid, int niceValue)
 {
     syscall(30, (uint64_t) pid, (uint64_t) niceValue, 0, 0, 0);
 }
+
+void kernelColumnTest(int num, int ageing)
+{
+    syscall(31, (uint64_t) num, (uint64_t) ageing, 0, 0, 0);
+}

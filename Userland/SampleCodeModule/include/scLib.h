@@ -83,7 +83,6 @@ int receive(char ** message);
 /*creates a mutex. Return value is the mutex Number, used to lock,unlock*/
 int newMutex();
 
-
 /*tries to lock if mutex available. If not, it blocks until it is unlocked by the process that locked it*/
 int lock(int mutex);
 
@@ -99,5 +98,6 @@ void kernelAllocatorTest();
 /* Changes the prioriy of the process*/
 void kernelNice(int i, int i1);
 
+void kernelColumnTest(int num, int ageing);
 
 #endif

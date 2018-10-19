@@ -88,7 +88,7 @@ void setFontColour(Colour);
 void paintWindow(Colour);
 
 /* paints the current window with the default background colour */
-void newWindow ();
+void clearWindow();
 
 /* makes an enter or a new line */
 void enter();

@@ -68,7 +68,7 @@ static void m3()
 void messageTest()
 {
     myPid = userStartProcess("m2", (uint64_t) m2, userGetCurrentPid());
-    mutex = newMutex();
+    mutex = newMutex(0);
     printF("meu Pid: %d      \n", myPid);
     if (myPid == -1)
     {

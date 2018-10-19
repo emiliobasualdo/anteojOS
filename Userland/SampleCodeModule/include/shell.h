@@ -24,9 +24,6 @@
 #define BUFFER_OVERFLOW -4
 #define AMPRESAND_CMD -5
 
-#define FALSE 0
-#define TRUE  1
-
 #define OS_SHELL_LINE     "anteojOS:$ "
 #define NO_SUCH_CMMD_MSG  "No such command found, check your input."
 #define ILLEGAL_INPUT_MSG "Your input contains illegal values, only printable characters admitted. Check your input."

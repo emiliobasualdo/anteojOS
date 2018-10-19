@@ -24,7 +24,7 @@ static int prod[MAXPROC];
 
 int producerConsumer(int numProducers, int numConsumers)
 {
-    mutex = newMutex();
+    mutex = newMutex(0);
 
     int aux = createProducers(numProducers);
     if (aux == 0)

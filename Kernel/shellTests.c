@@ -180,7 +180,7 @@ static void f3()
 
 void mutexTest()
 {
-    mutex = startMutex();
+    mutex = startMutex(0);
     if (createAndExecProcess("f1", (uint64_t) f1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
     {
         simple_printf("f1: ERROR: otro == NULL\n");

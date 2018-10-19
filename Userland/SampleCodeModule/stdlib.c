@@ -103,7 +103,7 @@ int isSpace(char c)
 
 int isGraph(char c)
 {
-    return c >= 32 && c<=126;
+    return c >= 32 && c<= 126;
 }
 int isQuote(char c)
 {

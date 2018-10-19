@@ -104,9 +104,9 @@ int receive(char ** message)
     return (int) syscall(24, (uint64_t) message, 0, 0, 0 , 0);
 }
 
-int newMutex()
+int newMutex(int initValue)
 {
-    return (int) syscall(25, 0, 0, 0, 0 , 0);
+    return (int) syscall(25, (uint64_t) initValue, 0, 0, 0 , 0);
 }
 
 int lock(int mutex)
@@ -137,4 +137,9 @@ void kernelNice(int pid, int niceValue)
 void kernelColumnTest(int num, int ageing)
 {
     syscall(31, (uint64_t) num, (uint64_t) ageing, 0, 0, 0);
+}
+
+void userKillAllDescendants(int pid)
+{
+    syscall(32, (uint64_t) pid, 0, 0, 0, 0);
 }

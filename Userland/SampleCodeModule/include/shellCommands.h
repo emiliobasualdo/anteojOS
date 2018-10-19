@@ -12,6 +12,7 @@
 #include "userPrintf.h"
 #include "prodcons.h"
 #include "messageTest.h"
+#include "philosophers.h"
 
 #define MAX_BUFFER_SIZE 10000
 #define MAX_ARGS 10

@@ -109,7 +109,7 @@ void printIpcsQueues()
  * le doy el ID de su mutex
  * Si recibo -1, significa que no me lo pude "crear"
  */
-int startMutex()
+int startMutex(int initValue)
 {
     if(positionMutexArray >= MAXMUTEXES)
     {
@@ -118,7 +118,7 @@ int startMutex()
         {
             if(mutexList[positionMutexArray].value == -1)
             {
-                mutexList[positionMutexArray].value = 0;
+                mutexList[positionMutexArray].value = initValue;
                 mutexList[positionMutexArray].nextProcessInLine = createQueue(MAXINQUEUE);
                 return i;
             }
@@ -127,14 +127,12 @@ int startMutex()
     }
     else
     {
-        mutexList[positionMutexArray].value = 0;
+        mutexList[positionMutexArray].value = initValue;
         mutexList[positionMutexArray].nextProcessInLine = createQueue(MAXINQUEUE);
         positionMutexArray++;
         return positionMutexArray - 1;
     }
 }
-
-
 
 int lockMutex(int mutex)
 {

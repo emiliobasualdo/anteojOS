@@ -7,6 +7,8 @@
 
 #define MAX_BUFFER 1024
 #define MAX_INT_DIGIT 20
+#define FALSE 0
+#define TRUE !FALSE
 
 /* reads the buffer and returns the line written on stdin */
 char * reaDLine(char *, unsigned int);

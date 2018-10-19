@@ -166,4 +166,11 @@ uint64_t nice(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r
  ** executes a test
  */
 uint64_t kernelColumnTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 31
+ ** kill all descendentts of pid rdi
+ *
+ */
+uint64_t userKillAllDescendants(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
 #endif

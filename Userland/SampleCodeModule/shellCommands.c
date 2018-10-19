@@ -387,7 +387,9 @@ int nice(int argc, argVector argv)
 
 int columnTest(int argc, argVector argv)
 {
+    newWindow();
     printF("In this test we will prove that we are running a scheduler with priorities\n");
+    printF("We are going to execute many identical process, they are all set to do the same task, but their priorities vary\n");
     printF("How many process do you want to execute?: ");
     int num;
     while ((num = getNum()) < 0 || num > 40 )
@@ -396,12 +398,13 @@ int columnTest(int argc, argVector argv)
     }
     printF("\n");
     char agening;
+    printF("Each row represents a process, the number to the left is the current process priority level, 0 is the highest\n");
     printF("Know you must decide if you wish to see the process loosing priority while getting older o or not\n");
     printF("This decision does not affect the scheduler, it simply marks the created process as 'un-ageing', they do not get old\n");
     printF("Set ageing? [y=TRUE][n=FALSE]: ");
     while ((agening=getChar()) != 'y' && agening != 'n')
     {
-        printF("\n [y=TRUE][n=FALSE]: ");
+        printF("\n[y=TRUE][n=FALSE]: ");
     }
     printF("\n");
     printF("All right, we can now start the test. ¡REMEMBER you can always exit the test by typing 'q'!\n");
@@ -410,6 +413,11 @@ int columnTest(int argc, argVector argv)
     kernelColumnTest(num, agening=='y');
     newShell();
     return TRUE;
+}
+
+int philoTest(int argc, argVector argv)
+{
+    return startPhilosophers();
 }
 
 /* Funciones auxiliares para los comandos de de usuario*/

@@ -90,7 +90,7 @@ int newToRead()
 
 char getNextChar()
 {
-    if (!newToRead())
+    while (!newToRead())
         setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);
     return returnNextChar();
 }

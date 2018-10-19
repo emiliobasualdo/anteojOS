@@ -27,13 +27,13 @@ extern int unlockMutexASM(int * mutex);
 extern int lockMutexASM(int * mutex);
 
 //Disponibiliza un id de Mutex
-int startMutex();
+int startMutex(int initValue);
 
 //Inicializa los mutex
 int initIPCS();
 int lockMutex(int mutex);
 int unlockMutex(int mutex);
-int startMutex();
+int startMutex(int initValue);
 
 
 //destruye el mutex si no tiene procesos en la cola

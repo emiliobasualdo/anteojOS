@@ -6,6 +6,7 @@
 
 typedef int pPid;
 
+
 typedef struct message_t
 {
     uint64_t id;
@@ -32,6 +33,8 @@ typedef struct messageQueue
     messageNode * first;
     messageNode * last;
 } messageQueue;
+
+typedef mutex_t sem_t ;
 
 /**
  * Metodos y structs para la cola de mensajes

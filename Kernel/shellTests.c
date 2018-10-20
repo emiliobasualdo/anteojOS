@@ -193,21 +193,100 @@ void mutexTest()
     }
     if (createAndExecProcess("f3", (uint64_t) f3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
     {
-        simple_printf("f2: ERROR: otro == NULL\n");
+        simple_printf("f3: ERROR: otro == NULL\n");
         return;
     }
-    long ifff = 0;
-    while (ifff < 100000000) {
+    long aux = 0;
+    while (aux < 100000000) {
 
-        ifff++;
+        aux++;
     }
 
     while(destroyMutexK(mutex) == -1)
     {
-        ifff = 0;
-        while (ifff < 45)
+        aux = 0;
+        while (aux < 45)
         {
-        ifff++;
+        aux++;
+        }
+    }
+
+    simple_printf("i final = %d\n", i);
+}
+
+int sem = 0;
+
+static void s1()
+{
+    int j = 0;
+    semWait(sem);
+    while(j++ < 100)
+    {
+        i++;
+        simple_printf("is1 = %d\n", i);
+    }
+    semPost(sem);
+    simple_printf("aca termina s1\n");
+
+}
+static void s2()
+{
+    int j = 0;
+    while(j++ < 100)
+    {
+        semWait(sem);
+        i--;
+        simple_printf("is2 = %d\n", i);
+
+        semPost(sem);
+    }
+    simple_printf("aca termina s2\n");
+}
+
+static void s3()
+{
+    int j = 0;
+    while(j++ < 100)
+    {
+        semWait(sem);
+        i += 2;
+        simple_printf("is3 = %d\n", i);
+        semPost(sem);
+    }
+    simple_printf("aca termina s3\n");
+
+}
+
+void semTest()
+{
+    sem = semStart(1);
+    if (createAndExecProcess("s1", (uint64_t) s1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    {
+        simple_printf("s1: ERROR: otro == NULL\n");
+        return;
+    }
+    if (createAndExecProcess("s2", (uint64_t) s2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    {
+        simple_printf("s2: ERROR: otro == NULL\n");
+        return;
+    }
+    if (createAndExecProcess("s3", (uint64_t) s3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    {
+        simple_printf("s3: ERROR: otro == NULL\n");
+        return;
+    }
+    long aux = 0;
+    while (aux < 100000000) {
+
+        aux++;
+    }
+
+    while(destroyMutexK(mutex) == -1)
+    {
+        aux = 0;
+        while (aux < 45)
+        {
+            aux++;
         }
     }
 

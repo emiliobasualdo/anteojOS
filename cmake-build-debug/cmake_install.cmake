@@ -1,4 +1,4 @@
-# Install script for directory: /Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP3/anteojOS
+# Install script for directory: /Users/pedroremigiopingarilho/Desktop/ITBA/SO/TP03/anteojOS
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP3/anteojOS/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/pedroremigiopingarilho/Desktop/ITBA/SO/TP03/anteojOS/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

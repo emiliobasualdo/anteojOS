@@ -94,7 +94,12 @@ void * initializeKernelBinary() // todo ver clearBSS
 void theAllMighty()
 {
     simple_printf("The all mighty\n");
-    if (createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE, INTERACTIVE) == PID_ERROR)
+//    if (createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE, INTERACTIVE) == PID_ERROR)
+//    {
+//        simple_printf("theAllMighty: ERROR: shell == NULL\n");
+//        return;
+//    }
+    if (createAndExecProcess("p1", (uint64_t) semTest, getCurrentProc()->pid, TRUE, INTERACTIVE) == PID_ERROR)
     {
         simple_printf("theAllMighty: ERROR: shell == NULL\n");
         return;
@@ -114,6 +119,10 @@ int main()
     if (!initializeAllocator())
     {
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
+        return 0;
+    }
+    if(!initIPCS()) {
+        simple_printf("kernel: ERROR: initIPCs retornó FALSE\n");
         return 0;
     }
     pcbPtr pacientCero = initScheduler("theAllMighty", (uint64_t) theAllMighty);

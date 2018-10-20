@@ -20,24 +20,29 @@
 
 
 /**
- * Metodos Mutex
+ * Metodos Mutex y Semaforos
  */
 extern int cmpandSwap(int * mutex);
 extern int unlockMutexASM(int * mutex);
 extern int lockMutexASM(int * mutex);
 
-//Disponibiliza un id de Mutex
+
+//Disponibiliza un id de Mutex / Sem
 int startMutex(int initValue);
+int semStart(int initValue);
 
 //Inicializa los mutex
 int initIPCS();
 int lockMutex(int mutex);
 int unlockMutex(int mutex);
-int startMutex(int initValue);
 
+// Semaforos
+int semWait(int sem);
+int semPost(int sem);
 
 //destruye el mutex si no tiene procesos en la cola
 int destroyMutexK(int mutex);
+int semDestroyK(int sem);
 
 /**
  * Metodos para crear nuevo mensaje y mandarlo

@@ -459,6 +459,7 @@ int endLessLoop()
             printF("Soy el proceso %d y sigo vivio! Matame si te animas\n", pid);
         }
     }
+    return TRUE;
 }
 
 int prodCons(int argc, argVector argv)

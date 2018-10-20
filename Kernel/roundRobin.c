@@ -21,8 +21,9 @@ static void normalQueueRemoveNode(rrNodePtr node);
 static void printStructure(rrQueue *pQueue);
 static void normalQueueAddNodeHead(rrNodePtr newNode, rrQueue *pQueue);
 static void preemptProcess(rrNodePtr pNode);
-static void setQuantum(rrNodePtr pNode);
+static void setNodeQuantum(rrNodePtr pNode);
 static void updatePriority(rrNodePtr pNode);
+static boolean isValidQuantum(int quantum);
 
 /** Arrays estaticos de los vectores de colas.
 * Se los accede con punteros y se usan como estructuras para
@@ -95,7 +96,7 @@ pcbPtr rrNextAvailableProcess()
     // si llegamos hasta aca, es porque hay un proceso para correr
     // pero este NO es el current de antes, por ende, es un proceso
     // que estaba en estado ready y con un quantum viejo, hay que cambiarloss
-    setQuantum(ret);
+    setNodeQuantum(ret);
     directSetProcessState(ret->pcbPtr->pid, RUNNING, NO_REASON);
     current = ret;
     return ret->pcbPtr;
@@ -186,9 +187,27 @@ static void updatePriority(rrNodePtr pNode)
     }
 }
 
-static void setQuantum(rrNodePtr pNode)
+static void setNodeQuantum(rrNodePtr pNode)
 {
     pNode->quantum = rrQuantum + (MIN_PRIORITY - pNode->pcbPtr->priority);
+}
+
+void setQuantum(int newQuantum)
+{
+    if(isValidQuantum(newQuantum))
+        rrQuantum = newQuantum;
+    else
+        simple_printf("Kernel: ERROR: %d is nos a valid quantum value\n");
+}
+
+static boolean isValidQuantum(int quantum)
+{
+    return quantum > 0;
+}
+
+int getQuantum()
+{
+    return rrQuantum;
 }
 
 /** Hacemos el cambio entre puntero de estructuras de running y de finished*/
@@ -338,7 +357,7 @@ static void preemptProcess(rrNodePtr pNode)
         normalQueueAddNodeHead(current, &(runningQueques[current->pcbPtr->priority]));
     }
     directSetProcessState(pNode->pcbPtr->pid, RUNNING, NO_REASON);
-    setQuantum(pNode);
+    setNodeQuantum(pNode);
     current = pNode;
 }
 
@@ -488,7 +507,7 @@ static rrNodePtr createNewNode(pcbPtr pcbPtr)
 
     ret->pcbPtr = pcbPtr;
     process[pcbPtr->pid] = ret;
-    setQuantum(ret);
+    setNodeQuantum(ret);
     ret->rrTurns = 0;
     return ret;
 }

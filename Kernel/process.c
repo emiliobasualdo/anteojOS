@@ -230,7 +230,7 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
         for(i = 0; proc->postBox->count > 0;i++)
         {
             dequeueMessage(proc->postBox, msg);
-            kernelFree(msg->content);
+            //kernelFree(msg->content); // todo solucionar esto
         }
         kernelFree(proc->postBox);
         if (isValidPid(proc->pid))

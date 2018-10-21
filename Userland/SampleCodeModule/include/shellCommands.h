@@ -111,6 +111,8 @@ int allocatorTest(int count, argVector argv);
 
 int nice(int count, argVector argv);
 
+int setQuantum(int argc, argVector argv);
+
 /* Funciones auxiliares para las funciones de usuario*/
 
 int multiTest(int count, argVector argv);
@@ -120,5 +122,7 @@ int endLessLoop();
 int messageTesting();
 
 int columnTest(int argc, argVector argv);
+
+int getQuantum(int argc, argVector argv);
 
 #endif

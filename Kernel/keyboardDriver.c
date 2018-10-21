@@ -13,23 +13,44 @@ char keyboardShiftList[128]= {0,27,'!','@','#','$','%','^','&','*','(',')','_','
 
 int capsLock = 0;
 int shift = 0;
+int multiMedia = 0;
 
-char buffer[BUFFERSIZE] = {0};
+int buffer[BUFFERSIZE] = {0};
 int bufferWrite = 0;
 int bufferRead = 0;
 int size = 0;
 
 int keyboardInterpreter()
 {
-    unsigned char key = (unsigned char) getKey();
+    int key = (unsigned char) getKey();
+    if(key == 0xE0) //multimedia
+    {
+        multiMedia = (multiMedia+1 ) % 2;
+    }
     if (key & 0x80)
     {
         if(key == 0xAA || key == 0xB6)
             shift = 0;
         return UP;
     }
-    else
+    else // DOWN
     {
+        if(multiMedia)//si la me avisaron que se viene un multimedia
+        {
+            switch (key)
+            {
+                // cursor up
+                case 0x48:
+                    charToBuffer(C_UP);
+                    break;
+                    // cursor dowb
+                case 0x50:
+                    charToBuffer(C_DOWN);
+                    break;
+                default:break;
+            }
+
+        }
         if (key == 58)
         {
             capsLock = !capsLock;
@@ -38,7 +59,7 @@ int keyboardInterpreter()
         {
             shift = 1;
         }
-        char c = keyboardList[key];
+        int c = keyboardList[key];
         if (c>='a' && c <= 'z')
         {
             if ( (capsLock && !shift) || (!capsLock && shift) )
@@ -50,12 +71,12 @@ int keyboardInterpreter()
         {
             c = keyboardShiftList[key];
         }
-        charToBuffer((unsigned char) c);
+        charToBuffer(c);
         return DOWN;
     }
 }
 
-void charToBuffer(unsigned char c)
+void charToBuffer(int c)
 {
     if (c != 0)
     {
@@ -66,9 +87,9 @@ void charToBuffer(unsigned char c)
     }
 }
 
-char returnNextChar()
+int returnNextChar()
 {
-    char resp = 0;
+    int resp = 0;
     if(size == 0)
     {
         return resp;
@@ -88,7 +109,7 @@ int newToRead()
     return 1;
 }
 
-char getNextChar()
+int getNextChar()
 {
     while (!newToRead())
         setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);

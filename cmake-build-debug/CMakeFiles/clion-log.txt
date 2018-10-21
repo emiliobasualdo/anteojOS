@@ -1,6 +1,6 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP3/anteojOS
--- The C compiler identification is AppleClang 8.0.0.8000042
--- The CXX compiler identification is AppleClang 8.0.0.8000042
+/Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/pedroremigiopingarilho/Desktop/ITBA/SO/TP03/anteojOS
+-- The C compiler identification is AppleClang 10.0.0.10001145
+-- The CXX compiler identification is AppleClang 10.0.0.10001145
 -- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc
 -- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -- works
 -- Detecting C compiler ABI info
@@ -15,4 +15,4 @@
 -- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: /Users/pilo/Dropbox/ITBA/3º/SO/ProyectosSO/TP3/anteojOS/cmake-build-debug
+-- Build files have been written to: /Users/pedroremigiopingarilho/Desktop/ITBA/SO/TP03/anteojOS/cmake-build-debug

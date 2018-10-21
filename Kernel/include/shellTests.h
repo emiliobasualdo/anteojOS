@@ -15,5 +15,6 @@ int proc1();
 int proc2();
 int multiProcessTest();
 void mutexTest();
+void semTest();
 
 #endif

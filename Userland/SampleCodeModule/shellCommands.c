@@ -23,6 +23,7 @@ command commands[]={
         {"message_test","Performs a test of Message Passing", messageTesting},
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
+        {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -169,7 +170,7 @@ int changeColour(void(*f)(Colour), int flag)
         printF("%d) %s \n", i, SET_FONT_EX );
     }
     changeFontColour(original);
-    char c;
+    int c;
     int ask = TRUE;
     int changed = FALSE;
     Colour c1 = getCurrentFontColour();
@@ -397,7 +398,7 @@ int columnTest(int argc, argVector argv)
         printF("\nPlease type a number between 0 and 40: ");
     }
     printF("\n");
-    char agening;
+    int agening;
     printF("Each row represents a process, the number to the left is the current process priority level, 0 is the highest\n");
     printF("Know you must decide if you wish to see the process loosing priority while getting older o or not\n");
     printF("This decision does not affect the scheduler, it simply marks the created process as 'un-ageing', they do not get old\n");
@@ -420,7 +421,16 @@ int philoTest(int argc, argVector argv)
     return startPhilosophers();
 }
 
-/* Funciones auxiliares para los comandos de de usuario*/
+int setQuantum(int argc, argVector argv)
+{
+    getQuantum(argc, argv);
+    printF("Select the new Quantum value :");
+    userSetQuantum(getNum());
+    printF("\n");
+    return TRUE;
+}
+
+/** Funciones auxiliares para los comandos de de usuario*/
 
 int multiTest(int count, argVector argv)
 {
@@ -496,4 +506,10 @@ int messageTesting()
 {
     messageTest();
     return 0;
+}
+
+int getQuantum(int argc, argVector argv)
+{
+    printF("Current Quantum is %d\n", userGetQuantum());
+    return TRUE;
 }

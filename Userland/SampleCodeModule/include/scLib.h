@@ -8,7 +8,7 @@
 void write(char * );
 
 /* system call to read the next character */
-char getChar();
+int getChar();
 
 /* system call to get the hour */
 int getHour();
@@ -101,5 +101,9 @@ void kernelNice(int i, int i1);
 void kernelColumnTest(int num, int ageing);
 
 void userKillAllDescendants(int pid);
+
+int userGetQuantum();
+
+void userSetQuantum(int pid);
 
 #endif

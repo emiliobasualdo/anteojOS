@@ -68,3 +68,23 @@ unlockMutexASM:
 	mov rax, 0
 	xchg rax, [rdi]
 	jmp final
+
+
+;preguntar pq no funca
+semWaitASM:
+    push rbp
+    mov rbp, rsp
+    xor rax,rax
+    xchg rax, [rdi]
+    lock dec rax
+    xchg rax, [rdi]
+    jmp final
+
+;preguntar pq no funca
+semPostASM:
+    push rbp
+    mov rbp, rsp
+    xchg rax, [rdi]
+    lock inc rax
+    xchg rax, [rdi]
+    jmp final

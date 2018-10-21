@@ -219,13 +219,13 @@ int sem = 0;
 static void s1()
 {
     int j = 0;
-    semWait(sem);
+    semWaitK(sem);
     while(j++ < 100)
     {
         i++;
         simple_printf("is1 = %d\n", i);
     }
-    semPost(sem);
+    semPostK(sem);
     simple_printf("aca termina s1\n");
 
 }
@@ -234,13 +234,14 @@ static void s2()
     int j = 0;
     while(j++ < 100)
     {
-        semWait(sem);
+//        simple_printf("me bloquee antes del sem wait2\n");
+        semWaitK(sem);
+//        simple_printf("me bloquee dsps del sem wait2\n");
         i--;
-        simple_printf("is2 = %d\n", i);
-
-        semPost(sem);
+        simple_printf("is2 = %d j= %d\n", i, j);
+        semPostK(sem);
     }
-    simple_printf("aca termina s2\n");
+    simple_printf("aca termina s2\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
 
 static void s3()
@@ -248,10 +249,12 @@ static void s3()
     int j = 0;
     while(j++ < 100)
     {
-        semWait(sem);
+//        simple_printf("me bloquee antes del sem wait3\n");
+        semWaitK(sem);
+//        simple_printf("me bloquee dsps del sem wait3\n");
         i += 2;
-        simple_printf("is3 = %d\n", i);
-        semPost(sem);
+        simple_printf("is3 = %d j=%d\n", i, j);
+        semPostK(sem);
     }
     simple_printf("aca termina s3\n");
 
@@ -259,7 +262,7 @@ static void s3()
 
 void semTest()
 {
-    sem = semStart(1);
+    sem = semStartK(1);
     if (createAndExecProcess("s1", (uint64_t) s1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
     {
         simple_printf("s1: ERROR: otro == NULL\n");
@@ -281,7 +284,7 @@ void semTest()
         aux++;
     }
 
-    while(destroyMutexK(mutex) == -1)
+    while(semDestroyK(mutex) == -1)
     {
         aux = 0;
         while (aux < 45)

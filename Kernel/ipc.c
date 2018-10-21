@@ -89,7 +89,7 @@ static void printSemList(int sem)
     {
         simple_printf("-> %d ",semList[sem].nextProcessInLine->array[(semList[sem].nextProcessInLine->front+i)%MAXINQUEUE]);
     }
-    simple_printf("\n");
+    simple_printf("processses in list: %d\n", semList[sem].nextProcessInLine->size);
 
 }
 
@@ -108,6 +108,13 @@ void printIpcsQueues()
     for(i = 0; i <= messageMutex.nextProcessInLine->size; i++)
     {
         simple_printf("-> %d ",messageMutex.nextProcessInLine->array[(messageMutex.nextProcessInLine->front+i)%MAXINQUEUE]);
+    }
+    simple_printf("\n");
+
+    simple_printf("Sem Mutex Queue = ");
+    for(i = 0; i <= semMutex.nextProcessInLine->size; i++)
+    {
+        simple_printf("-> %d ",semMutex.nextProcessInLine->array[(semMutex.nextProcessInLine->front+i)%MAXINQUEUE]);
     }
     simple_printf("\n");
 
@@ -190,7 +197,7 @@ int unlockMutex(int mutex)
 
             setProcessState(process, READY, MUTEX_BLOCK);
 
-            schedulerAddProcPid(process);
+            setProcessPriority(process, MAX_PRIORITY);
             //printMutexList(mutex);
         }
         else
@@ -224,7 +231,6 @@ static int messageMutexUnlock()
     if(process != EMPTY_QUEUE)
     {
         setProcessState(process, READY, MESSAGE_PASSING);
-        schedulerAddProcPid(process);
         return 1;
     }else
     {
@@ -254,7 +260,6 @@ static int semMutexUnlock()
     if(process != EMPTY_QUEUE)
     {
         setProcessState(process, READY, MESSAGE_PASSING);
-        schedulerAddProcPid(process);
         return 1;
     }else
     {
@@ -279,7 +284,7 @@ int destroyMutexK(int mutex)
  * SEMAFOROS
  */
 
-int semStart(int initValue)
+int semStartK(int initValue)
 {
     if(positionMutexArray >= MAXMUTEXES)
     {
@@ -304,7 +309,7 @@ int semStart(int initValue)
     }
 }
 
-int semWait(int sem)
+int semWaitK(int sem)
 {
     pPid process = getCurrentProc()->pid;
     if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL)
@@ -312,6 +317,12 @@ int semWait(int sem)
         return -1;
     }
 
+//    int i;
+//    for(i = 0; i <= semMutex.nextProcessInLine->size; i++)
+//    {
+//        simple_printf("-> %d ",semMutex.nextProcessInLine->array[(semMutex.nextProcessInLine->front+i)%MAXINQUEUE]);
+//    }
+//    simple_printf("\n");
     semMutexLock();
     semList[sem].value--;
     semMutexUnlock();
@@ -327,7 +338,7 @@ int semWait(int sem)
     return 0;
 }
 
-int semPost(int sem)
+int semPostK(int sem)
 {
     if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL)
     {
@@ -347,11 +358,11 @@ int semPost(int sem)
                 semMutexUnlock();
 
                 pPid process = dequeue(semList[sem].nextProcessInLine);
+             //   printSemList(sem);
 
                 setProcessState(process, READY, MUTEX_BLOCK);
+                setProcessPriority(process, MAX_PRIORITY);
 
-                schedulerAddProcPid(process);
-                printSemList(sem);
             }
         }
     }
@@ -530,7 +541,6 @@ static void asyncSend(pPid from, pPid to, char * body)
                 {
                     changeBlockedReceiveArray(to, SND);
                     setProcessState(to, READY, MESSAGE_PASSING);
-                    schedulerAddProcPid(to);
                 }
             }
             endWhile = 0;

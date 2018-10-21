@@ -183,4 +183,23 @@ uint64_t userSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, 
 
 
 
+/* eax = 32
+ ** creates a semaphore
+ */
+uint64_t kernelCreateSemaphore(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 33
+ ** Try to access space through a semaphore
+ */
+uint64_t kernelSemWait(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 34
+ **  Frees a semaphore
+ */
+uint64_t kernelSemPost(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 35
+ ** Try to destroy space through a semaphore
+ */
+uint64_t kernelSemDestroy(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 #endif

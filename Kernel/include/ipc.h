@@ -11,8 +11,8 @@
 #include "lib.h"
 #include "dinamicMemory.h"
 
-#define MAXMUTEXES 20
-#define MAXINQUEUE 20
+#define MAXMUTEXES 10
+#define MAXINQUEUE 5
 
 #define SND 1
 #define REC 0
@@ -29,7 +29,7 @@ extern int lockMutexASM(int * mutex);
 
 //Disponibiliza un id de Mutex / Sem
 int startMutex(int initValue);
-int semStart(int initValue);
+int semStartK(int initValue);
 
 //Inicializa los mutex
 int initIPCS();
@@ -37,8 +37,8 @@ int lockMutex(int mutex);
 int unlockMutex(int mutex);
 
 // Semaforos
-int semWait(int sem);
-int semPost(int sem);
+int semWaitK(int sem);
+int semPostK(int sem);
 
 //destruye el mutex si no tiene procesos en la cola
 int destroyMutexK(int mutex);

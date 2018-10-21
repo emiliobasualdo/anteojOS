@@ -143,3 +143,23 @@ void userKillAllDescendants(int pid)
 {
     syscall(32, (uint64_t) pid, 0, 0, 0, 0);
 }
+
+int semStart(int amount)
+{
+    return (int) syscall(33, (uint64_t) amount, 0, 0, 0,0);
+}
+
+int semWait(int sem)
+{
+    return (int) syscall(34, (uint64_t) sem, 0, 0, 0,0);
+}
+
+int semPost(int sem)
+{
+    return (int) syscall(35, (uint64_t) sem, 0, 0, 0,0);
+}
+
+int semDestroy(int sem)
+{
+    return (int) syscall(36, (uint64_t)sem, 0, 0, 0, 0);
+}

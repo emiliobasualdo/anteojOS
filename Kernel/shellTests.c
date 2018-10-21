@@ -234,13 +234,14 @@ static void s2()
     int j = 0;
     while(j++ < 100)
     {
+//        simple_printf("me bloquee antes del sem wait2\n");
         semWait(sem);
+//        simple_printf("me bloquee dsps del sem wait2\n");
         i--;
-        simple_printf("is2 = %d\n", i);
-
+        simple_printf("is2 = %d j= %d\n", i, j);
         semPost(sem);
     }
-    simple_printf("aca termina s2\n");
+    simple_printf("aca termina s2\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
 
 static void s3()
@@ -248,9 +249,11 @@ static void s3()
     int j = 0;
     while(j++ < 100)
     {
+//        simple_printf("me bloquee antes del sem wait3\n");
         semWait(sem);
+//        simple_printf("me bloquee dsps del sem wait3\n");
         i += 2;
-        simple_printf("is3 = %d\n", i);
+        simple_printf("is3 = %d j=%d\n", i, j);
         semPost(sem);
     }
     simple_printf("aca termina s3\n");

@@ -102,4 +102,16 @@ void kernelColumnTest(int num, int ageing);
 
 void userKillAllDescendants(int pid);
 
+/* Creates a new semaphore */
+int semStart(int amount);
+
+/* Tries to pass semaphore*/
+int semWait(int sem);
+
+/* Frees semaphore*/
+int semPost(int sem);
+
+/* Destroys Semaphore*/
+int semDestroy(int sem);
+
 #endif

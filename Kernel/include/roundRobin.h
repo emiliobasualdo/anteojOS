@@ -35,5 +35,7 @@ void printRRQueues();
 void rrNotifyProcessStateChange(pPid pid);
 void rrNotifyProcessPriorityChange(pPid pid);
 unsigned long long getRRRunTime(pPid pid);
+void setQuantum(int newQuantum);
+int getQuantum();
 
 #endif

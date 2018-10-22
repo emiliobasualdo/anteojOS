@@ -116,10 +116,10 @@ int main()
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;
     }
-    if(!initIPCS()) {
+/*    if(!initIPCS()) {
         simple_printf("kernel: ERROR: initIPCs retornó FALSE\n");
         return 0;
-    }
+    }*/
     pcbPtr pacientCero = initScheduler("theAllMighty", (uint64_t) theAllMighty);
     if (!pacientCero)
     {
@@ -129,7 +129,6 @@ int main()
     simple_printf("kernel: switchdinggg\n");
     switchToNext();
     simple_printf("kernel: volviendo de switch\n");
-
     simple_printf("\nX////////////////////////////XX\n");
     simple_printf("\nX////////////////////////////XX\n");
     return 0;

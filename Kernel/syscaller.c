@@ -8,11 +8,9 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
                                createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
-<<<<<<< HEAD
-                               nice, kernelColumnTest, kernelKillAllDescendants, userGetQuantum, userSetQuantum };
-=======
-                               nice, kernelColumnTest, userKillAllDescendants, kernelCreateSemaphore, kernelSemWait, kernelSemPost, kernelSemDestroy};
->>>>>>> 17ef4df8b5f2e588c5fa16f57a5da60b9a6a7b15
+                               nice, kernelColumnTest, kernelCreateSemaphore, kernelSemWait,
+                               kernelSemPost, kernelSemDestroy, kernelKillAllDescendants, kernelGetQuantum, kernelSetQuantum };
+
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -183,35 +181,28 @@ uint64_t kernelKillAllDescendants(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint
     killAllDescendants((pPid) rdi);
     return 1;
 }
-<<<<<<< HEAD
-uint64_t userGetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
-{
-    return (uint64_t) getQuantum();
-}
-uint64_t userSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
-{
-    setQuantum((int) rdi);
-    return 1;
-}
-=======
-
 uint64_t kernelCreateSemaphore(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t) semStartK((int)rdi);
 }
-
 uint64_t kernelSemWait(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t)semWaitK((int)rdi);
 }
-
 uint64_t kernelSemPost(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t)semPostK((int)rdi);
 }
-
 uint64_t kernelSemDestroy(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t)semDestroyK((int)rdi);
 }
->>>>>>> 17ef4df8b5f2e588c5fa16f57a5da60b9a6a7b15
+uint64_t kernelGetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) getQuantum();
+}
+uint64_t kernelSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    setQuantum((int) rdi);
+    return 1;
+}

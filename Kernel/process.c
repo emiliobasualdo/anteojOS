@@ -208,7 +208,6 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
             return NULL;
         }
     }
-
     return newPcb;
 }
 
@@ -354,21 +353,11 @@ void printAllProcs()
 {
     simple_printf(" b=BORN, r=READY, R=RUNNING, B=BLOCKED, D=DEAD, N=NORMAL, I=INTERACTIVE, D=NO CHANGE\n");
     simple_printf(" PID - NAME - STATE - FOREGROUND - PRIORITY - PRIORITY STATE - RUN TIME - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n");
-    Queue *queue = createQueue(MAX_PROCS);
-    enqueue(queue, INIT_PID);
-    pPid current = dequeue(queue);
-    printProc(array[current]);
-    pcbPtr child;
-    do
+    for (int i = 0; i < MAX_PROCS; ++i)
     {
-        for(int i = 0; i < array[current]->childrenCount; ++i)
-        {
-            child = array[array[current]->childs[i]];
-            printProc(child);
-            enqueue(queue, child->pid);
-        }
-        current = dequeue(queue);
-    }while (current != PID_ERROR);
+        if(array[i] != NULL)
+            printProc(array[i]);
+    }
     simple_printf("\n");
 }
 

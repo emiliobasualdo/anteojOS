@@ -143,17 +143,6 @@ void userKillAllDescendants(int pid)
 {
     syscall(32, (uint64_t) pid, 0, 0, 0, 0);
 }
-
-<<<<<<< HEAD
-int userGetQuantum()
-{
-    return (int) syscall(33, 0, 0, 0, 0, 0);
-}
-
-void userSetQuantum(int pid)
-{
-    syscall(34, (uint64_t) pid, 0, 0, 0, 0);
-=======
 int semStart(int amount)
 {
     return (int) syscall(33, (uint64_t) amount, 0, 0, 0,0);
@@ -172,5 +161,14 @@ int semPost(int sem)
 int semDestroy(int sem)
 {
     return (int) syscall(36, (uint64_t)sem, 0, 0, 0, 0);
->>>>>>> 17ef4df8b5f2e588c5fa16f57a5da60b9a6a7b15
+}
+
+int userGetQuantum()
+{
+    return (int) syscall(37, 0, 0, 0, 0, 0);
+}
+
+void userSetQuantum(int pid)
+{
+    syscall(38, (uint64_t) pid, 0, 0, 0, 0);
 }

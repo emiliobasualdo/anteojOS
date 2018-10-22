@@ -5,7 +5,6 @@
 #define END 1000000000 // velocidad
 #define CANT_BLOCKS 50
 #define LEVEL (END/CANT_BLOCKS)
-#define PAD 10
 
 short cantProcess;
 int xRes,yRes, xInit, yInit;
@@ -87,6 +86,7 @@ void columnTest(short cantProcs, boolean ageing)
     // agregar que pueda cambiar el cuantum con teclas
     while (getNextChar() != 'q'){}
     killAllDescendants(getCurrentProc()->pid);
+    simple_printf("xxxxxxXXXXXXXXXXXXX xxxxx aca estamos \n");
     clearWindow();
 }
 

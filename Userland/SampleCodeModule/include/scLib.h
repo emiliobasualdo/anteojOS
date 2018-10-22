@@ -102,11 +102,6 @@ void kernelColumnTest(int num, int ageing);
 
 void userKillAllDescendants(int pid);
 
-<<<<<<< HEAD
-int userGetQuantum();
-
-void userSetQuantum(int pid);
-=======
 /* Creates a new semaphore */
 int semStart(int amount);
 
@@ -118,6 +113,8 @@ int semPost(int sem);
 
 /* Destroys Semaphore*/
 int semDestroy(int sem);
->>>>>>> 17ef4df8b5f2e588c5fa16f57a5da60b9a6a7b15
 
+int userGetQuantum();
+
+void userSetQuantum(int pid);
 #endif

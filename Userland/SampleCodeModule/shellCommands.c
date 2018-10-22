@@ -24,6 +24,7 @@ command commands[]={
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
+        {"philosophers","Performs the dining philosophers problem", philoTest},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -416,11 +417,6 @@ int columnTest(int argc, argVector argv)
     return TRUE;
 }
 
-int philoTest(int argc, argVector argv)
-{
-    return startPhilosophers();
-}
-
 int setQuantum(int argc, argVector argv)
 {
     getQuantum(argc, argv);
@@ -513,3 +509,21 @@ int getQuantum(int argc, argVector argv)
     printF("Current Quantum is %d\n", userGetQuantum());
     return TRUE;
 }
+
+int philoTest(int argc, argVector argv)
+{
+    if (argc != 2)
+    {
+        printF("%s\n", ARGUMENTS_AMOUNT_ERROR("1"));
+        return 0;
+    }
+    int aux, resp;
+    char * aux1 = toInt(argv[1], &resp, &aux);
+    if (resp > 5 || resp < 2)
+    {
+        printF("Error: argument must be a number between 2 and 5\n");
+        return 0;
+    }
+    return startPhilosophers(resp);
+}
+

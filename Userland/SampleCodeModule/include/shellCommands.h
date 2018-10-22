@@ -125,4 +125,6 @@ int columnTest(int argc, argVector argv);
 
 int getQuantum(int argc, argVector argv);
 
+int philoTest(int argc, argVector argv);
+
 #endif

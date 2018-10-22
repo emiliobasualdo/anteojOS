@@ -409,12 +409,12 @@ messageQueue * createNewMessageQueue()
 static void createNewMessage(messageQueue* queue, uint64_t pidSender, uint64_t pidReceiver, char * messageBody)
 {
     msg_t message;
-    message.pidReceiver = pidReceiver;
+    message.pidReceiver = (int)pidReceiver;
     int length = strlen(messageBody);
     message.content = kernelMalloc(length+1);
     memcpy(message.content, messageBody,strlen(messageBody));
     message.content[length] = 0;
-    message.pidSender = pidSender;
+    message.pidSender = (int)pidSender;
     if(!messageAlreadyInQueue(queue, message))
     {
         message.id = id++;

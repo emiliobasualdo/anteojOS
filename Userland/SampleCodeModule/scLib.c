@@ -4,9 +4,9 @@ void write(char * string)
 {
     syscall(1,(uint64_t) string, 0,0,0,0);
 }
-char getChar()
+int getChar()
 {
-    return (char) syscall(2, 0, 0, 0, 0, 0);
+    return (int) syscall(2, 0, 0, 0, 0, 0);
 }
 int getHour()
 {
@@ -46,7 +46,7 @@ int notifyExitRequest(unsigned int rdi, unsigned int rsi, const unsigned short *
 }
 int putChar(char c)
 {
-    return (int) syscall(12, c, 0, 0, 0, 0);
+    return (int) syscall(12, (uint64_t) c, 0, 0, 0, 0);
 }
 int removeChar()
 {
@@ -143,7 +143,6 @@ void userKillAllDescendants(int pid)
 {
     syscall(32, (uint64_t) pid, 0, 0, 0, 0);
 }
-
 int semStart(int amount)
 {
     return (int) syscall(33, (uint64_t) amount, 0, 0, 0,0);
@@ -162,4 +161,14 @@ int semPost(int sem)
 int semDestroy(int sem)
 {
     return (int) syscall(36, (uint64_t)sem, 0, 0, 0, 0);
+}
+
+int userGetQuantum()
+{
+    return (int) syscall(37, 0, 0, 0, 0, 0);
+}
+
+void userSetQuantum(int pid)
+{
+    syscall(38, (uint64_t) pid, 0, 0, 0, 0);
 }

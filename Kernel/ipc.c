@@ -422,8 +422,6 @@ static void createNewMessage(messageQueue* queue, uint64_t pidSender, uint64_t p
     }
 }
 
-
-
 static boolean sameMessage(msg_t msg1, msg_t msg2)
 {
     return msg1.pidSender == msg2.pidSender && msg1.pidReceiver == msg2.pidReceiver && strcmp(msg1.content, msg2.content);

@@ -8,6 +8,8 @@
 #define BUFFERSIZE 1024
 #define UP -2
 #define DOWN -3
+#define C_UP -4
+#define C_DOWN -5
 
 /* gets the key pressed from stdout */
 extern int getKey(void);
@@ -16,14 +18,14 @@ extern int getKey(void);
 int keyboardInterpreter();
 
 /* adds a character to the current buffer */
-void charToBuffer(unsigned char);
+void charToBuffer(int);
 
 /* returns the first added character in buffer */
-char returnNextChar();
+int returnNextChar();
 
 /* returns a boolean value: 1 if there is a new character to read */
 int newToRead();
 
-char getNextChar();
+int getNextChar();
 
 #endif

@@ -39,7 +39,7 @@ int producerConsumer(int numProducers, int numConsumers)
 
     while (run)//TODO imprimir error si llego al limite
     {
-        char c = getChar();
+        int c = getChar();
         switch (c)
         {
             case '1':

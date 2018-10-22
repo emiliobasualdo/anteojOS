@@ -1,6 +1,9 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
+#define C_UP -4
+#define C_DOWN -5
+
 #define LINE_SIZE 256
 
 /* returns a given integer to a string containing that integer */
@@ -39,5 +42,7 @@ int rand(void);
 
 /*changes seed value for rand*/
 void srand(unsigned int seed);
+
+int isCmd(int num);
 
 #endif

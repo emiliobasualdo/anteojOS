@@ -8,7 +8,7 @@
 void write(char * );
 
 /* system call to read the next character */
-char getChar();
+int getChar();
 
 /* system call to get the hour */
 int getHour();
@@ -114,4 +114,7 @@ int semPost(int sem);
 /* Destroys Semaphore*/
 int semDestroy(int sem);
 
+int userGetQuantum();
+
+void userSetQuantum(int pid);
 #endif

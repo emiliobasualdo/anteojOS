@@ -123,3 +123,8 @@ void srand(unsigned int seed)
 {
     next = seed;
 }
+
+int isCmd(int num)
+{
+    return num == C_DOWN || num == C_UP;
+}

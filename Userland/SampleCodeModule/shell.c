@@ -5,13 +5,21 @@ static unsigned int saverTime = DEFAULT_SAVER_TIME;
 static unsigned int inactivityCounter = 0;
 int secs = 0;
 
+char buffer[MAX_BUFFER_SIZE];
+int bufferPtr;
+
+char cmdsBuffer[MAX_HISTORY][MAX_BUFFER_SIZE];
+int cmdBufferLast;
+int viewIndex;
+
+void putLastBuffer(int dir);
+
 void shell()
 {
-    char buffer[MAX_BUFFER_SIZE];
-    int bufferPtr;
     int run = TRUE;
     int resp = NULL_CMMD;
-    char c;
+    int c;
+    cmdBufferLast = viewIndex = 0;
     turnOnOff();
     while(run)
     {
@@ -21,10 +29,10 @@ void shell()
         while(c != '\n')
         {
             c = getChar();
-            if (isGraph(c))
+            if (isGraph((char) c))
             {
-                buffer[bufferPtr++] = c;      // bufferPtr siempre apunta a donde agregar
-                putChar(c);
+                buffer[bufferPtr++] = (char) c;  // bufferPtr siempre apunta a donde agregar
+                putChar((char) c);
             }
             else if (c == '\b' && bufferPtr > 0)  // no tendria sentido seguir borrando
             {
@@ -35,14 +43,20 @@ void shell()
             {
                 if (bufferPtr > 0)    //sino solamente imprimo una linea nueva pero no mando el comando
                 {
-                    buffer[bufferPtr] = c; // para saber hasta donde leer
+                    buffer[bufferPtr] = (char) c; // para saber hasta donde leer
+                    addToCmdHistory(buffer); // lo agregamos con \n;
                     NEW_LINE;
                     resp = parseAndInterpret(buffer);
                 }
                 else
                 {
-                    putChar(c);
+                    putChar((char) c);
                 }
+            }
+            else if(isCmd(c))
+            {
+                int dir = c == C_UP ? -1 : 1;
+                putLastBuffer(dir);
             }
 
         }
@@ -64,6 +78,28 @@ void shell()
         }
     }
     doBeforeExit();
+}
+
+void putLastBuffer(int dir)
+{
+    if ((viewIndex + dir) >= 0 && (viewIndex + dir) <= cmdBufferLast)
+    {
+        int i = 0;
+        viewIndex = viewIndex + dir;
+
+        while(bufferPtr > 0) // limpiamos el current
+        {
+            removeChar();
+            bufferPtr--;
+        }
+
+        while(cmdsBuffer[viewIndex][i] != '\n')
+        {
+            buffer[bufferPtr++] = cmdsBuffer[viewIndex][i];
+            putChar(cmdsBuffer[viewIndex][i++]);
+        }
+        buffer[bufferPtr] = '\n'; // pero no lo imprimimos porque todavía no confirmamos la acción
+    }
 }
 
 void turnOnOff()
@@ -216,4 +252,12 @@ void refreshInactivityCounter()
 void setSaverTime(int num)
 {
     saverTime = num;
+}
+
+void addToCmdHistory(char *cmd)
+{
+    strncpy(cmdsBuffer[cmdBufferLast], cmd, MAX_BUFFER_SIZE);
+    cmdBufferLast = (cmdBufferLast+1)% MAX_BUFFER_SIZE;
+    cmdsBuffer[cmdBufferLast][0] = '\n'; // para no levantar basura en el historial
+    viewIndex = cmdBufferLast;
 }

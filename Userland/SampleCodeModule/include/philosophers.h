@@ -1,14 +1,18 @@
-//
-// Created by Emilio Basualdo on 10/19/18.
-//
-
-#ifndef ANTEOJOS_PHILOSOPHERS_H
-#define ANTEOJOS_PHILOSOPHERS_H
+#ifndef PHILOSOPHERS_H
+#define PHILOSOPHERS_H
 
 #include "scLib.h"
 #include "userPrintf.h"
 #include "stdio.h"
 
-int startPhilosophers();
+#define N 5                         /** número de filósofos */
+#define THINKING 2                  /** el filósofo está pensando */
+#define HUNGRY 1                    /** el filósofo está buscando los tenedores */
+#define EATING 0                    /** el filósofo está comiendo */
+#define LEFT (phnum - 1) % N
+#define RIGHT (phnum + 1) % N
+#define NAME "PHIL"
 
-#endif //ANTEOJOS_PHILOSOPHERS_H
+int startPhilosophers(int num);
+
+#endif

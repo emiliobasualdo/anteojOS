@@ -3,7 +3,7 @@
 char * reaDLine(char * line, unsigned int size)
 {
     int i=0;
-    char character;
+    int character;
     while (i < size && ( character=getChar() )  != '\n')
     {
         if (character == '\b')
@@ -124,7 +124,7 @@ char * toInt(char * string, int * k, int * resp)
 
 int getNum()
 {
-    char c;
+    int c;
     char buffer[MAX_INT_DIGIT];
     int bufferIndex = 0;
     while((c=getChar()) != '\n')
@@ -144,8 +144,17 @@ int getNum()
         }
     }
     buffer[bufferIndex] = 0;
-    int num;
+    int num = 0;
     int flag;
     toInt(buffer,&num, &flag);
     return num;
+}
+
+void strncpy(char *to, const char * from, int n)
+{
+    while (n >= 0)
+    {
+        to[n] = from[n];
+        n--;
+    }
 }

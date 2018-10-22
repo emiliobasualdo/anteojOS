@@ -9,44 +9,42 @@ void runAllocatorTest()
     static long counterAlloc = 0, counterFree = 0;
     simple_printf("\nWELCOME TO THE ALLOCATOR TEST\n");
     simple_printf("We are going to allocate a lot of memory and see what happens\n");
-    simple_printf("Press a key to continue!\n");
-    getNextChar();
+    sleep();
 
     simple_printf("\nFirst, we will try allocating small amounts of bytes\n");
     simple_printf("We will allocate %d bytes on amounts of %d bytes\n", SMALL_AMOUNT*(MAX_ADDRESS_SIZE), SMALL_AMOUNT);
     simple_printf("After all bytes are allocated, all buddy systems will be shown as trees, from the smaller leaf up to the bigger leaf\n");
-    simple_printf("Press a key to continue!\n");
-    getNextChar();
+    sleep();
 
-    for (int i=0; i<MAX_ADDRESS_SIZE; i++)
+    int i;
+    for (i=0; i<MAX_ADDRESS_SIZE; i++)
     {
         addresses[i] = kernelMalloc(SMALL_AMOUNT);
         if (addresses[i] != NULL)
         {
             counterAlloc += SMALL_AMOUNT;
-            simple_printf("#%d: %d bytes allocated starting from at ", i, SMALL_AMOUNT);
-            drawHexa((uint64_t ) addresses[i]);
-            simple_printf("\n");
+            simple_printf("#%d: %d bytes allocated starting from %d\n", i, SMALL_AMOUNT, (uint64_t) addresses[i]);
         }
         else
         {
-            simple_printf("#%d --> is NULL!\n");
+            simple_printf("#%d --> is NULL!\n", i);
             i = MAX_ADDRESS_SIZE;
         }
     }
 
+    simple_printf("Now we'll draw the trees of the buddy systems of the memory manager\n");
     sleep();
     drawAllocator();
+    simple_printf("drawing trees ......\n");
     sleep();
 
-    simple_printf("\n\n\n As ");
-    drawHexa((uint64_t) counterAlloc);
-    simple_printf(" bytes were allocated, now we will try to use that space!\n");
+
+    simple_printf("\n\nAs %d bytes were allocated, now we will try to use that space!\n", counterAlloc);
     sleep();
 
     char anteojos[SMALL_AMOUNT] = "anteojOS";
 
-    for (int i=0; i<MAX_ADDRESS_SIZE; i++)
+    for (i=0; i<MAX_ADDRESS_SIZE; i++)
     {
         for (int j=0; j<SMALL_AMOUNT; j++)
         {
@@ -56,33 +54,34 @@ void runAllocatorTest()
 
     simple_printf("We wrote anteojOS on every address obtained and now we will try to read them:\n");
     sleep();
-    for (int i=0; i<MAX_ADDRESS_SIZE; i++)
+
+    for (i=0; i<MAX_ADDRESS_SIZE; i++)
     {
         simple_printf("#%d contains -----> %s\n", i, addresses[i]);
     }
+
     sleep();
 
     simple_printf("\nNow it's time to free those bytes!\n");
     sleep();
 
-    for(int i=0; i<MAX_ADDRESS_SIZE; i++)
+
+    for(i=0; i<MAX_ADDRESS_SIZE; i++)
     {
-        simple_printf("#%d: freeing %d bytes at ", i, SMALL_AMOUNT);
-        drawHexa((uint64_t) addresses[i]);
-        simple_printf("\n");
+        simple_printf("#%d: freeing %d bytes at %d\n", i, SMALL_AMOUNT, addresses[i]);
         kernelFree(addresses[i]);
         counterFree +=SMALL_AMOUNT;
     }
 
+    simple_printf("Now we'll draw the trees of the buddy systems of the memory manager\n");
     sleep();
     drawAllocator();
     sleep();
 
+
     if (counterAlloc == counterFree)
     {
-        simple_printf("\nIf we are here it's because ");
-        drawHexa((uint64_t) counterAlloc);
-        simple_printf(" bytes were allocated and then freed\n");
+        simple_printf("\nIf we are here it's because %d bytes were allocated and then freed\n", counterAlloc);
         simple_printf("\nFIRST TEST APPROVED :)\n");
     }
     else
@@ -90,21 +89,17 @@ void runAllocatorTest()
         simple_printf("\nFIRST TEST DISSAPROVED :(\n");
     }
 
-
-    sleep();
     simple_printf("\nSecondly, we will try allocating greater amounts of bytes: from small amounts to big amounts\n");
     simple_printf("After all bytes are allocated, all buddy systems will be shown as trees, from the smaller leaf up to the bigger leaf\n");
     sleep();
 
-    for (int i=1; i<MAX_ADDRESS_SIZE; i++)
+    for (i=0; i<MAX_ADDRESS_SIZE; i++)
     {
-        addresses[i] = kernelMalloc((size_t )(GREAT_AMOUNT * i));
+        addresses[i] = kernelMalloc((size_t )(GREAT_AMOUNT * (i+1)));
         if (addresses[i] != NULL)
         {
-            counterAlloc += GREAT_AMOUNT * i;
-            simple_printf("#%d: %d bytes allocated starting from at ", i, GREAT_AMOUNT * i);
-            drawHexa((uint64_t ) addresses[i]);
-            simple_printf("\n");
+            counterAlloc += GREAT_AMOUNT * (i+1);
+            simple_printf("#%d: %d bytes allocated starting from %d\n", i, GREAT_AMOUNT * (i+1), (uint64_t) addresses[i]);
         }
         else
         {
@@ -113,16 +108,16 @@ void runAllocatorTest()
         }
     }
 
+
+    simple_printf("Now we'll draw the trees of the buddy systems of the memory manager\n");
     sleep();
     drawAllocator();
     sleep();
 
-    simple_printf("\n\n\n As ");
-    drawHexa((uint64_t) counterAlloc);
-    simple_printf(" bytes were allocated, now we will try to use that space!\n");
+    simple_printf("\n\nAs %d bytes were allocated, now we will try to use that space!\n", counterAlloc);
     sleep();
 
-    for (int i=0; i<MAX_ADDRESS_SIZE; i++)
+    for (i=0; i<MAX_ADDRESS_SIZE; i++)
     {
         for (int j=0; j<SMALL_AMOUNT; j++)
         {
@@ -132,22 +127,21 @@ void runAllocatorTest()
 
     simple_printf("We wrote anteojOS on every address obtained and now we will try to read them:\n");
     sleep();
-    for (int i=0; i<MAX_ADDRESS_SIZE; i++)
+
+    for (i=0; i<MAX_ADDRESS_SIZE; i++)
     {
         simple_printf("#%d contains -----> %s\n", i, addresses[i]);
     }
-    sleep();
 
+    sleep();
     simple_printf("\nNow it's time to free those bytes!\n");
     sleep();
 
-    for(int i=0; i<MAX_ADDRESS_SIZE; i++)
+    for(i=0; i<MAX_ADDRESS_SIZE; i++)
     {
-        simple_printf("#%d: freeing %d bytes at ", i, GREAT_AMOUNT * i);
-        drawHexa((uint64_t) addresses[i]);
-        simple_printf("\n");
+        simple_printf("#%d: freeing %d bytes at %d\n", i, GREAT_AMOUNT * (i+1), addresses[i]);
         kernelFree(addresses[i]);
-        counterFree += GREAT_AMOUNT * i;
+        counterFree += GREAT_AMOUNT * (i+1);
     }
 
     sleep();
@@ -156,9 +150,7 @@ void runAllocatorTest()
 
     if (counterAlloc == counterFree)
     {
-        simple_printf("\nIf we are here it's because ");
-        drawHexa((uint64_t) counterAlloc);
-        simple_printf(" bytes were allocated and then freed\n");
+        simple_printf("\nIf we are here it's because %d bytes were allocated and then freed\n", counterAlloc);
         simple_printf("\nSECOND TEST APPROVED :)\n");
     }
     else
@@ -169,14 +161,6 @@ void runAllocatorTest()
 
 static void sleep()
 {
-    kernelSleep();
-    kernelSleep();
-    kernelSleep();
-    kernelSleep();
-    kernelSleep();
-    kernelSleep();
-    kernelSleep();
-    kernelSleep();
     kernelSleep();
     kernelSleep();
     kernelSleep();

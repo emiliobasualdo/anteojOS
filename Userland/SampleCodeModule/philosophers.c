@@ -22,8 +22,9 @@ void test(int phnum)
 
         state[phnum] = EATING;
 
-        printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
-        printF("%s is eating\n", getPhilName(phnum));
+        /*printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
+        printF("%s is eating\n", getPhilName(phnum));*/
+        drawDiningTable();
 
         unlock(S[phnum]);
     }
@@ -58,8 +59,9 @@ void putFork(int phnum)
         return;
     }*/
     state[phnum] = THINKING;                            /** el filósofo terminó de comer */
-    printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
-    printF("%s is thinking\n", getPhilName(phnum), phnum + 1);
+    /*printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
+    printF("%s is thinking\n", getPhilName(phnum), phnum + 1);*/
+    drawDiningTable();
 
     test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
     test(RIGHT);                                        /** ver si el vecino derecho ahora puede comer */
@@ -91,17 +93,17 @@ int startPhilosophers (int num)
     for (i = 0; i < qtyPhilosophers; i++)
     {
         S[i] = newMutex(1);
+        state[i] = THINKING;
     }
+
+    drawDiningTable();
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
         userSprintf(name,"%d-%s", i, NAME);
         procPid[i] = userStartProcess(name, (uint64_t)philosopher, FALSE);
-        printF("Philosopher %s #%d is thinking, with PID: %d\n", getPhilName(i), i + 1, procPid[i]);
-        state[i] = THINKING;
+        //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
     }
-
-    drawDiningTable();
 
     char c;
     while((c = getChar()) != 'q')
@@ -119,7 +121,7 @@ int startPhilosophers (int num)
                     userSprintf(newPhilName,"%d-%s", i, NAME);
                     S[qtyPhilosophers] = newMutex(0);
                     procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t)philosopher, FALSE);
-                    printF("Philosopher %s #%d is thinking, with PID: %d\n", getPhilName(i), i + 1, procPid[qtyPhilosophers]);
+                    //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
                     state[qtyPhilosophers++] = THINKING;
                     drawDiningTable();
                 }
@@ -142,7 +144,7 @@ int startPhilosophers (int num)
         }
     }
 
-    userKillAllDescendants(userGetCurrentPid());
+    userKill(procPid[0], procPid[qtyPhilosophers-1]);
     return 1;
 }
 
@@ -180,6 +182,7 @@ int getCurrentPhil(int pid)
 /** dibuja la mesa con los comensales --> qtyPhil = {0, ... , N=5} --> depende de N */
 void drawDiningTable()
 {
+    newWindow();
     char * states[N];                          /** N es la máxima cantidad de filósofos */
     for (int i=0; i<qtyPhilosophers; i++)
     {
@@ -188,84 +191,128 @@ void drawDiningTable()
 
     switch (qtyPhilosophers)
     {
-        case 1:
-            printF("     ==========================\n"
-                   "    (     %s %s     )\n"
-                   "   (                            )\n"
-                   "  (                              )\n"
-                   " (                                )\n"
-                   "(                                  )\n"
-                   "|                                  |\n"
-                   "(                                  )\n"
-                   " (                                )\n"
-                   "  (                              )\n"
-                   "   (                            )\n"
-                   "    (                          )\n"
-                   "     ==========================\n"
-                   "\n", getPhilName(0), states[0]);
-            break;
         case 2:
-            printF("     ==========================\n"
-                   "    (     %s %s     )\n"
-                   "   (                            )\n"
-                   "  ( %s %s         )\n"
-                   " (                                )\n"
-                   "(                                  )\n"
-                   "|                                  |\n"
-                   "(                                  )\n"
-                   " (                                )\n"
-                   "  (                              )\n"
-                   "   (                            )\n"
-                   "    (                          )\n"
-                   "     ==========================\n"
+            printF("\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\t\t     ==========================\n"
+                   "\t\t    (     %s %s     )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t  ( %s %s         )\n"
+                   "\t\t (                                )\n"
+                   "\t\t(                                  )\n"
+                   "\t\t|                                  |\n"
+                   "\t\t(                                  )\n"
+                   "\t\t (                                )\n"
+                   "\t\t  (                              )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t    (                          )\n"
+                   "\t\t     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1]);
             break;
         case 3:
-            printF("     ==========================\n"
-                   "    (     %s %s     )\n"
-                   "   (                            )\n"
-                   "  ( %s %s         )\n"
-                   " (                                )\n"
-                   "(           %s %s  )\n"
-                   "|                                  |\n"
-                   "(                                  )\n"
-                   " (                                )\n"
-                   "  (                              )\n"
-                   "   (                            )\n"
-                   "    (                          )\n"
-                   "     ==========================\n"
+            printF("\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\t\t     ==========================\n"
+                   "\t\t    (     %s %s     )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t  ( %s %s         )\n"
+                   "\t\t (                                )\n"
+                   "\t\t(           %s %s  )\n"
+                   "\t\t|                                  |\n"
+                   "\t\t(                                  )\n"
+                   "\t\t (                                )\n"
+                   "\t\t  (                              )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t    (                          )\n"
+                   "\t\t     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2]);
             break;
         case 4:
-            printF("     ==========================\n"
-                   "    (     %s %s     )\n"
-                   "   (                            )\n"
-                   "  ( %s %s         )\n"
-                   " (                                )\n"
-                   "(           %s %s  )\n"
-                   "|                                  |\n"
-                   "(                                  )\n"
-                   " (   %s %s           )\n"
-                   "  (                              )\n"
-                   "   (                            )\n"
-                   "    (                          )\n"
-                   "     ==========================\n"
+            printF("\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\t\t     ==========================\n"
+                   "\t\t    (     %s %s     )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t  ( %s %s         )\n"
+                   "\t\t (                                )\n"
+                   "\t\t(           %s %s  )\n"
+                   "\t\t|                                  |\n"
+                   "\t\t(                                  )\n"
+                   "\t\t (   %s %s           )\n"
+                   "\t\t  (                              )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t    (                          )\n"
+                   "\t\t     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2], getPhilName(3), states[3]);
             break;
         case 5:
-            printF("     ==========================\n"
-                   "    (     %s %s     )\n"
-                   "   (                            )\n"
-                   "  ( %s %s         )\n"
-                   " (                                )\n"
-                   "(           %s %s  )\n"
-                   "|                                  |\n"
-                   "(                                  )\n"
-                   " (   %s %s           )\n"
-                   "  (                              )\n"
-                   "   (      %s %s )\n"
-                   "    (                          )\n"
-                   "     ==========================\n"
+            printF("\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\n"
+                   "\t\t     ==========================\n"
+                   "\t\t    (     %s %s     )\n"
+                   "\t\t   (                            )\n"
+                   "\t\t  ( %s %s         )\n"
+                   "\t\t (                                )\n"
+                   "\t\t(           %s %s  )\n"
+                   "\t\t|                                  |\n"
+                   "\t\t(                                  )\n"
+                   "\t\t (   %s %s           )\n"
+                   "\t\t  (                              )\n"
+                   "\t\t   (      %s %s )\n"
+                   "\t\t    (                          )\n"
+                   "\t\t     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2], getPhilName(3), states[3], getPhilName(4), states[4]);
             break;
         default: break;

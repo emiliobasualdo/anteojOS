@@ -47,10 +47,7 @@ static void drawTree(binaryTree bTree)
     if(bTree->left==NULL && bTree->right==NULL)
     {
         memorySlot mem = bTree->data;
-        simple_printf("I'm a leaf! I occupy ");
-        drawHexa(mem->memSize);
-        simple_printf(" in a slot of ");
-        drawHexa(mem->slotSize);
+        simple_printf("I'm a leaf! I occupy %d in a slot of %d", mem->memSize, mem->slotSize);
         switch (mem->state)
         {
             case OCCUPIED: simple_printf(" -----> I'm OCCUPIED\n");
@@ -109,9 +106,7 @@ void drawMemoryManager(memoryManager memManager)
 {
     for (int i=0; i<memManager->numBuddies; i++)
     {
-        simple_printf("\nI'm buddy #%d, I handle ", i+1);
-        drawHexa(memManager->buddies[i]->memSize);
-        simple_printf(" bytes\nLook at my tree:\n");
+        simple_printf("\nI'm buddy #%d, I handle %d bytes\nLook at my tree:\n", i+1, memManager->buddies[i]->memSize);
         drawTree(memManager->buddies[i]->root);
         simple_printf("\n");
     }

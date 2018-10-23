@@ -24,4 +24,7 @@ char * toInt(char *, int *, int *);
 int getNum();
 
 void strncpy(char *to, const char * from, int n);
+
+double squareRoot(double x);
+
 #endif

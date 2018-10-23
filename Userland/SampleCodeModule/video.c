@@ -6,6 +6,19 @@ unsigned int currentY = 0;
 unsigned int xRes = 0;
 unsigned int yRes = 0;
 
+Colour white = {255, 255, 255};
+Colour green = {0, 255, 0};
+Colour red = {255, 0, 0};
+Colour yellow = {255, 234, 0};
+
+#define THINKING 2                  /** el filósofo está pensando */
+#define HUNGRY 1                    /** el filósofo está buscando los tenedores */
+#define EATING 0                    /** el filósofo está comiendo */
+
+static void drawCircle(int x0, int y0, int radius, Colour colour);
+static void drawPlate(int x0, int y0, Colour colour);
+static void drawNameAndState(int x0, int y0, char * name, int state);
+
 void setClockCoordinates(unsigned int *x, unsigned int *y)
 {
     check();
@@ -90,6 +103,7 @@ void renderFont(Colour * start,const char* (*getFont)(int,int), int font,Colour 
         }
     }
 }
+
 void newWindow ()
 {
     check();
@@ -103,4 +117,196 @@ void newWindow ()
     currentX=0;
     currentY=0;
     setCoordinates(currentX, currentY);
+}
+
+void drawDiningTableInit()
+{
+    check();
+    newWindow();
+    drawCircle(xRes/2, yRes/2, yRes/3, white);
+}
+
+void drawDiningTable(int * state, int size)
+{
+
+    int x0, y0;
+
+    printF("To increase the number of philosophers, press 1. Up to 5 philosophers are available.\n"
+           "To lower the number of philosophers, press 0.\n"
+           "To quit, press 'q'.\n");
+
+    for (int i=0; i<size; i++)
+    {
+        y0 = yRes/2;
+        x0 = xRes/2;
+        switch (i)
+        {
+            case 0:
+                y0 -= yRes/4;
+                break;
+            case 1:
+                x0 -= xRes/7;
+                y0 -= yRes/7;
+                break;
+            case 2:
+                x0 -= xRes/7;
+                y0 += yRes/7;
+                break;
+            case 3:
+                x0 += xRes/7;
+                y0 += yRes/7;
+                break;
+            case 4:
+                x0 += xRes/7;
+                y0 -= yRes/7;
+                break;
+            default: break;
+        }
+        switch (state[i])
+        {
+            case EATING:
+                drawPlate(x0, y0, green);
+
+                break;
+            case HUNGRY:
+                drawPlate(x0, y0, yellow);
+                break;
+            default:
+                drawPlate(x0, y0, red);
+                break;
+        }
+        drawNameAndState(x0-yRes/20, y0 + yRes/20, getPhilName(i), state[i]);
+    }
+}
+
+static void drawPlate(int x0, int y0, Colour colour)
+{
+    for (int i=0; (yRes/20)-i > 0; i++)
+    {
+        drawCircle(x0, y0, (yRes/20)-i, colour);
+    }
+}
+
+void clearPlate (int index)
+{
+    int y0 = yRes/2;
+    int x0 = xRes/2;
+    switch (index)
+    {
+        case 0:
+            y0 -= yRes/4;
+            break;
+        case 1:
+            x0 -= xRes/7;
+            y0 -= yRes/7;
+            break;
+        case 2:
+            x0 -= xRes/7;
+            y0 += yRes/7;
+            break;
+        case 3:
+            x0 += xRes/7;
+            y0 += yRes/7;
+            break;
+        case 4:
+            x0 += xRes/7;
+            y0 -= yRes/7;
+            break;
+        default: break;
+    }
+    drawPlate(x0, y0, getCurrentBackgroundColour());
+    char * name = getPhilName(index);
+    int length = strlen(name) + strlen(" is thinking");
+    setCoordinates(x0 - yRes/20 + length*8, y0 + yRes/20);
+    for (int i = 0; i < length; i++)
+    {
+        removeChar();
+    }
+    setCoordinates(0, 0);
+    drawCircle(xRes/2, yRes/2, yRes/3, white);
+}
+
+static void drawCircle(int x0, int y0, int radius, Colour colour)
+{
+    int x = radius-1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+
+    while (x >= y)
+    {
+        drawAPixelWithColour(x0 + x, y0 + y, colour);
+        drawAPixelWithColour(x0 + y, y0 + x, colour);
+        drawAPixelWithColour(x0 - y, y0 + x, colour);
+        drawAPixelWithColour(x0 - x, y0 + y, colour);
+        drawAPixelWithColour(x0 - x, y0 - y, colour);
+        drawAPixelWithColour(x0 - y, y0 - x, colour);
+        drawAPixelWithColour(x0 + y, y0 - x, colour);
+        drawAPixelWithColour(x0 + x, y0 - y, colour);
+
+        if (err <= 0)
+        {
+            y++;
+            err += dy;
+            dy += 2;
+        }
+
+        if (err > 0)
+        {
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
+}
+
+static void drawNameAndState(int x0, int y0, char * name, int state)
+{
+    setCoordinates((unsigned )x0, (unsigned )y0);
+    int size = strlen(name);
+    for (int i=0; i<size; i++)
+    {
+        putChar(name[i]);
+    }
+    putChar(' ');
+    putChar('i');
+    putChar('s');
+    putChar(' ');
+    switch (state)
+    {
+        case EATING:
+            putChar('e');
+            putChar('a');
+            putChar('t');
+            putChar('i');
+            putChar('n');
+            putChar('g');
+            putChar(' ');
+            putChar(' ');
+            break;
+        case HUNGRY:
+            putChar('h');
+            putChar('u');
+            putChar('n');
+            putChar('g');
+            putChar('r');
+            putChar('y');
+            putChar(' ');
+            putChar(' ');
+            break;
+        case THINKING:
+            putChar('t');
+            putChar('h');
+            putChar('i');
+            putChar('n');
+            putChar('k');
+            putChar('i');
+            putChar('n');
+            putChar('g');
+            break;
+        default:
+            break;
+    }
+    setCoordinates(0, 0);
 }

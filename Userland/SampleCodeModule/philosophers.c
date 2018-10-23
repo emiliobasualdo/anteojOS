@@ -11,9 +11,7 @@ void eat();
 void think();
 void sleepPhil();
 int getCurrentPhil(int pid);
-void drawDiningTable();
 int qtyPhilosophers;
-char * getPhilName(int index);
 
 /** phnum: index del filósofo, de 0 a N-1 */
 void test(int phnum)
@@ -24,7 +22,7 @@ void test(int phnum)
 
         /*printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
         printF("%s is eating\n", getPhilName(phnum));*/
-        drawDiningTable();
+        drawDiningTable(state, qtyPhilosophers);
 
         unlock(S[phnum]);
     }
@@ -37,7 +35,7 @@ void takeFork(int phnum)
 
     state[phnum] = HUNGRY;                              /** registrar que el filósofo tiene hambre */
     //printF("Philosopher %d is hungry\n", phnum + 1);
-    //drawDiningTable();
+    //drawDiningTable(state, qtyPhilosophers);
 
     /** eat if neighbours are not eating */
     test(phnum);                                        /** tratar de adquirir dos tenedores */
@@ -53,15 +51,10 @@ void putFork(int phnum)
 {
     lock(mutex);                                  /** entrar en la región crítica */
 
-    /*if (state[phnum] != EATING)
-    {
-        printF("Philosofer %d tried putting down forks but he wasn't eating\n", phnum+1);
-        return;
-    }*/
     state[phnum] = THINKING;                            /** el filósofo terminó de comer */
     /*printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
     printF("%s is thinking\n", getPhilName(phnum), phnum + 1);*/
-    drawDiningTable();
+    drawDiningTable(state, qtyPhilosophers);
 
     test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
     test(RIGHT);                                        /** ver si el vecino derecho ahora puede comer */
@@ -96,7 +89,8 @@ int startPhilosophers (int num)
         state[i] = THINKING;
     }
 
-    drawDiningTable();
+    drawDiningTableInit();
+    drawDiningTable(state, qtyPhilosophers);
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
@@ -113,7 +107,7 @@ int startPhilosophers (int num)
             case '1':
                 if (qtyPhilosophers == N)
                 {
-                    printF("ERROR: you've reached the maximum quantity of philosophers\n");
+                    //printF("ERROR: you've reached the maximum quantity of philosophers\n");
                 }
                 else
                 {
@@ -123,28 +117,29 @@ int startPhilosophers (int num)
                     procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t)philosopher, FALSE);
                     //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
                     state[qtyPhilosophers++] = THINKING;
-                    drawDiningTable();
+                    drawDiningTable(state, qtyPhilosophers);
                 }
                 break;
             case '0':
                 if (qtyPhilosophers == 2)
                 {
-                    printF("ERROR: 2 philosophers are needed to perform the test\n");
+                    //printF("ERROR: 2 philosophers are needed to perform the test\n");
                 }
                 else
                 {
                     userKill(procPid[qtyPhilosophers-1], procPid[qtyPhilosophers-1]);
                     qtyPhilosophers--;
-                    drawDiningTable();
+                    clearPlate(qtyPhilosophers);
+                    drawDiningTable(state, qtyPhilosophers);
                 }
                 break;
-            default:
-                printF("ERROR: press 1 to increase the number of philosophers, 0 to decrease them or 'q' to quit\n");
-                break;
+            default:break;
         }
     }
 
     userKill(procPid[0], procPid[qtyPhilosophers-1]);
+    //userKill(userGetCurrentPid(), userGetCurrentPid());
+    newWindow();
     return 1;
 }
 
@@ -179,11 +174,11 @@ int getCurrentPhil(int pid)
     return -1;
 }
 
-/** dibuja la mesa con los comensales --> qtyPhil = {0, ... , N=5} --> depende de N */
-void drawDiningTable()
+
+/** dibuja la mesa con los comensales --> qtyPhil = {0, ... , N=5} --> depende de N
+void drawDiningTable(state, qtyPhilosophers)
 {
-    newWindow();
-    char * states[N];                          /** N es la máxima cantidad de filósofos */
+    char * states[N];                          // N es la máxima cantidad de filósofos
     for (int i=0; i<qtyPhilosophers; i++)
     {
         states[i] = (state[i] == EATING ? "is eating  " : (state[i] == HUNGRY ? "is hungry  " : "is thinking"));
@@ -207,19 +202,19 @@ void drawDiningTable()
                    "\n"
                    "\n"
                    "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(                                  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (                                )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
+                   "                                     ==========================\n"
+                   "                                    (     %s %s     )\n"
+                   "                                   (                            )\n"
+                   "                                  ( %s %s         )\n"
+                   "                                 (                                )\n"
+                   "                                (                                  )\n"
+                   "                                |                                  |\n"
+                   "                                (                                  )\n"
+                   "                                 (                                )\n"
+                   "                                  (                              )\n"
+                   "                                   (                            )\n"
+                   "                                    (                          )\n"
+                   "                                     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1]);
             break;
         case 3:
@@ -238,19 +233,19 @@ void drawDiningTable()
                    "\n"
                    "\n"
                    "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(           %s %s  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (                                )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
+                   "                                     ==========================\n"
+                   "                                    (     %s %s     )\n"
+                   "                                   (                            )\n"
+                   "                                  ( %s %s         )\n"
+                   "                                 (                                )\n"
+                   "                                (           %s %s  )\n"
+                   "                                |                                  |\n"
+                   "                                (                                  )\n"
+                   "                                 (                                )\n"
+                   "                                  (                              )\n"
+                   "                                   (                            )\n"
+                   "                                    (                          )\n"
+                   "                                     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2]);
             break;
         case 4:
@@ -269,19 +264,19 @@ void drawDiningTable()
                    "\n"
                    "\n"
                    "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(           %s %s  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (   %s %s           )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
+                   "                                     ==========================\n"
+                   "                                    (     %s %s     )\n"
+                   "                                   (                            )\n"
+                   "                                  ( %s %s         )\n"
+                   "                                 (                                )\n"
+                   "                                (           %s %s  )\n"
+                   "                                |                                  |\n"
+                   "                                (                                  )\n"
+                   "                                 (   %s %s           )\n"
+                   "                                  (                              )\n"
+                   "                                   (                            )\n"
+                   "                                    (                          )\n"
+                   "                                     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2], getPhilName(3), states[3]);
             break;
         case 5:
@@ -300,24 +295,24 @@ void drawDiningTable()
                    "\n"
                    "\n"
                    "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(           %s %s  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (   %s %s           )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (      %s %s )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
+                   "                                     ==========================\n"
+                   "                                    (     %s %s     )\n"
+                   "                                   (                            )\n"
+                   "                                  ( %s %s         )\n"
+                   "                                 (                                )\n"
+                   "                                (           %s %s  )\n"
+                   "                                |                                  |\n"
+                   "                                (                                  )\n"
+                   "                                 (   %s %s           )\n"
+                   "                                  (                              )\n"
+                   "                                   (      %s %s )\n"
+                   "                                    (                          )\n"
+                   "                                     ==========================\n"
                    "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2], getPhilName(3), states[3], getPhilName(4), states[4]);
             break;
         default: break;
     }
-}
+}*/
 
 char * getPhilName(int index)
 {

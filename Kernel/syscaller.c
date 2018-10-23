@@ -123,12 +123,18 @@ uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t rdx, uint64_t rcx, 
 }
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
+    int from, to;
+    from = (int) rdi;
+    to = (int) rsi;
+    if(from < 0 || (from > to))
+        return FALSE;
+
     boolean ret = TRUE;
-    for (int i = (int) rdi; i <= rsi; ++i)
+    for (int i = from; i <= rsi; ++i)
     {
-        ret = ret && setProcessState((pPid) i, DEAD, NO_REASON);
+        ret = ret && setProcessState(i, DEAD, NO_REASON);
     }
-    return ret;
+    return (uint64_t) ret;
 }
 uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {

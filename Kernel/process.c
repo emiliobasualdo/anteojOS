@@ -116,7 +116,7 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
 /**
  * Asume que las interrupciones estan apagadas*/
 void killAllDescendants(pPid pid) {
-    if (!procExists(pid))
+    if (!procExists(pid) || pid > 0)
         return;
     pPid childPid;
     pcbPtr proc = array[pid];
@@ -173,7 +173,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->foreground = foreground;
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
-    newPcb->postBox = createNewMessageQueue();
+    //newPcb->postBox = createNewMessageQueue();
 
     if(priority == INTERACTIVE)
     {

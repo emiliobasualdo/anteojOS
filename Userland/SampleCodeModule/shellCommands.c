@@ -17,7 +17,7 @@ command commands[]={
         {"proc_bomb", "Starts a process bomb", procBomb},
         {"back_test","Performs a test to prove the background functionality", backgroundTest},
         {"multi_test","Performs a test to prove the multi-processing functionality",multiProcTest},
-        {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo>", kill},
+        {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo> or kill <p pid>", kill},
         {"prod_cons", "Simulates de Producer Consumer Problem", prodCons},
         {"allocator_test", "Performs a test to prove the physical memory management functionality", allocatorTest},
         {"message_test","Performs a test of Message Passing", messageTesting},
@@ -328,22 +328,36 @@ int procBomb(int argc, argVector argv)
 
 int kill(int argc, argVector argv)
 {
-    int fromPid, toPid;
+    int fromPid, toPid, pPid;
     int flag = 0;
     if (argc < 2)
     {
-        printF("Usage: kill <pid> or kill <pidFrom pidTo>\n");
+        printF("Usage: kill <pid> or kill <pidFrom pidTo> or kill <p pid>\n");
         return FALSE;
     }
-    toInt(argv[1],&fromPid,&flag);
     if (argc == 3)
-        toInt(argv[2],&toPid,&flag);
+    {
+        if(strcmp(argv[1], "p") == 0)
+        {
+            toInt(argv[2],&pPid,&flag);
+            userKillAllDescendants(pPid);
+            return TRUE;
+        }
+        else
+        {
+            toInt(argv[1],&fromPid,&flag);
+            toInt(argv[2],&toPid,&flag);
+        }
+    }
     else
+    {
+        toInt(argv[1],&fromPid,&flag);
         toPid = fromPid;
+    }
 
     if(!flag)
     {
-        printF("Usage: kill <pid> or kill <pidFrom pidTo>\n");
+        printF("Usage: kill <pid> or kill <pidFrom pidTo> or kill <p pid>\n");
         return FALSE;
     }
     userKill(fromPid, toPid);
@@ -518,7 +532,7 @@ int philoTest(int argc, argVector argv)
         return 0;
     }
     int aux, resp;
-    char * aux1 = toInt(argv[1], &resp, &aux);
+    toInt(argv[1], &resp, &aux);
     if (resp > 5 || resp < 2)
     {
         printF("Error: argument must be a number between 2 and 5\n");

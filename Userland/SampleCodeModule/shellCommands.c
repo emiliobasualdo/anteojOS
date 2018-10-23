@@ -337,7 +337,8 @@ int kill(int argc, argVector argv)
     }
     if (argc == 3)
     {
-        if(strcmp(argv[1], "p") == 0)
+        printF("%s%s%s\n", argv[0],argv[1], argv[2]);
+        if(strcmp(argv[1], "p"))
         {
             toInt(argv[2],&pPid,&flag);
             userKillAllDescendants(pPid);

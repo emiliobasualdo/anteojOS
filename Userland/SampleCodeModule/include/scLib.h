@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "syscall.h"
+#include <userPrintf.h>
 
 /* system call to draw a string */
 void write(char * );

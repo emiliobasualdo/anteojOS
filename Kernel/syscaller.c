@@ -8,8 +8,8 @@ func_type fList[] = {write, read, getHour, getMin, getSec, beep,
                                setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
                                createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
-                               nice, kernelColumnTest, kernelCreateSemaphore, kernelSemWait,
-                               kernelSemPost, kernelSemDestroy, kernelKillAllDescendants, kernelGetQuantum, kernelSetQuantum };
+                               nice, kernelColumnTest,kernelKillAllDescendants ,kernelCreateSemaphore, kernelSemWait,
+                               kernelSemPost, kernelSemDestroy, kernelGetQuantum, kernelSetQuantum };
 
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -18,7 +18,6 @@ uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint6
     function = fList[rax-1];
     return function(rdi,rsi,rdx,rcx,r8);
 }
-
 uint64_t write(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     drawString((const char *) rdi);
@@ -184,6 +183,7 @@ uint64_t kernelColumnTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 }
 uint64_t kernelKillAllDescendants(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
+    simple_printf("rdi %d\n", rdi);
     killAllDescendants((pPid) rdi);
     return 1;
 }

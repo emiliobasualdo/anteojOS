@@ -74,6 +74,8 @@ int isDigit(char c)
     return c>='0' && c<='9' ? 1 : 0 ;
 }
 
+/** EL strcmp más bizarro de la historía, pero bueno
+ * Retorna 0 Si son distintos */
 int strcmp(char *s1, char *s2)
 {
     while (*s1 && *s2)

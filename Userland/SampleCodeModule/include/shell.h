@@ -23,6 +23,7 @@
 #define ILLEGAL_INPUT -3
 #define BUFFER_OVERFLOW -4
 #define AMPRESAND_CMD -5
+#define PIPE_CMD -5
 
 #define MAX_CMD 40
 #define MAX_HISTORY 20

@@ -105,7 +105,7 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
 /* eax = 19
 ** create and executes a process
 */
-uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t fore, uint64_t argv, uint64_t argc);
 
 /* eax = 20
 ** kills a proces process state

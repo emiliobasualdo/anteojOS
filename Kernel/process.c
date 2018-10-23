@@ -9,7 +9,8 @@
 static boolean isValidPid(pPid pid);
 static void freeProcess(pcbPtr proc);
 static pPid getNextPid();
-static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority);
+static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority,
+                         char **argv, int argc);
 static pPid arrayAdd(pcbPtr pcbPtr, int demandPid);
 static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
@@ -48,13 +49,14 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
     arrSize = MAX_PROCS;
     maxPid = arrSize-1; // cond dinamica tiene sentido, aca no todo
     // creamos el nuevo proceso
-    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, DEFAULT_PRIORITY);
+    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, DEFAULT_PRIORITY, NULL, 0);
     if (!init) {
         simple_printf("ERROR: initProcessControl: Alguno es null\n");
         freeProcess(init);
         return NULL;
     }
-    bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE, DEFAULT_PRIORITY);
+    bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE,
+                                     DEFAULT_PRIORITY, NULL, 0);
     nextPid = BUSSY_WAITING + 1;
     return init;
 }
@@ -65,7 +67,8 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
  * en el arreglo de procesos, si es posbile.
  * Y se lo agrega a la lista del papá
  * */
-pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short priority)
+pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short priority, char **argv,
+                     int argc)
 {
     if ( !instruction)
     {
@@ -82,7 +85,12 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
         simple_printf("ERROR: %d is not a valid priority\n",priority);
         return NULL;
     }
-    pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground, priority);
+    if((argv == NULL && argc != 0) || (argc == 0 && argv != NULL) || argc < 0)
+    {
+        simple_printf("ERROR: argc or argv are illegal\n",priority);
+        return NULL;
+    }
+    pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground, priority, argv, argc);
     if (!newPcb)
     {
         //simple_printf("ERROR: createProcess: newPcb = null\n");
@@ -138,7 +146,8 @@ void killAllDescendants(pPid pid) {
  * de tipo de prioridad.
  * Sino se le asigna ese numero
  */
-static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority)
+static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority,
+                         char **argv, int argc)
 {
     pcbPtr newPcb = kernelMalloc(sizeof(pcb));
     if (newPcb == NULL)
@@ -196,7 +205,13 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     }
 
     newPcb->stackFrame = (stackFrame_t *) newPcb->rsp;
+
+    // https://aaronbloomfield.github.io/pdr/book/x86-64bit-ccc-chapter.pdf
+    //To pass parameters to the subroutine, we put up to six of them into registers (in order: rdi, rsi,rdx, rcx, r8, r9)
     newPcb->stackFrame->rdi = instruction;
+    newPcb->stackFrame->rsi = (uint64_t) argv;
+    newPcb->stackFrame->rdx = (uint64_t) argc;
+
     newPcb->stackFrame->rip = (uint64_t) procContainer;
     newPcb->stackFrame->cs = CS_VALUE;
     newPcb->stackFrame->rflags = RFLAGS_VALUE;
@@ -406,10 +421,10 @@ void printSons(pPid parentPid)
  * de esta manera nos aseguramos que el sistema no muera
  * al hacer return
  * */
-int procContainer(uint64_t inst)
+int procContainer(uint64_t inst, char **argv, int argc)
 {
-    int(*func)(void) = (int (*)(void)) inst;
-    int ret = func();
+    int(*func)(char **, int) = (int (*)(char **, int)) inst;
+    int ret = func(argv,argc);
     simple_printf("Kernel Message: Process %s with pid %d died, with return=%d\n",getCurrentProc()->name, getCurrentProc()->pid, ret);
 
     procsDeathCleanUp(getCurrentProc());

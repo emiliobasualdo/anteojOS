@@ -96,8 +96,9 @@ typedef pcb *pcbPtr;
 typedef pcbPtr *pArray;
 
 
-int procContainer(uint64_t inst);
-pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short i);
+int procContainer(uint64_t inst, char **argv, int argc);
+pcbPtr
+createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short i, char **argv, int argc);
 pcbPtr initProcessControl(char *name, uint64_t instruction);
 boolean procExists(pPid pid);
 void arrayAddInit(pArray array, pcbPtr init);

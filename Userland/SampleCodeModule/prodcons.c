@@ -45,7 +45,7 @@ int producerConsumer(int numProducers, int numConsumers)
             case '1':
                 if(numberOfProds < MAXPROC)
                 {
-                    int pid = userStartProcess("producer", (uint64_t) producer, userGetCurrentPid());
+                    int pid = userStartProcess("producer", (uint64_t) producer, NULL, 0);
                     prod[numberOfProds] = pid;
                     numberOfProds++;
                     printF("cantidad de prods: %d , pid: %d\n", numberOfProds, pid);
@@ -54,7 +54,7 @@ int producerConsumer(int numProducers, int numConsumers)
             case '2':
                 if(numberOfCons < MAXPROC)
                 {
-                    int pid = userStartProcess("consumer", (uint64_t) consumer, userGetCurrentPid());
+                    int pid = userStartProcess("consumer", (uint64_t) consumer, NULL, 0);
                     cons[numberOfCons] = pid;
                     numberOfCons++;
                     printF("cantidad de cons: %d , pid: %d\n", numberOfCons, pid);
@@ -132,7 +132,7 @@ static int createProducers(int numProducers)
     int prodsCreated=(numProducers>MAXPROC)?MAXPROC:numProducers;
     for (int i=0; i < prodsCreated; i++)
     {
-        currPID = userStartProcess("producer", (uint64_t) producer, userGetCurrentPid());
+        currPID = userStartProcess("producer", (uint64_t) producer, NULL, 0);
         if (currPID == -1)          // todo chequear
         {
             return 0;
@@ -149,7 +149,7 @@ static int createConsumers(int numConsumers)
 
     for (int i=0; i<consCreated; i++)
     {
-        currPID = userStartProcess("consumer", (uint64_t) consumer, userGetCurrentPid());
+        currPID = userStartProcess("consumer", (uint64_t) consumer, NULL, 0);
         if (currPID == -1)          // todo chequear
         {
             return 0;

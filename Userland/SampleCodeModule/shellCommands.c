@@ -12,7 +12,7 @@ command commands[]={
         //{"digital_clock","Displays a digital clock on screen", digital_clock},
         {"timezone", "Allows the user to change the current timezone. Usage: timezone [int]",timezone},
         //{"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
-        {"exceptionTester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
+        {"exception _tester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
         {"ps", "Prints all process. Usage ps or ps <q> or ps <p pid>", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
         {"back_test","Performs a test to prove the background functionality", backgroundTest},
@@ -46,6 +46,18 @@ int executeCommand(int argc, argVector argv)
         execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn);
         return AMPRESAND_CMD;
     }
+/*    else
+    {
+        for (int i = 0; i < argc; ++i)
+        {
+            if(strcmp(argv[i], "|"))
+            {
+                execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn);
+                return PIPE_CMD;
+            }
+        }
+
+    }*/
     return (*commands[cmd].fn)(argc,argv);
 }
 
@@ -63,7 +75,7 @@ int commandExists(const char *name)
 
 int execProcInBackground(char *name, uint64_t intstruction)
 {
-    int pid = userStartProcess(name, intstruction, FALSE);
+    int pid = userStartProcess(name, intstruction, NULL, 0);
     if (pid == -1)
         printF("Shell: Error executing process in background\n");
     else

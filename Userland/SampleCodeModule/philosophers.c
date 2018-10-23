@@ -100,7 +100,7 @@ int startPhilosophers (int num)
     for (i = 0; i < qtyPhilosophers; i++)
     {
         userSprintf(name,"%d-%s", i, NAME);
-        procPid[i] = userStartProcess(name, (uint64_t)philosopher, FALSE);
+        procPid[i] = userStartProcess(name, (uint64_t) philosopher, NULL, 0);
         //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
     }
 
@@ -119,7 +119,7 @@ int startPhilosophers (int num)
                     char newPhilName[10];
                     userSprintf(newPhilName,"%d-%s", i, NAME);
                     S[qtyPhilosophers] = newMutex(0);
-                    procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t)philosopher, FALSE);
+                    procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t) philosopher, NULL, 0);
                     //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
                     state[qtyPhilosophers] = THINKING;
                     qtyPhilosophers++;

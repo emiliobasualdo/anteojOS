@@ -79,7 +79,7 @@ void columnTest(short cantProcs, boolean ageing)
     {
         priority = (short) (i % PRIORITY_LEVELS);
         simple_sprintf(name,"%d-%s-%d", i, NAME, priority); // la congurencia nunca va a quedar 5
-        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority);
+        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, 0);
         if(!ageing)
             setProcessPriority(pid, priority);
     }
@@ -105,7 +105,7 @@ void setVariables(short procsCant)
 int proc1()
 {
     simple_printf("Hola!! soy %s y estoy creando hijos\n", getCurrentProc()->name);
-    createAndExecProcess(NULL, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY);
+    createAndExecProcess(NULL, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0);
     proc1();
     return -1;
 }
@@ -127,7 +127,7 @@ boolean processBomb()
     getNextChar();
     getNextChar();
     simple_sprintf(name,"%sc","process_bomb");
-    createAndExecProcess(name, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY);
+    createAndExecProcess(name, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0);
     simple_printf("If we got here is because this OS is the best at handling process bombs ;)\n");
     return TRUE;
 }
@@ -179,17 +179,17 @@ static void f3()
 void mutexTest()
 {
     mutex = startMutex(0);
-    if (createAndExecProcess("f1", (uint64_t) f1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("f1", (uint64_t) f1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("f1: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("f2", (uint64_t) f2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("f2", (uint64_t) f2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("f2: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("f3", (uint64_t) f3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("f3", (uint64_t) f3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("f3: ERROR: otro == NULL\n");
         return;
@@ -261,17 +261,17 @@ static void s3()
 void semTest()
 {
     sem = semStartK(1);
-    if (createAndExecProcess("s1", (uint64_t) s1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("s1", (uint64_t) s1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("s1: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("s2", (uint64_t) s2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("s2", (uint64_t) s2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("s2: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("s3", (uint64_t) s3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("s3", (uint64_t) s3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("s3: ERROR: otro == NULL\n");
         return;

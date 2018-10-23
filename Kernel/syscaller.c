@@ -116,9 +116,10 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
         printAllProcs();
     return 0;
 }
-uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t fore, uint64_t argv, uint64_t argc)
 {
-    return (uint64_t) createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) rdx, DEFAULT_PRIORITY);
+    return (uint64_t) createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) fore,
+                                           DEFAULT_PRIORITY, (char **) argv, (int) argc);
 }
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {

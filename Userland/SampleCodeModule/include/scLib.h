@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "syscall.h"
 #include <userPrintf.h>
+#include "stdio.h"
 
 /* system call to draw a string */
 void write(char * );
@@ -64,7 +65,7 @@ void userFree(uint64_t x);
 void userPs(char type, int pid);
 
 /* not much to explain*/
-int userStartProcess(char *name, uint64_t instruct, int foreground);
+int userStartProcess(char *name, uint64_t instruct, char **argv, int argc);
 
 /* Can change between Running, Blocked, Dead*/
 int userKill(int rdi, int toPid);

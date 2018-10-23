@@ -7,11 +7,14 @@ int S[N];                           /** un semáforo por filósofo */
 
 int procPid[N];                   /** arreglo con los PID de los filósofos */
 
-void eat();
+int eat();
 void think();
 void sleepPhil();
 int getCurrentPhil(int pid);
 int qtyPhilosophers;
+
+#define MAX_FOOD 10000000000
+#define MAX_PLATE (MAX_FOOD / 50) // va a comer 50 platos
 
 /** phnum: index del filósofo, de 0 a N-1 */
 void test(int phnum)
@@ -66,13 +69,15 @@ void * philosopher ()
 {
     int aux = getCurrentPhil(userGetCurrentPid());
     int * i = &aux;
-    while (1)
+    int hungry = TRUE;
+    while (hungry)
     {
         think();
         takeFork(*i);
-        eat();
+        hungry = eat();
         putFork(*i);
     }
+    return 0;
 }
 
 int startPhilosophers (int num)
@@ -100,7 +105,7 @@ int startPhilosophers (int num)
     }
 
     char c;
-    while((c = getChar()) != 'q')
+    while((c = (char) getChar()) != 'q')
     {
         switch (c)
         {
@@ -116,7 +121,8 @@ int startPhilosophers (int num)
                     S[qtyPhilosophers] = newMutex(0);
                     procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t)philosopher, FALSE);
                     //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
-                    state[qtyPhilosophers++] = THINKING;
+                    state[qtyPhilosophers] = THINKING;
+                    qtyPhilosophers++;
                     drawDiningTable(state, qtyPhilosophers);
                 }
                 break;
@@ -148,9 +154,18 @@ void think()
     sleepPhil();
 }
 
-void eat()
+int eat()
 {
-    sleepPhil();
+    static long long counter = 0;
+    while(counter < MAX_FOOD)
+    {
+        counter++;
+        if(counter % MAX_PLATE == 0)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 void sleepPhil()

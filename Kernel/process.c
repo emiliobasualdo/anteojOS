@@ -116,7 +116,7 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
 /**
  * Asume que las interrupciones estan apagadas*/
 void killAllDescendants(pPid pid) {
-    if (!procExists(pid) || pid > 0)
+    if (!procExists(pid))
         return;
     pPid childPid;
     pcbPtr proc = array[pid];
@@ -124,7 +124,11 @@ void killAllDescendants(pPid pid) {
         killAllDescendants(array[proc->childs[i]]->pid);
         childPid = proc->childs[i];
         if(procExists(childPid))
+        {
+            if(childPid == pid)
+                simple_printf("ERROROROROROROOR\n");
             setProcessState(childPid,DEAD, NO_REASON);
+        }
     }
 }
 
@@ -217,7 +221,7 @@ boolean procExists(pPid pid)
 }
 
 boolean isValidPid(pPid pid) {
-    return (pid <= maxPid && pid > INIT_PID ) || pid == NO_PARENT;
+    return (pid <= maxPid && pid >= INIT_PID ) || pid == NO_PARENT;
 }
 
 static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca tengo que liberar todo
@@ -282,12 +286,7 @@ static pPid getNextPid()
 
 boolean isValidPState(int state)
 {
-    for (int i = BORN; i <= DEAD; ++i) {
-        if(state == i){
-            return TRUE;
-        }
-    }
-    return FALSE;
+    return (state >= BORN && state <= DEAD);
 }
 
 /** Si es necesrio, notificamos al algoritmo de scheduling para que haga lo necesario */
@@ -340,8 +339,13 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
  */
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason)
 {
-    if (!procExists(pid) || !isValidPState(newState)){
+    if (!procExists(pid)){
         simple_printf("Kernel message: ERROR: pid is not valid \n");
+        return FALSE;
+    }
+    if(!isValidPState(newState))
+    {
+        simple_printf("Kernel message: ERROR: not valid state \n");
         return FALSE;
     }
     array[pid]->state = newState;

@@ -86,7 +86,6 @@ void columnTest(short cantProcs, boolean ageing)
     // agregar que pueda cambiar el cuantum con teclas
     while (getNextChar() != 'q'){}
     killAllDescendants(getCurrentProc()->pid);
-    simple_printf("xxxxxxXXXXXXXXXXXXX xxxxx aca estamos \n");
     clearWindow();
 }
 
@@ -102,7 +101,6 @@ void setVariables(short procsCant)
     blockWidth = xRes / (CANT_BLOCKS*2);
     //simple_printf("xRes=%d yRes=%d cantRows=%d rowHeight=%d blockHeight=%d\n",xRes, yRes,cantRows, rowHeight, blockHeight);
 }
-
 
 int proc1()
 {

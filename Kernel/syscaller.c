@@ -90,7 +90,7 @@ uint64_t changeBackgroundColour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64
 }
 uint64_t setCoordinates(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    setCoord(rdi, rsi);
+    setCoord((unsigned int) rdi, (unsigned int) rsi);
     return 0;
 }
 uint64_t sysMalloc (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -183,7 +183,6 @@ uint64_t kernelColumnTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 }
 uint64_t kernelKillAllDescendants(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    simple_printf("rdi %d\n", rdi);
     killAllDescendants((pPid) rdi);
     return 1;
 }

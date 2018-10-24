@@ -97,6 +97,35 @@ pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean
     return newProc->pid;
 }
 
+pPid createNotExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority, char **argv,
+                          int argc)
+{
+    pcbPtr newProc = createProcess(name, instruction, parent, foreground, priority, argv, argc);
+    if(!newProc)
+    {
+        simple_printf("createAndExecProcess: !newProc\n");
+        return PID_ERROR;
+    }
+
+    return newProc->pid;
+}
+
+boolean execProc(pPid pid)
+{
+    pcbPtr pcb = getPcbPtr(pid);
+    if(!pcb)
+    {
+        simple_printf("execProc: !pcb\n");
+        return FALSE;
+    }
+    if (!schedulerAddProc(pcb))
+    {
+        simple_printf("execProc: !schedulerAddProc(newProc)\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
 static boolean schedulerAddProc(pcbPtr proc)
 {
     if(proc == NULL)

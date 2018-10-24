@@ -255,7 +255,8 @@ int dupProc(pPid pidOut, pPid pidIn)
     return 0;
 }
 
-void addStandardPipes(pPid pid) {
+void addStandardPipes(pPid pid)
+{
     pcbPtr process = getPcbPtr(pid);
     if(process == NULL)
     {

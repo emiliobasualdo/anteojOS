@@ -24,7 +24,7 @@ command commands[]={
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
-        {"philosophers","Performs the dining philosophers problem", philoTest},
+        {"philosophers","Performs the dining philosophers problem. Usage: philosophers <2-5>", philoTest},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -43,7 +43,7 @@ int executeCommand(int argc, argVector argv)
     }
     if (argv[argc-1][0] == '&')
     {
-        execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn);
+        execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn, argc, argv);
         return AMPRESAND_CMD;
     }
     else
@@ -52,8 +52,20 @@ int executeCommand(int argc, argVector argv)
         {
             if(strcmp(argv[i], "|"))
             {
-                execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn);
-                return PIPE_CMD;
+                if(argc > i+1)
+                {
+                    int cmd2 = commandExists(argv[i+1]);
+                    if (cmd2 == NULL_CMMD)
+                    {
+                        return NULL_CMMD;
+                    }
+                    int pid1 = createProc(commands[cmd].name, (uint64_t) commands[cmd].fn, (char **) argv, i);
+                    int pid2 = createProc(commands[cmd2].name, (uint64_t) commands[cmd2].fn, (char **) (argv + i + 1), argc - (i + 1));
+                    pipe(pid1,pid2);
+                    startProc(pid2);
+                    startProc(pid1);
+                    return PIPE_CMD;
+                }
             }
         }
 
@@ -73,9 +85,9 @@ int commandExists(const char *name)
     return NULL_CMMD;
 }
 
-int execProcInBackground(char *name, uint64_t intstruction)
+int execProcInBackground(char *name, uint64_t intstruction, int argc, argVector argv)
 {
-    int pid = userStartProcess(name, intstruction, NULL, 0);
+    int pid = userStartProcess(name, intstruction, (char **) argv, argc);
     if (pid == -1)
         printF("Shell: erro while creating process\n", pid);
     else
@@ -98,6 +110,10 @@ int echo (int argc, argVector argv)
     if (argc == 1)
     {
         return 0;
+    }
+    if(argc == -1) // leemos de stdin
+    {
+        
     }
     for (int i=1; i<argc; i++)
     {
@@ -464,7 +480,7 @@ int multiTest(int count, argVector argv)
     for (int i = 0; i < count; ++i)
     {
         userSprintf(name, "%s-%d",aux_programs[0].name, i);
-        execProcInBackground(name, (uint64_t) aux_programs[0].fn);
+        execProcInBackground(name, (uint64_t) aux_programs[0].fn, count, argv);
     }
     printF("\nWe will leave the program%s running for you to decide what to do with it\n",count==1?"":"s");
     printF("Remember you can kill %s with the command kill <pid>\n",count==1?"it":"them");
@@ -532,7 +548,7 @@ int philoTest(int argc, argVector argv)
 {
     if (argc != 2)
     {
-        printF("%s\n", ARGUMENTS_AMOUNT_ERROR("1"));
+        printF("Usage: philosophers <2-5>\n");
         return 0;
     }
     int aux, resp;

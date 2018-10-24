@@ -106,7 +106,7 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
 /* eax = 19
 ** create and executes a process
 */
-uint64_t startProcess(uint64_t rdi, uint64_t rsi, uint64_t fore, uint64_t argv, uint64_t argc);
+uint64_t kernelCreateAndExProcess(uint64_t rdi, uint64_t rsi, uint64_t fore, uint64_t argv, uint64_t argc);
 
 /* eax = 20
 ** kills a proces process state
@@ -218,5 +218,13 @@ uint64_t closeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t
  **  Sets a pipe from left to right
  */
 uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 42
+ */
+uint64_t kernelCreateProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 43
+ */
+uint64_t kernelStartProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 #endif

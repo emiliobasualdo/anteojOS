@@ -11,7 +11,9 @@
 #include "lib.h"
 #include "dinamicMemory.h"
 
-#define MAXMUTEXES 10
+#define MAXMUTEXES 100
+#define MAXSEMAPHORES 10
+
 #define MAXINQUEUE 5
 
 #define SND 1
@@ -35,6 +37,7 @@ int semStartK(int initValue);
 int initIPCS();
 int lockMutex(int mutex);
 int unlockMutex(int mutex);
+int tryToLockMutex(int mutex);
 
 // Semaforos
 int semWaitK(int sem);

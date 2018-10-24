@@ -8,6 +8,7 @@
 #include <ipc.h>
 #include <roundRobin.h>
 #include <videoDriver.h>
+#include <pipes.h>
 
 boolean processBomb();
 void columnTest(short cantProcs, boolean ageing);
@@ -16,5 +17,6 @@ int proc2();
 int multiProcessTest();
 void mutexTest();
 void semTest();
+void pipeTest();
 
 #endif

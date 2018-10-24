@@ -115,9 +115,9 @@ GDTR64:					; Global Descriptors Table Register
 gdt64:					; This structure is copied to 0x0000000000001000
 SYS64_NULL_SEL equ $-gdt64		; Null Segment
 	dq 0x0000000000000000
-SYS64_CODE_SEL equ $-gdt64		; Code segment, read/execute, nonconforming
+SYS64_CODE_SEL equ $-gdt64		; Code segment, readK/execute, nonconforming
 	dq 0x0020980000000000		; 0x00209A0000000000
-SYS64_DATA_SEL equ $-gdt64		; Data segment, read/write, expand down
+SYS64_DATA_SEL equ $-gdt64		; Data segment, readK/writeK, expand down
 	dq 0x0000900000000000		; 0x0020920000000000
 gdt64_end:
 

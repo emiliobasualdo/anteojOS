@@ -258,10 +258,10 @@ APICx2apicEnd:
 
 APICignore:
 	xor eax, eax
-	lodsb				; We have a type that we ignore, read the next byte
+	lodsb				; We have a type that we ignore, readK the next byte
 	add ebx, eax
 	add rsi, rax
-	sub rsi, 2			; For the two bytes just read
+	sub rsi, 2			; For the two bytes just readK
 	jmp readAPICstructures		; Read the next structure
 
 parseAPICTable_done:

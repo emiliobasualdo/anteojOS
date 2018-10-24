@@ -10,7 +10,7 @@
 #define FALSE 0
 #define TRUE !FALSE
 
-/* reads the buffer and returns the line written on stdin */
+/* reads the buffer and returns the line written on myStdin */
 char * reaDLine(char *, unsigned int);
 
 /*

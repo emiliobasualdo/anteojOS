@@ -32,8 +32,8 @@ char s_list[] = "list";
 char s_format[] = "format";
 char s_initialize[] = "initialize";
 char s_create[] = "create";
-char s_read[] = "read";
-char s_write[] = "write";
+char s_read[] = "readK";
+char s_write[] = "writeK";
 char s_delete[] = "delete";
 struct BMFSEntry entry;
 void *pentry = &entry;
@@ -49,7 +49,7 @@ void format();
 int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel);
 void create(char *filename, unsigned long long maxsize);
 void read(char *filename);
-void write(char *filename);
+void writeString(char *filename);
 void delete(char *filename);
 
 /* Program code */
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 		printf("Written by Ian Seyler @ Return Infinity (ian.seyler@returninfinity.com)\n\n");
 		printf("Usage: %s disk function file\n", argv[0]);
 		printf("Disk: the name of the disk file\n");
-		printf("Function: list, read, write, create, delete, format, initialize\n");
+		printf("Function: list, readK, writeK, create, delete, format, initialize\n");
 		printf("File: (if applicable)\n");
 		exit(0);
 	}
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if ((disk = fopen(diskname, "r+b")) == NULL)	// Open for read/write in binary mode
+	if ((disk = fopen(diskname, "r+b")) == NULL)	// Open for readK/writeK in binary mode
 	{
 		printf("Error: Unable to open disk '%s'\n", diskname);
 		exit(0);
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	}
 	else if (strcasecmp(s_write, command) == 0)
 	{
-		write(filename);
+		writeString(filename);
 	}
 	else if (strcasecmp(s_delete, command) == 0)
 	{
@@ -432,7 +432,7 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 
 	// Open the disk image file for writing.  This will truncate the disk file
 	// if it already exists, so we should do this only after we're ready to
-	// actually write to the file.
+	// actually writeK to the file.
 	if (ret == 0)
 	{
 		disk = fopen(diskname, "wb");
@@ -462,7 +462,7 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 			}
 			if (fwrite(buffer, chunkSize, 1, disk) != 1)
 			{
-				printf("Error: Failed to write disk '%s'\n", diskname);
+				printf("Error: Failed to writeK disk '%s'\n", diskname);
 				ret = 1;
 				break;
 			}
@@ -490,13 +490,13 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 		{
 			if (fwrite(buffer, 512, 1, disk) != 1)
 			{
-				printf("Error: Failed to write disk '%s'\n", diskname);
+				printf("Error: Failed to writeK disk '%s'\n", diskname);
 				ret = 1;
 			}
 		}
 		else
 		{
-			printf("Error: Failed to read file '%s'\n", mbr);
+			printf("Error: Failed to readK file '%s'\n", mbr);
 			ret = 1;
 		}
 	}
@@ -513,7 +513,7 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 			{
 				if (fwrite(buffer, chunkSize, 1, disk) != 1)
 				{
-					printf("Error: Failed to write disk '%s'\n", diskname);
+					printf("Error: Failed to writeK disk '%s'\n", diskname);
 					ret = 1;
 				}
 			}
@@ -521,7 +521,7 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 			{
 				if (ferror(disk))
 				{
-					printf("Error: Failed to read file '%s'\n", boot);
+					printf("Error: Failed to readK file '%s'\n", boot);
 					ret = 1;
 				}
 				break;
@@ -541,7 +541,7 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 			{
 				if (fwrite(buffer, chunkSize, 1, disk) != 1)
 				{
-					printf("Error: Failed to write disk '%s'\n", diskname);
+					printf("Error: Failed to writeK disk '%s'\n", diskname);
 					ret = 1;
 				}
 			}
@@ -549,7 +549,7 @@ int initialize(char *diskname, char *size, char *mbr, char *boot, char *kernel)
 			{
 				if (ferror(disk))
 				{
-					printf("Error: Failed to read file '%s'\n", kernel);
+					printf("Error: Failed to readK file '%s'\n", kernel);
 					ret = 1;
 				}
 				break;
@@ -749,7 +749,7 @@ void read(char *filename)
 }
 
 
-void write(char *filename)
+void writeString(char *filename)
 {
 	struct BMFSEntry tempentry;
 	FILE *tfile;

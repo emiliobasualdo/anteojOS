@@ -110,6 +110,7 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
         return FALSE;
     }
     parent->childs[parent->childrenCount++] = childPid;
+
     return TRUE;
 }
 
@@ -174,6 +175,14 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
     newPcb->postBox = createNewMessageQueue();
+
+    for (int i = 0; i < FD_AMOUNT; ++i)
+    {
+        newPcb->fd[i] = -1;
+    }
+
+    newPcb->fd[STDIN] = createPipeK()->pipeId;
+    newPcb->fd[STDOUT] = createPipeK()->pipeId;
 
     if(priority == INTERACTIVE)
     {

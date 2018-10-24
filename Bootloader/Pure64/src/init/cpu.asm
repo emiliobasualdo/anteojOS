@@ -35,7 +35,7 @@ init_cpu:
 ; See example in Intel Volume 3A. Example Base and Mask Calculations
 ;	mov ecx, 0x00000200		; MTRR_Phys_Base_MSR(0)
 ;	mov edx, 0x00000000		; Base is EDX:EAX, 0x0000000000000006
-;	mov eax, 0x00000006		; Type 6 (write-back cache)
+;	mov eax, 0x00000006		; Type 6 (writeK-back cache)
 ;	wrmsr
 ;	mov ecx, 0x00000201		; MTRR_Phys_Mask_MSR(0)
 ;;	mov edx, 0x00000000		; Mask is EDX:EAX, 0x0000000001000800 (Because bochs sucks)

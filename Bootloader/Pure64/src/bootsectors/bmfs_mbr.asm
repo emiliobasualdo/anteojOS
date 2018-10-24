@@ -85,7 +85,7 @@ halt:
 ; IN:	EAX - High word of 64-bit DOS sector number
 ;	EBX - Low word of 64-bit DOS sector number
 ;	ES:CX - destination buffer
-; OUT:	ES:CX points one byte after the last byte read
+; OUT:	ES:CX points one byte after the last byte readK
 ;	EAX - High word of next sector
 ;	EBX - Low word of sector
 readsector:

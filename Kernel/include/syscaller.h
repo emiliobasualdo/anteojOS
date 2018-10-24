@@ -11,16 +11,17 @@
 #include "ipc.h"
 #include "pageAllocator.h"
 #include "allocatorTest.h"
+#include "pipes.h"
 
 /* eax = 1
 ** draws a string with a given string in rdi
 */
-uint64_t write(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+uint64_t writeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 2
 ** returns the next character to consume from the buffer
 */
-uint64_t read(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+uint64_t readK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 3
 ** return the hour
@@ -193,10 +194,29 @@ uint64_t kernelSemPost(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, u
 uint64_t kernelSemDestroy(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 37
+ **
  */
 uint64_t kernelGetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
 
 /* eax = 38
+ **
  */
 uint64_t kernelSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 39
+ **  Opens Pipe
+ */
+uint64_t openPipe(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+
+/* eax = 40
+ **  Closes a pipe
+ */
+uint64_t closeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
+/* eax = 41
+ **  Sets a pipe from left to right
+ */
+uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8);
+
 #endif

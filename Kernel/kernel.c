@@ -15,6 +15,7 @@
 #include <dinamicMemory.h>
 #include <pageAllocator.h>
 #include <shellTests.h>
+#include <pipes.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -94,11 +95,14 @@ void * initializeKernelBinary() // todo ver clearBSS
 void theAllMighty()
 {
     simple_printf("The all mighty\n");
-    if (createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE, INTERACTIVE) == PID_ERROR)
+    pPid shellPid = createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE, INTERACTIVE);
+    if (shellPid == PID_ERROR)
     {
         simple_printf("theAllMighty: ERROR: shell == NULL\n");
         return;
     }
+    addStandardPipes(shellPid);
+
     simple_printf("theAllMighty: cargando IDT\n");
     loadIDT();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
@@ -116,10 +120,20 @@ int main()
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;
     }
-/*    if(!initIPCS()) {
+    if(!initIPCS())
+    {
         simple_printf("kernel: ERROR: initIPCs retornó FALSE\n");
         return 0;
-    }*/
+    }
+    if(!initPipes())
+    {
+        simple_printf("kernel: ERROR: initPipes retornó FALSE\n");
+    }
+    if(!initKeyboardDriver())
+    {
+        simple_printf("kernel: ERROR: initKeyboardDriver retornó FALSE\n");
+        return 0;
+    }
     pcbPtr pacientCero = initScheduler("theAllMighty", (uint64_t) theAllMighty);
     if (!pacientCero)
     {

@@ -84,7 +84,7 @@ The delete function accepts one parameter:
 
 The read function accepts two parameters:
 
-	Name = The name of the file to read
+	Name = The name of the file to readK
 	Destination = The memory address to store the file
 
 
@@ -92,9 +92,9 @@ The read function accepts two parameters:
 
 The write function accepts three parameters:
 
-	Name = The name of the file to write
+	Name = The name of the file to writeString
 	Source = The memory address of the data
-	Size = The amount of bytes to write
+	Size = The amount of bytes to writeK
 
 
 **Directory/List**

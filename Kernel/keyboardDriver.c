@@ -1,4 +1,4 @@
- #include <keyboardDriver.h>
+#include <keyboardDriver.h>
 
 /* The following 2 arrays were taken from an osdev tutorial */
 char keyboardList[128] = {0,27,'1','2','3','4','5','6','7','8','9','0','-','=','\b','\t','q','w','e','r','t','y','u','i',
@@ -13,44 +13,29 @@ char keyboardShiftList[128]= {0,27,'!','@','#','$','%','^','&','*','(',')','_','
 
 int capsLock = 0;
 int shift = 0;
-int multiMedia = 0;
+pipe_t * myStdin;
+//char buffer[BUFFERSIZE] = {0};
+//int bufferWrite = 0;
+//int bufferRead = 0;
+//int size = 0;
 
-int buffer[BUFFERSIZE] = {0};
-int bufferWrite = 0;
-int bufferRead = 0;
-int size = 0;
+int initKeyboardDriver()
+{
+    myStdin = getPipeFromPipeList(0);
+    return 1;
+}
 
 int keyboardInterpreter()
 {
-    int key = (unsigned char) getKey();
-    if(key == 0xE0) //multimedia
-    {
-        multiMedia = (multiMedia+1 ) % 2;
-    }
+    unsigned char key = (unsigned char) getKey();
     if (key & 0x80)
     {
         if(key == 0xAA || key == 0xB6)
             shift = 0;
         return UP;
     }
-    else // DOWN
+    else
     {
-        if(multiMedia)//si la me avisaron que se viene un multimedia
-        {
-            switch (key)
-            {
-                // cursor up
-                case 0x48:
-                    charToBuffer(C_UP);
-                    break;
-                    // cursor dowb
-                case 0x50:
-                    charToBuffer(C_DOWN);
-                    break;
-                default:break;
-            }
-
-        }
         if (key == 58)
         {
             capsLock = !capsLock;
@@ -59,7 +44,7 @@ int keyboardInterpreter()
         {
             shift = 1;
         }
-        int c = keyboardList[key];
+        char c = keyboardList[key];
         if (c>='a' && c <= 'z')
         {
             if ( (capsLock && !shift) || (!capsLock && shift) )
@@ -71,47 +56,53 @@ int keyboardInterpreter()
         {
             c = keyboardShiftList[key];
         }
-        charToBuffer(c);
+        charToBuffer((unsigned char) c);
         return DOWN;
     }
 }
 
-void charToBuffer(int c)
+void charToBuffer(unsigned char c)
 {
     if (c != 0)
     {
-        buffer[bufferWrite] = c;
-        bufferWrite++;
-        bufferWrite = bufferWrite % BUFFERSIZE;
-        size++;
+        writePipeK(myStdin, (char *) (&c), 1);
+
+        for (int i = 0; i < 100000; ++i) {
+
+        }
+
+        //drawPipeBuffer(myStdin);
     }
 }
 
-int returnNextChar()
+char getNextChar()//antes returnNextChar
 {
-    int resp = 0;
-    if(size == 0)
-    {
-        return resp;
-    }
-    resp = buffer[bufferRead++];
-    bufferRead = bufferRead % BUFFERSIZE;
-    size--;
-    return resp;
+    char * nextChar = kernelMalloc(sizeof(char));
+    int read = readPipeK(myStdin, nextChar, 1);
+    return (*nextChar);
+//    char resp = 0;
+//    if(size == 0)
+//    {
+//        return resp;
+//    }
+//    resp = buffer[bufferRead++];
+//    bufferRead = bufferRead % BUFFERSIZE;
+//    size--;
+//    return resp;
 }
 
-int newToRead()
-{
-    if (size == 0 || bufferRead == bufferWrite)
-    {
-        return 0;
-    }
-    return 1;
-}
-
-int getNextChar()
-{
-    while (!newToRead())
-        setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);
-    return returnNextChar();
-}
+//int newToRead()
+//{
+//    if (myStdin->charsToRead == 0 || myStdin->bufferReadPosition == myStdin->bufferWritePosition)
+//    {
+//        return 0;
+//    }
+//    return 1;
+//}
+//
+//char getNextChar()
+//{
+//    while (!newToRead())
+//        setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);
+//    return returnNextChar();
+//}

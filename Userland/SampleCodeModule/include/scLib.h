@@ -3,11 +3,17 @@
 
 #include <stdint.h>
 #include "syscall.h"
+#include "stdlib.h"
 
-/* system call to draw a string */
-void write(char * );
+/* system call to draw a string*/
+void writeString(char *string);
+/* system call to draw a string if STDOUT or writeString in pipe if else*/
+void write(char *, int);
 
-/* system call to read the next character */
+/* system call to read a string if STDIN or read from pipe if else*/
+void read(char *, int);
+
+/* system call to readK the next character */
 int getChar();
 
 /* system call to get the hour */
@@ -40,7 +46,7 @@ int notifyExitRequest();
 /* system call to clear the screen and show a new window */
 void newWindow();
 
-/* system call to write a char */
+/* system call to writeK a char */
 int putChar(char );
 
 /* system call to do a backSpace */
@@ -117,4 +123,6 @@ int semDestroy(int sem);
 int userGetQuantum();
 
 void userSetQuantum(int pid);
+
+int pipe(int p1, int p2);
 #endif

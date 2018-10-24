@@ -1,13 +1,31 @@
+#include <userPrintf.h>
 #include "scLib.h"
 
-void write(char * string)
+void writeString(char *string)
 {
-    syscall(1,(uint64_t) string, 0,0,0,0);
+    syscall(1,1,(uint64_t) string,(uint64_t) strlen(string),0,0);
 }
+void write(char * string, int length)
+{
+    syscall(1,1,(uint64_t) string,(uint64_t)length,0,0);
+}
+
+void read(char * string, int length)
+{
+    syscall(2,0,(uint64_t) string,(uint64_t)length,0,0);
+}
+
 int getChar()
 {
-    return (int) syscall(2, 0, 0, 0, 0, 0);
+    char aux = 0;
+    //printF("intento getChar\n");
+    syscall(2, 0, (uint64_t) (&aux), 1, 0, 0);//que create me retorne el puntero de pipe...
+//    printF("esto ->");
+//    printF("%c",aux);
+//    printF("<- esto");
+    return aux;
 }
+
 int getHour()
 {
     return (int) syscall(3, 0, 0, 0, 0, 0);
@@ -40,7 +58,7 @@ void setFontColour(uint8_t r, uint8_t g, uint8_t b)
 {
     syscall(10,r,g,b, 0,0);
 }
-int notifyExitRequest(unsigned int rdi, unsigned int rsi, const unsigned short *rdx, unsigned int rcx, unsigned int r8)
+int notifyExitRequest()
 {
     return (int) syscall(11, 0, 0, 0, 0, 0);
 }
@@ -171,4 +189,9 @@ int userGetQuantum()
 void userSetQuantum(int pid)
 {
     syscall(38, (uint64_t) pid, 0, 0, 0, 0);
+}
+
+int pipe(int p1, int p2)
+{
+    return (int) syscall(41, (uint64_t) p1, (uint64_t) p2, 0, 0, 0);
 }

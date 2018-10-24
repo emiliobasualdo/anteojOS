@@ -557,7 +557,7 @@ nextIOAPIC:
 	mov al, [VBEModeInfoBlock.BitsPerPixel]		; Color depth
 	stosb
 
-; Initialization is now complete... write a message to the screen
+; Initialization is now complete... writeK a message to the screen
 	mov rsi, msg_done
 	call os_print_string
 

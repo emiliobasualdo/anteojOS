@@ -13,24 +13,27 @@
 
 #define MAX_PROC_NAME 70
 #define INIT_PID 0
-#define BUSSY_WAITING INIT_PID+1
+#define BUSSY_WAITING (INIT_PID+1)
 #define MAX_PROCS 1000
 #define MAX_CHILDREN 60
 #define MAX_SECURITY_LIMITAION 3
-#define PID_ERROR -1
+#define PID_ERROR (-1)
 #define HEAP_STACK_SIZE 4096
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
 #define DEFAULT_NAME "process"
-#define DO_NOT_CHANGE -3
-#define INTERACTIVE -2
-#define NORMAL -1
+#define DO_NOT_CHANGE (-3)
+#define INTERACTIVE (-2)
+#define NORMAL (-1)
 #define PRIORITY_LEVELS 5
 #define MAX_PRIORITY 0
 #define MIN_PRIORITY (PRIORITY_LEVELS-1)
 #define DEFAULT_PRIORITY MAX_PRIORITY
+#define FD_AMOUNT 2
+
+
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;
@@ -88,6 +91,7 @@ typedef struct
 
     int creationLimit;
     messageQueue * postBox;
+    int fd[FD_AMOUNT];
 }pcb;
 
 

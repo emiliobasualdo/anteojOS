@@ -4,12 +4,13 @@
 #include <videoDriver.h>
 #include <process.h>
 #include <scheduler.h>
+#include <pipes.h>
 
 #define BUFFERSIZE 1024
 #define UP -2
 #define DOWN -3
-#define C_UP -4
-#define C_DOWN -5
+
+int initKeyboardDriver();
 
 /* gets the key pressed from stdout */
 extern int getKey(void);
@@ -18,14 +19,14 @@ extern int getKey(void);
 int keyboardInterpreter();
 
 /* adds a character to the current buffer */
-void charToBuffer(int);
+void charToBuffer(unsigned char);
 
-/* returns the first added character in buffer */
-int returnNextChar();
+///* returns the first added character in buffer */
+//char returnNextChar();
+//
+///* returns a boolean value: 1 if there is a new character to read */
+//int newToRead();
 
-/* returns a boolean value: 1 if there is a new character to read */
-int newToRead();
-
-int getNextChar();
+char getNextChar();
 
 #endif

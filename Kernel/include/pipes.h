@@ -4,25 +4,19 @@
 #include "dinamicMemory.h"
 #include <stdint.h>
 #include "ipc.h"
-
-#define MAXPIPES 10
-#define PIPEBUFFERSIZE 4096
-
-typedef struct pipe_t {
-
-    int pipeId;
-    char * buffer;
-    int bufferReadPosition;
-    int bufferWritePosition;
-    int charsToRead;
-    int mutex;
-
-} pipe_t;
+#include "ipcStructs.h"
+#include "system.h"
 
 
-pipe_t * create_pipeK();
-int write_pipeK(pipe_t * pipe, char * buffer, uint64_t size);
-int read_pipeK(pipe_t * pipe, char * buffer, uint64_t size);
-int close_pipeK(pipe_t * pipe);
+#define MAXPIPES 100
+
+pipe_t * addPipeK();
+int writePipeK(pipe_t *pipe, char *buffer, uint64_t size);
+int readPipeK(pipe_t *pipe, char *buffer, uint64_t size);
+int closePipeK(pipe_t * pipe);
+int dupProc(pPid pidOut, pPid pidIn);
+int initPipes();
+
+void drawPipeBuffer(pipe_t * pipe);
 
 #endif //ANTEOJOS_PIPES_H

@@ -6,6 +6,17 @@
 
 typedef int pPid;
 
+typedef struct pipe_t {
+
+    int pipeId;
+    char * buffer;
+    int bufferReadPosition;
+    int bufferWritePosition;
+    int charsToRead;
+    int mutex;
+    int readMutex;
+    int writeMutex;
+} pipe_t;
 
 typedef struct message_t
 {
@@ -51,4 +62,11 @@ void dequeueMessage(messageQueue* queue, msg_t * message);
 
 void printIpcsQueues();
 
+/**
+ * Pipes
+ */
+pipe_t * getPipeFromPipeList(int id);
+pipe_t * createPipeK();
+void addStandardPipes(pPid pid);
+int addPipeProcess();
 #endif

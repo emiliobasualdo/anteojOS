@@ -58,7 +58,7 @@ int buildImage(array_t fileArray, char *output_file) {
 		return FALSE;
 	}
 
-	//First, write the kernel
+	//First, writeK the kernel
 	FILE *source = fopen(fileArray.array[0], "r");
 	write_file(target, source);
 

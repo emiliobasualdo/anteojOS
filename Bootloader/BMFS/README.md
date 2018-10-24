@@ -55,12 +55,12 @@ Alternately, you can specify the reserved size after the file name. The reserved
 
 ## Read from BMFS to a local file
 
-	bmfs disk.image read FileName.Ext
+	bmfs disk.image readK FileName.Ext
 
 
 ## Write a local file to BMFS
 
-	bmfs disk.image write FileName.Ext
+	bmfs disk.image writeK FileName.Ext
 
 
 ## Delete a file on BMFS

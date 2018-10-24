@@ -12,10 +12,13 @@
  */
 static mutex_t mutexList[MAXMUTEXES];
 int positionMutexArray = 0;
+
 static mutex_t messageMutex;
+
 static pPid blockedByReceive[MAXINQUEUE];
 static int numberBlockedReceiveArray = 0;
-static sem_t semList[MAXMUTEXES];
+
+static sem_t semList[MAXSEMAPHORES];
 int positionSemArray = 0;
 static mutex_t semMutex;
 
@@ -140,6 +143,10 @@ void printIpcsQueues()
  */
 int startMutex(int initValue)
 {
+    if(initValue != 1 && initValue != 0)
+    {
+        return -1;
+    }
     if(positionMutexArray >= MAXMUTEXES)
     {
         int i;
@@ -161,6 +168,16 @@ int startMutex(int initValue)
         positionMutexArray++;
         return positionMutexArray - 1;
     }
+}
+//equivalente a lock pero no bloquea al proceso(sirve para los fd)
+int tryToLockMutex(int mutex)
+{
+    pPid process = getCurrentProc()->pid;
+    if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
+    {
+        return -1;
+    }
+    return lockMutexASM(&(mutexList[mutex].value));
 }
 
 int lockMutex(int mutex)
@@ -286,10 +303,10 @@ int destroyMutexK(int mutex)
 
 int semStartK(int initValue)
 {
-    if(positionMutexArray >= MAXMUTEXES)
+    if(positionMutexArray >= MAXSEMAPHORES)
     {
         int i;
-        for(i = 0; i < MAXMUTEXES; i++)
+        for(i = 0; i < MAXSEMAPHORES; i++)
         {
             if(semList[positionSemArray].nextProcessInLine == NULL)
             {
@@ -317,61 +334,49 @@ int semWaitK(int sem)
         return -1;
     }
 
-//    int i;
-//    for(i = 0; i <= semMutex.nextProcessInLine->size; i++)
-//    {
-//        simple_printf("-> %d ",semMutex.nextProcessInLine->array[(semMutex.nextProcessInLine->front+i)%MAXINQUEUE]);
-//    }
-//    simple_printf("\n");
     semMutexLock();
-    semList[sem].value--;
-    semMutexUnlock();
 
-    if(semList[sem].value<0)
+
+    if(semList[sem].value>=0)
     {
-        if(!isFull(semList[sem].nextProcessInLine))
-        {
-            enqueue(semList[sem].nextProcessInLine, process);
-            setProcessState(process, BLOCKED, MUTEX_BLOCK);
-        }
+        semList[sem].value--;
+        semMutexUnlock();
+        return 0;
     }
+    if(!isFull(semList[sem].nextProcessInLine))
+    {
+        enqueue(semList[sem].nextProcessInLine, process);
+        setProcessState(process, BLOCKED, MUTEX_BLOCK);
+    }
+    semMutexUnlock();
     return 0;
 }
 
 int semPostK(int sem)
 {
-    if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL)
-    {
+    if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL) {
         return -1;
+    }
+    semMutexLock();
+
+    if(isEmpty(semList[sem].nextProcessInLine))
+    {
+        semList[sem].value++;
     }
     else
     {
-        semMutexLock();
-        semList[sem].value++;
-        semMutexUnlock();
-        if(semList[sem].value < 0)
-        {
-            if(!isEmpty(semList[sem].nextProcessInLine))
-            {
-                semMutexLock();
-                semList[sem].value--;
-                semMutexUnlock();
+        pPid process = dequeue(semList[sem].nextProcessInLine);
 
-                pPid process = dequeue(semList[sem].nextProcessInLine);
-             //   printSemList(sem);
-
-                setProcessState(process, READY, MUTEX_BLOCK);
-                setProcessPriority(process, MAX_PRIORITY);
-
-            }
-        }
+        setProcessState(process, READY, MUTEX_BLOCK);
+        setProcessPriority(process, MAX_PRIORITY);
     }
+    semMutexUnlock();
     return 0;
 }
 
 int semDestroyK(int sem)
 {
-    if(sem < 0 || semList[sem].nextProcessInLine == NULL || semList[sem].value != 0)
+    if(sem < 0 || semList[sem].nextProcessInLine == NULL || !isEmpty(semList[sem].nextProcessInLine))
     {
         return -1;
     }

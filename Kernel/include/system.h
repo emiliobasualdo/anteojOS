@@ -1,7 +1,3 @@
-//
-// Created by Emilio Basualdo on 9/4/18.
-//
-
 #ifndef PROCESOS_SYSTEM_H
 #define PROCESOS_SYSTEM_H
 
@@ -19,6 +15,12 @@
 #define FALSE 0
 #define TRUE !FALSE
 typedef int boolean;
+
+#define STDINOUT 0
+#define STDIN 0
+#define STDOUT 1
+
+#define PIPEBUFFERSIZE 1024
 
 char *myStrncpy(char *dst, const char*src, unsigned int n);
 int strcmp(char *, char *);

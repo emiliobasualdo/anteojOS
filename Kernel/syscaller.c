@@ -1,15 +1,16 @@
+#include <process.h>
 #include "syscaller.h"
 
 typedef uint64_t (*func_type)();
 
-func_type fList[] = {write, read, getHour, getMin, getSec, beep,
+func_type fList[] = {writeK, readK, getHour, getMin, getSec, beep,
                                sleep, userDrawPixel, getResolutions, changeFontColour,
                                myExit, putChar, removeChar, changeBackgroundColour,
                                setCoordinates, sysMalloc, sysFree,
                                printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
                                createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
-                               nice, kernelColumnTest, kernelCreateSemaphore, kernelSemWait,
-                               kernelSemPost, kernelSemDestroy, kernelKillAllDescendants, kernelGetQuantum, kernelSetQuantum };
+                               nice, kernelColumnTest,kernelKillAllDescendants, kernelCreateSemaphore, kernelSemWait,
+                               kernelSemPost, kernelSemDestroy, kernelGetQuantum, kernelSetQuantum, openPipe, closeK, pipeK};
 
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -19,14 +20,44 @@ uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint6
     return function(rdi,rsi,rdx,rcx,r8);
 }
 
-uint64_t write(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t writeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    drawString((const char *) rdi);
-    return 0;
+    int fd = (int)rdi;
+    char * buffer = (char *) rsi;
+    int length = (int) rdx;
+
+    pcbPtr process = getCurrentProc();
+
+    pipe_t * pipe = getPipeFromPipeList(process->fd[fd]);
+
+    return (uint64_t) writePipeK(pipe, buffer, (uint64_t)length);
+
+    /*old
+     *drawString((const char *) rdi);
+     *return 0;
+     */
 }
-uint64_t read(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t readK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) getNextChar();
+    int fd = (int)rdi;
+    char * buffer = (char *) rsi;
+    int length = (int) rdx;
+    if(length <= 0)
+    {
+        return 0;
+    }
+    pcbPtr process = getCurrentProc();
+
+    pipe_t * pipe = getPipeFromPipeList(process->fd[fd]);
+
+    return (uint64_t) readPipeK(pipe, buffer, (uint64_t) length);
+
+
+    //proc | proc2
+    /*old
+     * return (uint64_t) getNextChar();
+     * */
+
 }
 uint64_t getHour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -205,4 +236,19 @@ uint64_t kernelSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 {
     setQuantum((int) rdi);
     return 1;
+}
+
+uint64_t openPipe(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) addPipeK();
+}
+
+uint64_t closeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t)closePipeK((pipe_t *) rdi);
+}
+
+uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t)dupProc((pPid) rdi, (pPid) rsi);
 }

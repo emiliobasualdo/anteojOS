@@ -52,7 +52,7 @@ void runAllocatorTest()
         }
     }
 
-    simple_printf("We wrote anteojOS on every address obtained and now we will try to read them:\n");
+    simple_printf("We wrote anteojOS on every address obtained and now we will try to readK them:\n");
     sleep();
 
     for (i=0; i<MAX_ADDRESS_SIZE; i++)
@@ -125,7 +125,7 @@ void runAllocatorTest()
         }
     }
 
-    simple_printf("We wrote anteojOS on every address obtained and now we will try to read them:\n");
+    simple_printf("We wrote anteojOS on every address obtained and now we will try to readK them:\n");
     sleep();
 
     for (i=0; i<MAX_ADDRESS_SIZE; i++)

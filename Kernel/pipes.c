@@ -136,7 +136,7 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         }
         if (pipe->charsToRead < PIPEBUFFERSIZE-1)
         {
-            pipe->buffer[pipe->bufferWritePosition] = 0;
+            pipe->buffer[pipe->bufferWritePosition] = EOF;
         }
     }
 
@@ -198,6 +198,9 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         unlockMutex(pipe->writeMutex);
 
     unlockMutex(pipe->mutex);
+
+    if(size == 1 && buffer[0] == EOF)
+        return EOF;
 
     return size;
 }

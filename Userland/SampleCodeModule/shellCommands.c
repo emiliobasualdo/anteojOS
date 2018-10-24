@@ -118,7 +118,7 @@ int echo (int argc, argVector argv)
     if(argc == -1) // leemos de stdin
     {
         char c;
-        while ((c= (char)getChar()) != 0 )
+        while ((c= (char)getChar()) != -1 )
         {
             putChar(c);
         }

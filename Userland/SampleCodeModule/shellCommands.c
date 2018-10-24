@@ -59,11 +59,9 @@ int executeCommand(int argc, argVector argv)
                     {
                         return NULL_CMMD;
                     }
-                    int pid1 = createProc(commands[cmd].name, (uint64_t) commands[cmd].fn, (char **) argv, i);
                     int pid2 = createProc(commands[cmd2].name, (uint64_t) commands[cmd2].fn, (char **) (argv + i + 1), argc - (i + 1));
-                    pipe(pid1,pid2);
+                    pipe(userGetCurrentPid(),pid2);
                     startProc(pid2);
-                    startProc(pid1);
                     return PIPE_CMD;
                 }
             }

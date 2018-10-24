@@ -63,7 +63,6 @@ int notifyExitRequest()
 int putChar(char c)
 {
     return (int) syscall(1,1,(uint64_t) (&c),1,0,0);
-    //return (int) syscall(12, (uint64_t) c, 0, 0, 0, 0);
 }
 int removeChar()
 {

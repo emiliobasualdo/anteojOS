@@ -20,7 +20,7 @@ typedef int boolean;
 #define STDIN 0
 #define STDOUT 1
 
-#define EOF (-10)
+#define EOF (-1)
 
 #define PIPEBUFFERSIZE 1024
 

@@ -200,6 +200,26 @@ int lockMutex(int mutex)
     return 0;
 }
 
+int lockMutexKeyboard(int mutex)
+{
+    pPid process = getCurrentProc()->pid;
+    if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
+    {
+        return -1;
+    }
+    if(lockMutexASM(&(mutexList[mutex].value)))
+    {
+        if(!isFull(mutexList[mutex].nextProcessInLine))
+        {
+            enqueue(mutexList[mutex].nextProcessInLine, process);
+
+            setProcessState(process, BLOCKED, KEYBOARD);
+
+        }
+    }
+    return 0;
+}
+
 int unlockMutex(int mutex)
 {
     if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)

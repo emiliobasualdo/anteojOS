@@ -38,6 +38,7 @@ int initIPCS();
 int lockMutex(int mutex);
 int unlockMutex(int mutex);
 int tryToLockMutex(int mutex);
+int lockMutexKeyboard(int mutex);
 
 // Semaforos
 int semWaitK(int sem);

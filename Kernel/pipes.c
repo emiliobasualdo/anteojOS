@@ -110,16 +110,16 @@ pipe_t * createPipeK()
 
             pipe->mutex = startMutex(0);
 
-            simple_printf("mutex: %d\n", pipe->mutex);
+            //simple_printf("mutex: %d\n", pipe->mutex);
             for (int i = 0; i < 400000; ++i) {
 
             }
 
             pipe->readMutex = startMutex(1);
-            simple_printf("readmutex: %d\n", pipe->readMutex);
+            //simple_printf("readmutex: %d\n", pipe->readMutex);
 
             pipe->writeMutex = startMutex(1);
-            simple_printf("writemutex: %d\n", pipe->writeMutex);
+            //simple_printf("writemutex: %d\n", pipe->writeMutex);
 
             pipeList[j] = pipe;
             unlockMutex(pipeListMutex);
@@ -133,7 +133,7 @@ pipe_t * createPipeK()
 
 int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
 {
-    simple_printf("entro al write\n");
+    //simple_printf("entro al write\n");
     int size = (int)sizeP;
     if(pipe == NULL)
     {
@@ -154,7 +154,7 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
             {
                 unlockMutex(pipe->mutex);
 
-                lockMutex(pipe->writeMutex); //espero hasta que se lea algo
+                lockMutexKeyboard(pipe->writeMutex); //espero hasta que se lea algo
 
                 //simple_printf("Got b4 mutexlock2 %d\n", pipe->mutex);
                 lockMutex(pipe->mutex);
@@ -195,9 +195,9 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         return -1;
     }
     int size = (int)sizeP;
-    simple_printf("Got in read ");
+    //simple_printf("Got in read ");
     lockMutex(pipe->mutex);
-    simple_printf("Not bloqued ");
+    //simple_printf("Not bloqued ");
 
     if(pipe->pipeId == STDOUT)
     {
@@ -211,28 +211,28 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         {
             unlockMutex(pipe->mutex);
 
-            simple_printf("entre al lockreadmutex \n");
+            //simple_printf("entre al lockreadmutex \n");
 
-            int a = lockMutex(pipe->readMutex);
+            int a = lockMutexKeyboard(pipe->readMutex);
 
-            simple_printf("lock: %d\n", a);
+            //simple_printf("lock: %d\n", a);
 
             for (int j = 0; j < 4000000; ++j) {}
 
-            simple_printf("sali del  lockreadmutex\n");
+            //simple_printf("sali del  lockreadmutex\n");
 
             lockMutex(pipe->mutex);
 
 
-            simple_printf("no me trave con el lockmutex\n");
+            //simple_printf("no me trave con el lockmutex\n");
         }
         else
         {
             int index = (i + pipe->bufferReadPosition++) % PIPEBUFFERSIZE;
-            simple_printf("entro al else\n");
+            //simple_printf("entro al else\n");
             buffer[i] = pipe->buffer[index];
             pipe->charsToRead--;
-            simple_printf("estoy en read\n");
+            //simple_printf("estoy en read\n");
             i++;
         }
         tryToLockMutex(pipe->readMutex);

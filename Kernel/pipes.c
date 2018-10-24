@@ -62,7 +62,8 @@ pipe_t * createPipeK()
     int j;
     lockMutex(pipeListMutex);
     for ( j = 0; j < MAXPIPES; ++j) {
-        if(pipeList[j] == NULL){
+        if(pipeList[j] == NULL)
+        {
             pipe_t * pipe = kernelMalloc(sizeof(pipe_t));
             if (pipe == NULL)
             {
@@ -125,14 +126,20 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
             }
             else
             {
-                int index = (i + (pipe->bufferWritePosition)++) % PIPEBUFFERSIZE;
+                int index = (i + pipe->bufferWritePosition) % PIPEBUFFERSIZE;
+                pipe->bufferWritePosition = (pipe->bufferWritePosition+1)%PIPEBUFFERSIZE;
                 pipe->buffer[index]= buffer[i];
                 pipe->charsToRead+=1;
                 i++;
             }
             tryToLockMutex(pipe->writeMutex);
         }
+        if (pipe->charsToRead < PIPEBUFFERSIZE-1)
+        {
+            pipe->buffer[pipe->bufferWritePosition] = 0;
+        }
     }
+
 
     if(size>0 && buffer != 0)
     {
@@ -171,7 +178,7 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
                 lockMutex(pipe->readMutex);
 
 
-            for (int j = 0; j < 4000000; ++j) {}
+            for (int j = 0; j < 4000000; ++j){}
 
 
             lockMutex(pipe->mutex);
@@ -179,7 +186,8 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
             }
         else
         {
-            int index = (i + pipe->bufferReadPosition++) % PIPEBUFFERSIZE;
+            int index = (i + pipe->bufferReadPosition) % PIPEBUFFERSIZE;
+            pipe->bufferReadPosition = (1+ pipe->bufferReadPosition) % PIPEBUFFERSIZE;
             buffer[i] = pipe->buffer[index];
             pipe->charsToRead--;
             i++;

@@ -18,11 +18,9 @@ void read(char * string, int length)
 int getChar()
 {
     char aux = 0;
-    //printF("intento getChar\n");
+
     syscall(2, 0, (uint64_t) (&aux), 1, 0, 0);//que create me retorne el puntero de pipe...
-//    printF("esto ->");
-//    printF("%c",aux);
-//    printF("<- esto");
+
     return aux;
 }
 
@@ -64,7 +62,8 @@ int notifyExitRequest()
 }
 int putChar(char c)
 {
-    return (int) syscall(12, (uint64_t) c, 0, 0, 0, 0);
+    return (int) syscall(1,1,(uint64_t) (&c),1,0,0);
+    //return (int) syscall(12, (uint64_t) c, 0, 0, 0, 0);
 }
 int removeChar()
 {

@@ -232,7 +232,14 @@ int dupProc(pPid pidOut, pPid pidIn)
 
     if(p1 != NULL && p2 != NULL)
     {
+        closePipeK(getPipeFromPipeList(p1->fd[STDOUT]));
+        closePipeK(getPipeFromPipeList(p2->fd[STDIN]));
+
         int aux = addPipeProcess();
+        if (aux == -1)
+        {
+            return 1;
+        }
         p1->fd[STDOUT] = aux;
         p2->fd[STDIN] = aux;
         return 1;

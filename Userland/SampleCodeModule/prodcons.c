@@ -218,37 +218,4 @@ static void printAnteojOS()
     }
     printF("\n");
 }
-//
-// static anteojOS createAnteojOS()
-// {
-//     anteojOS ret = userMalloc(sizeof(anteojosCDT));
-//     ret->anteojos1 = ANTEOJOS1;
-//     ret->anteojos2 = ANTEOJOS2;
-//     ret->anteojos3 = ANTEOJOS3;
-//     ret->anteojos4 = ANTEOJOS4;
-//     ret->anteojos5 = ANTEOJOS5;
-//     ret->anteojos6 = ANTEOJOS6;
-//     ret->anteojos7 = ANTEOJOS7;
-//     ret->anteojos8 = ANTEOJOS8;
-//     ret->anteojos9 = ANTEOJOS9;
-//     return ret;
-// }
-//
-// static void printAnteojOS()
-// {
-//     anteojOS currAnteojOS;
-//
-//     for (int i=0; i<amountOfProductsOnHold; i++)
-//     {
-//         currAnteojOS = buffer[i];
-//         simple_printf("%s\n", currAnteojOS->anteojos1);
-//         simple_printf("%s\n", currAnteojOS->anteojos2);
-//         simple_printf("%s\n", currAnteojOS->anteojos3);
-//         simple_printf("%s\n", currAnteojOS->anteojos4);
-//         simple_printf("%s\n", currAnteojOS->anteojos5);
-//         simple_printf("%s\n", currAnteojOS->anteojos6);
-//         simple_printf("%s\n", currAnteojOS->anteojos7);
-//         simple_printf("%s\n", currAnteojOS->anteojos8);
-//         simple_printf("%s\n", currAnteojOS->anteojos9);
-//     }
-// }
+

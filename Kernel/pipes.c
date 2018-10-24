@@ -213,7 +213,10 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
 
             //simple_printf("entre al lockreadmutex \n");
 
-            int a = lockMutexKeyboard(pipe->readMutex);
+            if(pipe->pipeId == STDIN)
+                lockMutexKeyboard(pipe->readMutex);
+            else
+                lockMutex(pipe->readMutex);
 
             //simple_printf("lock: %d\n", a);
 

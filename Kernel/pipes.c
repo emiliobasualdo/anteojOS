@@ -129,7 +129,8 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
                 int index = (i + pipe->bufferWritePosition) % PIPEBUFFERSIZE;
                 pipe->bufferWritePosition = (pipe->bufferWritePosition+1)%PIPEBUFFERSIZE;
                 pipe->buffer[index]= buffer[i];
-                pipe->charsToRead+=1;
+                if(i != 0)
+                    pipe->charsToRead+=1;
                 i++;
             }
             tryToLockMutex(pipe->writeMutex);

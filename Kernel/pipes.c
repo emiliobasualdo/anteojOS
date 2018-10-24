@@ -251,7 +251,6 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
     return size;
 }
 
-
 int closePipeK(pipe_t * pipe)
 {
     if(pipe == NULL)

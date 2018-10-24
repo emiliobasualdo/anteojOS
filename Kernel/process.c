@@ -17,8 +17,8 @@ static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
 static void initChildVector(pcbPtr pcb);
-
 static void initChildVector(pcbPtr pcb);
+static void initArray();
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -51,17 +51,27 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
     // iniciamos el array de pcbPtrs
     arrSize = MAX_PROCS;
     maxPid = arrSize-1; // cond dinamica tiene sentido, aca no todo
+    initArray();
     // creamos el nuevo proceso
-    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, DEFAULT_PRIORITY, NULL, 0);
-    if (!init) {
+    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, MAX_PRIORITY, NULL, 0);
+    if (!init)
+    {
         simple_printf("ERROR: initProcessControl: Alguno es null\n");
         freeProcess(init);
         return NULL;
     }
     bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE,
-                                     DEFAULT_PRIORITY, NULL, 0);
+                                     MAX_PRIORITY, NULL, 0);
     nextPid = BUSSY_WAITING + 1;
     return init;
+}
+
+static void initArray()
+{
+    for (int i = 0; i < MAX_PROCS; ++i)
+    {
+        array[i] = NULL;
+    }
 }
 
 /**
@@ -432,8 +442,14 @@ void printAllProcs()
     simple_printf(" PID - NAME - STATE - FOREGROUND - PRIORITY - PRIORITY STATE - RUN TIME - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n");
     for (int i = 0; i < MAX_PROCS; ++i)
     {
+        simple_printf("loopin \n");
         if(array[i] != NULL)
+        {
+            simple_printf("i=%d", i);
             printProc(array[i]);
+        }
+
+        simple_printf("loop out \n");
     }
     simple_printf("\n");
 }

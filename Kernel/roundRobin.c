@@ -44,7 +44,7 @@ static rrNodePtr process[MAX_PROCS];
 static rrQueue blockedArr[REASON_COUNT];
 
 /** No es constante porque planeaba hacerlo cambiar en el tiempo*/
-static int rrQuantum = 3;
+static int rrQuantum = 5;
 
 /** El nodo corriendo en este momento*/
 static rrNodePtr current;
@@ -133,7 +133,7 @@ static rrNodePtr getNextReadyNode()
     // puede pasar que en esta queue esten todos muertos...
     // tenemos que pasar a otra queue hasta encontrar algo o retornar null.
     simple_printf("getNextReadyNode: entramos en recursion, imprimo esto por miedo a recursion infinita\n");
-    return getNextReadyNode();
+    return NULL ;//getNextReadyNode();
 }
 
 /** Elige si seguimos corriendo el current o si lo pasamos a otra estructura
@@ -522,7 +522,10 @@ static pcbPtr resetQueue(rrQueue *queue)
 static rrNodePtr normalQueuePop(rrQueue *queue)
 {
     if(rrIsEmpty(queue))
+    {
+        //simple_printf("normalQueuePop: retornandu null\n");
         return NULL;
+    }
     rrNodePtr node = queue->head.next;
     if (node) // todo chequear si es posible que sea null
     {

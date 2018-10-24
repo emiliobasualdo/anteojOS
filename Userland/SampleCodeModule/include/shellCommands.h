@@ -3,7 +3,6 @@
 
 #include "colour.h"
 #include <stdint.h>
-#include "clock.h"
 #include "shell.h"
 #include "scLib.h"
 #include "stdlib.h"
@@ -76,9 +75,6 @@ int font_colour (int argc, argVector argv);
 
 /* executes the change of background colour command */
 int background_colour(int argc, argVector argv);
-
-/* executes the digital clock command */
-int digital_clock(int argc, argVector argv);
 
 /* executes the time zone command */
 int timezone(int argc, argVector argv);

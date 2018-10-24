@@ -62,16 +62,12 @@ void charToBuffer(unsigned char c)
     if (c != 0)
     {
         writePipeK(myStdin, (char *) (&c), 1);
-
-        for (int i = 0; i < 100000; ++i) {
-
-        }
     }
 }
 
 char getNextChar()
 {
-    char * nextChar = kernelMalloc(sizeof(char));
-    int read = readPipeK(myStdin, nextChar, 1);
-    return (*nextChar);
+    char nextChar;
+    readPipeK(myStdin, &nextChar, 1);
+    return nextChar;
 }

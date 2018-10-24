@@ -66,7 +66,7 @@ static void changeBlockedReceiveArray(pPid pid, int state)
     }
 }
 
-static void printMutexList(int mutex)
+/*static void printMutexList(int mutex)
 {
     if(mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
@@ -79,8 +79,8 @@ static void printMutexList(int mutex)
         simple_printf("-> %d ",mutexList[mutex].nextProcessInLine->array[(mutexList[mutex].nextProcessInLine->front+i)%MAXINQUEUE]);
     }
     simple_printf("\n");
-}
-
+}*/
+/*
 static void printSemList(int sem)
 {
     if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL)
@@ -132,7 +132,7 @@ void printIpcsQueues()
         }
     }
     simple_printf("\n");
-}
+}*/
 /**
  * MUTEX
  */
@@ -172,7 +172,6 @@ int startMutex(int initValue)
 //equivalente a lock pero no bloquea al proceso(sirve para los fd)
 int tryToLockMutex(int mutex)
 {
-    pPid process = getCurrentProc()->pid;
     if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
         return -1;

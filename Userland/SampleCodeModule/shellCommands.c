@@ -77,7 +77,7 @@ int execProcInBackground(char *name, uint64_t intstruction)
 {
     int pid = userStartProcess(name, intstruction, NULL, 0);
     if (pid == -1)
-        printF("pid=%d\n", pid);
+        printF("Shell: erro while creating process\n", pid);
     else
         printF("pid=%d\n", pid);
     return pid;
@@ -213,13 +213,6 @@ int changeColour(void(*f)(Colour), int flag)
     return changed;
 }
 
-int digital_clock(int argc, argVector argv)
-{
-    showClock(NORMAL_MODE);
-    clear(argc,argv);
-    return 1;
-}
-
 int timezone(int argc, argVector argv)
 {
     if (argc != 2)
@@ -329,7 +322,6 @@ int printPs(int argc, argVector argv)
         default:
             printF("Usage: Usage: ps or ps <q> or ps <p pid>\n");
     }
-
     return TRUE;
 }
 

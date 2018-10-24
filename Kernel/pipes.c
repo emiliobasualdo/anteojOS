@@ -110,16 +110,16 @@ pipe_t * createPipeK()
 
             pipe->mutex = startMutex(0);
 
-            //simple_printf("mutex: %d\n", pipe->mutex);
+            simple_printf("mutex: %d\n", pipe->mutex);
             for (int i = 0; i < 400000; ++i) {
 
             }
 
             pipe->readMutex = startMutex(1);
-            //simple_printf("readmutex: %d\n", pipe->readMutex);
+            simple_printf("readmutex: %d\n", pipe->readMutex);
 
             pipe->writeMutex = startMutex(1);
-            //simple_printf("writemutex: %d\n", pipe->writeMutex);
+            simple_printf("writemutex: %d\n", pipe->writeMutex);
 
             pipeList[j] = pipe;
             unlockMutex(pipeListMutex);

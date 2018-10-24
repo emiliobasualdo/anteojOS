@@ -20,6 +20,8 @@ typedef int boolean;
 #define STDIN 0
 #define STDOUT 1
 
+#define EOF (-10)
+
 #define PIPEBUFFERSIZE 1024
 
 char *myStrncpy(char *dst, const char*src, unsigned int n);

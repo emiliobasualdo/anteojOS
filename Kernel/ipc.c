@@ -318,16 +318,18 @@ int semWaitK(int sem)
     }
 
     semMutexLock();
-    semList[sem].value--;
 
 
-    if(semList[sem].value<0)
+    if(semList[sem].value>=0)
     {
-        if(!isFull(semList[sem].nextProcessInLine))
-        {
-            enqueue(semList[sem].nextProcessInLine, process);
-            setProcessState(process, BLOCKED, MUTEX_BLOCK);
-        }
+        semList[sem].value--;
+        semMutexUnlock();
+        return 0;
+    }
+    if(!isFull(semList[sem].nextProcessInLine))
+    {
+        enqueue(semList[sem].nextProcessInLine, process);
+        setProcessState(process, BLOCKED, MUTEX_BLOCK);
     }
     semMutexUnlock();
     return 0;
@@ -335,37 +337,29 @@ int semWaitK(int sem)
 
 int semPostK(int sem)
 {
-    if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL)
-    {
+    if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL) {
         return -1;
+    }
+    semMutexLock();
+
+    if(isEmpty(semList[sem].nextProcessInLine))
+    {
+        semList[sem].value++;
     }
     else
     {
-        semMutexLock();
-        semList[sem].value++;
-        if(semList[sem].value < 0)
-        {
-            if(!isEmpty(semList[sem].nextProcessInLine))
-            {
-                semList[sem].value--;
+        pPid process = dequeue(semList[sem].nextProcessInLine);
 
-                pPid process = dequeue(semList[sem].nextProcessInLine);
-                //   printSemList(sem);
-
-                setProcessState(process, READY, MUTEX_BLOCK);
-                setProcessPriority(process, MAX_PRIORITY);
-
-            }
-        }
-        semMutexUnlock();
-
+        setProcessState(process, READY, MUTEX_BLOCK);
+        setProcessPriority(process, MAX_PRIORITY);
     }
+    semMutexUnlock();
     return 0;
 }
 
 int semDestroyK(int sem)
 {
-    if(sem < 0 || semList[sem].nextProcessInLine == NULL || semList[sem].value != 0)
+    if(sem < 0 || semList[sem].nextProcessInLine == NULL || !isEmpty(semList[sem].nextProcessInLine))
     {
         return -1;
     }

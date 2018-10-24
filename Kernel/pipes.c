@@ -278,3 +278,22 @@ int addPipeProcess()
     }
     return aux->pipeId;
 }
+
+
+int addPipeToSC()
+{
+    int aux = addPipeProcess();
+    pcbPtr process = getCurrentProc();
+    if(process == NULL || aux == -1)
+    {
+        return -1;
+    }
+    for (int i = 0; i < FD_AMOUNT; ++i)
+    {
+        if(process->fd[i] == aux)
+        {
+            return i;
+        }
+    }
+    return -1;
+}

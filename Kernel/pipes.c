@@ -115,7 +115,7 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         int i = 0;
         while(i < size)
         {
-            if (pipe->charsToRead >= PIPEBUFFERSIZE)//significa que el buffer esta lleno
+            if (pipe->charsToRead >= (PIPEBUFFERSIZE-1))//significa que el buffer esta lleno
             {
                 unlockMutex(pipe->mutex);
 
@@ -129,14 +129,16 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
                 int index = (i + pipe->bufferWritePosition) % PIPEBUFFERSIZE;
                 pipe->bufferWritePosition = (pipe->bufferWritePosition+1)%PIPEBUFFERSIZE;
                 pipe->buffer[index]= buffer[i];
-                pipe->charsToRead+=1;
+                if(i != 0)
+                    pipe->charsToRead+=1;
                 i++;
             }
             tryToLockMutex(pipe->writeMutex);
         }
         if (pipe->charsToRead < PIPEBUFFERSIZE-1)
         {
-            pipe->buffer[pipe->bufferWritePosition] = 0;
+            pipe->buffer[pipe->bufferWritePosition] = EOF;
+            pipe->charsToRead++;
         }
     }
 
@@ -312,4 +314,38 @@ int addPipeToSC()
         }
     }
     return -1;
+}
+
+//si 1 stdout nomas
+//si 2 stdin nomas
+//si no ambos
+int change(pPid proc, int flag)
+{
+    pcbPtr process = getPcbPtr(proc);
+    if(process == NULL)
+    {
+        return 0;
+    }
+
+    pipe_t * in = getPipeFromPipeList(process->fd[STDIN]);
+    pipe_t * out = getPipeFromPipeList(process->fd[STDOUT]);
+    switch (flag)
+    {
+        case 1:
+            if(in->pipeId != STDIN)
+            {
+                closePipeK(in);
+            }
+            break;
+        case 2:
+            if(out->pipeId != STDOUT)
+            {
+                closePipeK(in);
+            }
+
+            break;
+        default:
+
+            break;
+    }
 }

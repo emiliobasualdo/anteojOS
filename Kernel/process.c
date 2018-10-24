@@ -16,6 +16,7 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
+static void initChildVector(pcbPtr pcb);
 
 static void initChildVector(pcbPtr pcb);
 
@@ -105,7 +106,8 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
 /**
  * Asume que los parametros están validados
  */
-static boolean addChildToParentList(pPid parentPid, pPid childPid) {
+static boolean addChildToParentList(pPid parentPid, pPid childPid)
+{
     pcbPtr parent = array[parentPid];
     if (parent->childrenCount >= MAX_CHILDREN)
     {
@@ -132,6 +134,27 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
             return TRUE;
         }
     }
+    for (int i = 0; i < MAX_CHILDREN; ++i)
+    {
+        if(parent->childs[i] == PID_ERROR )
+        {
+            parent->childs[i] = childPid;
+            parent->childrenCount++;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]] == NULL)
+        {
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]]->state == DEAD)
+        {
+            procsDeathCleanUp(array[parent->childs[i]]);
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+    }
+    //parent->childs[parent->childrenCount++] = childPid;
     return FALSE;
 }
 
@@ -274,7 +297,7 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
 {
     if (proc)
     {
-        int i;
+/*        int i;
         msg_t * msg = NULL;
         for(i = 0; proc->postBox->count > 0;i++)
         {
@@ -284,7 +307,7 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
 
             }
             //kernelFree(msg->content); // todo solucionar esto
-        }
+        }*/
         kernelFree(proc->postBox);
         if (isValidPid(proc->pid))
             array[proc->pid] = NULL;
@@ -478,23 +501,20 @@ static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
     // si es padre...
     for (int i = 0; i < proc->childrenCount; ++i)
     {
-        if(procExists(proc->childs[i]) )
-        {
-            if(array[proc->childs[i]]->state != DEAD)
+        if (procExists(proc->childs[i])) {
+            if (array[proc->childs[i]]->state != DEAD)
             {
                 pcbPtr child = array[proc->childs[i]];
-                child->ppid = INIT_PID;                     // asiganmos el hijo a INIT_PID
-                addChildToParentList(INIT_PID, child->pid); // a INIT le asignamos un hijo nuevo
-            }
-            else
-            {
-                procsDeathCleanUp(array[proc->childs[i]]);
+                child->ppid = INIT_PID; // asiganmos el hijo a INIT_PID
+                if (false == addChildToParentList(INIT_PID, child->pid))
+                {
+                    simple_printf("Kernel message: ERROR: a %s no le podemos asignar más hijos\n", array[INIT_PID]->name);
+                    setProcessState(child->pid, DEAD, NO_REASON);// a INIT le asignamos un hijo nuevo
+                }
             }
         }
-
     }
-    // si es hijo NO lo sacamos de la lista del padre,
-    // eso será llevado a cabo por addChildToParent
+    // si es hijo NO lo sacamos de la lista del padre cosa de que siga apareciendo en el contandor
     setProcessState(proc->pid,DEAD,NO_REASON);
 }
 

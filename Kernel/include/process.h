@@ -11,21 +11,31 @@
 #include "ipcStructs.h"
 #include "dinamicMemory.h"
 
+<<<<<<< HEAD
+#define MAX_PROC_NAME 20
+#define INIT_PID 0
+#define BUSSY_WAITING (INIT_PID+1)
+#define MAX_PROCS 100
+#define MAX_CHILDREN 40
+#define MAX_SECURITY_LIMITAION 3
+#define PID_ERROR (-1)
+=======
 #define MAX_PROC_NAME 15
 #define INIT_PID 0
 #define BUSSY_WAITING INIT_PID+1
 #define MAX_PROCS 100
 #define MAX_CHILDREN 40
 #define PID_ERROR -1
+>>>>>>> master
 #define HEAP_STACK_SIZE 2048
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518
 #define SS_VALUE 0
 #define DEFAULT_NAME "process"
-#define DO_NOT_CHANGE -3
-#define INTERACTIVE -2
-#define NORMAL -1
+#define DO_NOT_CHANGE (-3)
+#define INTERACTIVE (-2)
+#define NORMAL (-1)
 #define PRIORITY_LEVELS 5
 #define MAX_PRIORITY 0
 #define MIN_PRIORITY (PRIORITY_LEVELS-1)

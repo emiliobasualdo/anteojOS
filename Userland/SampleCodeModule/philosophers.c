@@ -26,6 +26,11 @@ void test(int phnum)
 
         semPost(S[phnum]);
     }
+    else
+    {
+        //printF("%s cannot eat, i'm in a %d state, my left neighbour is in a %d state and my right neighbour is un a %d state\n", getPhilName(phnum), state[phnum], state[(LEFT==-1)?qtyPhilosophers-1:LEFT], state[(RIGHT == qtyPhilosophers)? 0 : RIGHT]);
+        //printF("my left neighbour is %d and my right beighbour is %d\n", (LEFT==-1)?qtyPhilosophers-1:LEFT, (RIGHT == qtyPhilosophers)? 0 : RIGHT);
+    }
 }
 
 /** philosopher phnum takes up forks */
@@ -34,7 +39,8 @@ void takeFork(int phnum)
     lock(mutex);                                         /** entrar en la región crítica */
 
     state[phnum] = HUNGRY;                              /** registrar que el filósofo tiene hambre */
-    //drawDiningTable(state, qtyPhilosophers);
+    ////printF("Philosopher %d is hungry\n", phnum + 1);
+    drawDiningTable(state, qtyPhilosophers);
 
     /** eat if neighbours are not eating */
     test(phnum);                                        /** tratar de adquirir dos tenedores */
@@ -57,11 +63,14 @@ void putFork(int phnum)
 
     if ((LEFT==-1)?qtyPhilosophers-1:LEFT == (RIGHT == qtyPhilosophers)? 0 : RIGHT)
     {
+        //printF("Testing neighbour on position #%d\n", (RIGHT == qtyPhilosophers)? 0 : RIGHT);
         test((RIGHT == qtyPhilosophers)? 0 : RIGHT);
     }
     else
     {
+        //printF("Testing neighbour on position #%d\n", (LEFT==-1)?qtyPhilosophers-1:LEFT);
         test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
+        //printF("Testing neighbour on position #%d\n", (RIGHT == qtyPhilosophers)? 0 : RIGHT);
         test((RIGHT == qtyPhilosophers)? 0 : RIGHT);    /** ver si el vecino derecho ahora puede comer */
     }
 

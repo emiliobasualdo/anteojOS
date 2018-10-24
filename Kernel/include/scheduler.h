@@ -10,7 +10,8 @@
 pcbPtr initScheduler(char *name, uint64_t instruction);
 pcbPtr getCurrentProc();
 uint64_t dispatcher(uint64_t rsp);
-pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority);
+pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority, char **argv,
+                          int argc);
 void printtt(uint64_t num);
 void switchToNext();
 boolean wakeUpBlocked(reasonT reason);

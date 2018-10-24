@@ -21,12 +21,6 @@ int keyboardInterpreter();
 /* adds a character to the current buffer */
 void charToBuffer(unsigned char);
 
-///* returns the first added character in buffer */
-//char returnNextChar();
-//
-///* returns a boolean value: 1 if there is a new character to read */
-//int newToRead();
-
 char getNextChar();
 
 #endif

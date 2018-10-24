@@ -79,14 +79,13 @@ void columnTest(short cantProcs, boolean ageing)
     {
         priority = (short) (i % PRIORITY_LEVELS);
         simple_sprintf(name,"%d-%s-%d", i, NAME, priority); // la congurencia nunca va a quedar 5
-        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority);
+        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, 0);
         if(!ageing)
             setProcessPriority(pid, priority);
     }
     // agregar que pueda cambiar el cuantum con teclas
     while (getNextChar() != 'q'){}
     killAllDescendants(getCurrentProc()->pid);
-    simple_printf("xxxxxxXXXXXXXXXXXXX xxxxx aca estamos \n");
     clearWindow();
 }
 
@@ -103,11 +102,10 @@ void setVariables(short procsCant)
     //simple_printf("xRes=%d yRes=%d cantRows=%d rowHeight=%d blockHeight=%d\n",xRes, yRes,cantRows, rowHeight, blockHeight);
 }
 
-
 int proc1()
 {
     simple_printf("Hola!! soy %s y estoy creando hijos\n", getCurrentProc()->name);
-    createAndExecProcess(NULL, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY);
+    createAndExecProcess(NULL, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0);
     proc1();
     return -1;
 }
@@ -129,7 +127,7 @@ boolean processBomb()
     getNextChar();
     getNextChar();
     simple_sprintf(name,"%sc","process_bomb");
-    createAndExecProcess(name, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY);
+    createAndExecProcess(name, (uint64_t) proc1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0);
     simple_printf("If we got here is because this OS is the best at handling process bombs ;)\n");
     return TRUE;
 }
@@ -181,17 +179,17 @@ static void f3()
 void mutexTest()
 {
     mutex = startMutex(0);
-    if (createAndExecProcess("f1", (uint64_t) f1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("f1", (uint64_t) f1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("f1: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("f2", (uint64_t) f2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("f2", (uint64_t) f2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("f2: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("f3", (uint64_t) f3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("f3", (uint64_t) f3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("f3: ERROR: otro == NULL\n");
         return;
@@ -263,17 +261,17 @@ static void s3()
 void semTest()
 {
     sem = semStartK(1);
-    if (createAndExecProcess("s1", (uint64_t) s1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("s1", (uint64_t) s1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("s1: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("s2", (uint64_t) s2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("s2", (uint64_t) s2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("s2: ERROR: otro == NULL\n");
         return;
     }
-    if (createAndExecProcess("s3", (uint64_t) s3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR)
+    if (createAndExecProcess("s3", (uint64_t) s3, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR)
     {
         simple_printf("s3: ERROR: otro == NULL\n");
         return;
@@ -299,65 +297,65 @@ void semTest()
 /**
  * Pipe test
  */
-pipe_t * pipe1;
-pipe_t * pipe2;
-
-void p1()
-{
-    char* msgs[4]={
-            "Hola don Jose",
-            "Por su casa yo pase",
-            "A su abuela yo la vi",
-            "Adios don Jose"
-    };
-//    readPipeK(me, buffer, 99);
-//    simple_printf("Jose: %s\n",buffer);
-//    sleep(randBound(1000,5000));
-//    writePipeK(jose, msgs[0], strlen(msgs[0]) + 1);
-//    readPipeK(me, buffer, 99);
-//    simple_printf("Jose: %s\n",buffer);
-//    sleep(randBound(1000,5000));
-//    writePipeK(jose, msgs[1], strlen(msgs[1]) + 1);
-//    readPipeK(me, buffer, 99);
-//    simple_printf("Jose: %s\n",buffer);
-//    sleep(randBound(1000,5000));
-//    writePipeK(jose, msgs[2], strlen(msgs[2]) + 1);
-//    readPipeK(me, buffer, 99);
-//    simple_printf("Jose: %s\n",buffer);
-//    sleep(randBound(1000,5000));
-//    writePipeK(jose, msgs[3], strlen(msgs[3]) + 1);
-//    closePipeK(getPipe());
-//    closePipeK(getPipe());
-}
-
-void p2()
-{
-    char* msgs[4]={
-            "Hola don Pepito",
-            "Paso usted por mi casa?",
-            "Vio usted a mi abuela?",
-            "Adios don Pepito"
-    };
-}
-
-void pipeTest() {
-    pipe1 = addPipeK();
-    pipe2 = addPipeK();
-
-    if (pipe1 == NULL || pipe2 == NULL) {
-        simple_printf("ERROR: pipe no se creo\n");
-    }
-    if (createAndExecProcess("p1", (uint64_t) p1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR) {
-        simple_printf("s1: ERROR: otro == NULL\n");
-        return;
-    }
-    if (createAndExecProcess("p2", (uint64_t) p2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY) == PID_ERROR) {
-        simple_printf("s2: ERROR: otro == NULL\n");
-        return;
-    }
-    long aux = 0;
-    while (aux < 100000000) {
-
-        aux++;
-    }
-}
+//pipe_t * pipe1;
+//pipe_t * pipe2;
+//
+//void p1()
+//{
+//    char* msgs[4]={
+//            "Hola don Jose",
+//            "Por su casa yo pase",
+//            "A su abuela yo la vi",
+//            "Adios don Jose"
+//    };
+////    readPipeK(me, buffer, 99);
+////    simple_printf("Jose: %s\n",buffer);
+////    sleep(randBound(1000,5000));
+////    writePipeK(jose, msgs[0], strlen(msgs[0]) + 1);
+////    readPipeK(me, buffer, 99);
+////    simple_printf("Jose: %s\n",buffer);
+////    sleep(randBound(1000,5000));
+////    writePipeK(jose, msgs[1], strlen(msgs[1]) + 1);
+////    readPipeK(me, buffer, 99);
+////    simple_printf("Jose: %s\n",buffer);
+////    sleep(randBound(1000,5000));
+////    writePipeK(jose, msgs[2], strlen(msgs[2]) + 1);
+////    readPipeK(me, buffer, 99);
+////    simple_printf("Jose: %s\n",buffer);
+////    sleep(randBound(1000,5000));
+////    writePipeK(jose, msgs[3], strlen(msgs[3]) + 1);
+////    closePipeK(getPipe());
+////    closePipeK(getPipe());
+//}
+//
+//void p2()
+//{
+//    char* msgs[4]={
+//            "Hola don Pepito",
+//            "Paso usted por mi casa?",
+//            "Vio usted a mi abuela?",
+//            "Adios don Pepito"
+//    };
+//}
+//
+//void pipeTest() {
+//    pipe1 = addPipeK();
+//    pipe2 = addPipeK();
+//
+//    if (pipe1 == NULL || pipe2 == NULL) {
+//        simple_printf("ERROR: pipe no se creo\n");
+//    }
+//    if (createAndExecProcess("p1", (uint64_t) p1, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR) {
+//        simple_printf("s1: ERROR: otro == NULL\n");
+//        return;
+//    }
+//    if (createAndExecProcess("p2", (uint64_t) p2, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, NULL, 0) == PID_ERROR) {
+//        simple_printf("s2: ERROR: otro == NULL\n");
+//        return;
+//    }
+//    long aux = 0;
+//    while (aux < 100000000) {
+//
+//        aux++;
+//    }
+//}

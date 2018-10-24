@@ -79,9 +79,10 @@ pcbPtr getCurrentProc()
     return current;
 }
 
-pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority)
+pPid createAndExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority, char **argv,
+                          int argc)
 {
-    pcbPtr newProc = createProcess(name, instruction, parent, foreground, priority);
+    pcbPtr newProc = createProcess(name, instruction, parent, foreground, priority, argv, argc);
     if(!newProc)
     {
         //simple_printf("createAndExecProcess: !newProc\n");

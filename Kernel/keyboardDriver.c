@@ -14,10 +14,6 @@ char keyboardShiftList[128]= {0,27,'!','@','#','$','%','^','&','*','(',')','_','
 int capsLock = 0;
 int shift = 0;
 pipe_t * myStdin;
-//char buffer[BUFFERSIZE] = {0};
-//int bufferWrite = 0;
-//int bufferRead = 0;
-//int size = 0;
 
 int initKeyboardDriver()
 {
@@ -70,39 +66,12 @@ void charToBuffer(unsigned char c)
         for (int i = 0; i < 100000; ++i) {
 
         }
-
-        //drawPipeBuffer(myStdin);
     }
 }
 
-char getNextChar()//antes returnNextChar
+char getNextChar()
 {
     char * nextChar = kernelMalloc(sizeof(char));
     int read = readPipeK(myStdin, nextChar, 1);
     return (*nextChar);
-//    char resp = 0;
-//    if(size == 0)
-//    {
-//        return resp;
-//    }
-//    resp = buffer[bufferRead++];
-//    bufferRead = bufferRead % BUFFERSIZE;
-//    size--;
-//    return resp;
 }
-
-//int newToRead()
-//{
-//    if (myStdin->charsToRead == 0 || myStdin->bufferReadPosition == myStdin->bufferWritePosition)
-//    {
-//        return 0;
-//    }
-//    return 1;
-//}
-//
-//char getNextChar()
-//{
-//    while (!newToRead())
-//        setProcessState(getCurrentProc()->pid, BLOCKED, KEYBOARD);
-//    return returnNextChar();
-//}

@@ -122,7 +122,7 @@ uint64_t changeBackgroundColour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64
 }
 uint64_t setCoordinates(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    setCoord(rdi, rsi);
+    setCoord((unsigned int) rdi, (unsigned int) rsi);
     return 0;
 }
 uint64_t sysMalloc (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -148,18 +148,25 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
         printAllProcs();
     return 0;
 }
-uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t fore, uint64_t argv, uint64_t argc)
 {
-    return (uint64_t) createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) rdx, DEFAULT_PRIORITY);
+    return (uint64_t) createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) fore,
+                                           DEFAULT_PRIORITY, (char **) argv, (int) argc);
 }
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
+    int from, to;
+    from = (int) rdi;
+    to = (int) rsi;
+    if(from < 0 || (from > to))
+        return FALSE;
+
     boolean ret = TRUE;
-    for (int i = (int) rdi; i <= rsi; ++i)
+    for (int i = from; i <= rsi; ++i)
     {
-        ret = ret && setProcessState((pPid) i, DEAD, NO_REASON);
+        ret = ret && setProcessState(i, DEAD, NO_REASON);
     }
-    return ret;
+    return (uint64_t) ret;
 }
 uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {

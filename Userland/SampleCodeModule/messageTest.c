@@ -67,7 +67,7 @@ static void m3()
 
 void messageTest()
 {
-    myPid = userStartProcess("m2", (uint64_t) m2, userGetCurrentPid());
+    myPid = userStartProcess("m2", (uint64_t) m2, NULL, 0);
     mutex = newMutex(0);
     printF("meu Pid: %d      \n", myPid);
     if (myPid == -1)
@@ -78,14 +78,14 @@ void messageTest()
     }
     runningProcess++;
 
-    if (userStartProcess("m1", (uint64_t) m1, userGetCurrentPid()) == -1)
+    if (userStartProcess("m1", (uint64_t) m1, NULL, 0) == -1)
     {
         printF("m1: ERROR: otro == NULL\n");
         runningProcess = 0;
         return;
     }
     runningProcess++;
-    if (userStartProcess("m3", (uint64_t) m3, userGetCurrentPid()) == -1)
+    if (userStartProcess("m3", (uint64_t) m3, NULL, 0) == -1)
     {
         printF("m3: ERROR: otro == NULL\n");
         runningProcess = 0;

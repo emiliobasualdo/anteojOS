@@ -9,12 +9,15 @@
 static boolean isValidPid(pPid pid);
 static void freeProcess(pcbPtr proc);
 static pPid getNextPid();
-static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority);
+static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority,
+                         char **argv, int argc);
 static pPid arrayAdd(pcbPtr pcbPtr, int demandPid);
 static boolean addChildToParentList(pPid parentPid, pPid childPid);
 static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
+
+static void initChildVector(pcbPtr pcb);
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -48,13 +51,14 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
     arrSize = MAX_PROCS;
     maxPid = arrSize-1; // cond dinamica tiene sentido, aca no todo
     // creamos el nuevo proceso
-    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, DEFAULT_PRIORITY);
+    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, DEFAULT_PRIORITY, NULL, 0);
     if (!init) {
         simple_printf("ERROR: initProcessControl: Alguno es null\n");
         freeProcess(init);
         return NULL;
     }
-    bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE, DEFAULT_PRIORITY);
+    bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE,
+                                     DEFAULT_PRIORITY, NULL, 0);
     nextPid = BUSSY_WAITING + 1;
     return init;
 }
@@ -65,7 +69,8 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
  * en el arreglo de procesos, si es posbile.
  * Y se lo agrega a la lista del papá
  * */
-pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short priority)
+pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short priority, char **argv,
+                     int argc)
 {
     if ( !instruction)
     {
@@ -82,7 +87,12 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
         simple_printf("ERROR: %d is not a valid priority\n",priority);
         return NULL;
     }
-    pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground, priority);
+    if((argv == NULL && argc != 0) || (argc == 0 && argv != NULL) || argc < 0)
+    {
+        simple_printf("ERROR: argc or argv are illegal\n",priority);
+        return NULL;
+    }
+    pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground, priority, argv, argc);
     if (!newPcb)
     {
         //simple_printf("ERROR: createProcess: newPcb = null\n");
@@ -100,18 +110,29 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
     if (parent->childrenCount >= MAX_CHILDREN)
     {
         simple_printf("Kernel Message: ERROR: parent has already reached kids limit.... stop fornicating\n");
-        //programacion defensiva;
-        parent->creationLimit++;
-        if(parent->creationLimit > MAX_SECURITY_LIMITAION)
-        {
-            simple_printf("!Kernel: killing process's %s sons because it seems harmfull to the OS!!\n", array[parentPid]->name);
-            killAllDescendants(parentPid);
-        }
         return FALSE;
     }
-    parent->childs[parent->childrenCount++] = childPid;
-
-    return TRUE;
+    for (int i = 0; i < MAX_CHILDREN; ++i)
+    {
+        if(parent->childs[i] == PID_ERROR )
+        {
+            parent->childs[i] = childPid;
+            parent->childrenCount++;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]] == NULL)
+        {
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]]->state == DEAD)
+        {
+            procsDeathCleanUp(array[parent->childs[i]]);
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /**
@@ -125,7 +146,11 @@ void killAllDescendants(pPid pid) {
         killAllDescendants(array[proc->childs[i]]->pid);
         childPid = proc->childs[i];
         if(procExists(childPid))
+        {
+            if(childPid == pid)
+                simple_printf("ERROROROROROROOR\n");
             setProcessState(childPid,DEAD, NO_REASON);
+        }
     }
 }
 
@@ -135,7 +160,8 @@ void killAllDescendants(pPid pid) {
  * de tipo de prioridad.
  * Sino se le asigna ese numero
  */
-static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority)
+static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int demandPid, boolean foreground, short priority,
+                         char **argv, int argc)
 {
     pcbPtr newPcb = kernelMalloc(sizeof(pcb));
     if (newPcb == NULL)
@@ -174,6 +200,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->foreground = foreground;
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
+    initChildVector(newPcb);
     newPcb->postBox = createNewMessageQueue();
 
     for (int i = 0; i < FD_AMOUNT; ++i)
@@ -201,7 +228,13 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     }
 
     newPcb->stackFrame = (stackFrame_t *) newPcb->rsp;
+
+    // https://aaronbloomfield.github.io/pdr/book/x86-64bit-ccc-chapter.pdf
+    //To pass parameters to the subroutine, we put up to six of them into registers (in order: rdi, rsi,rdx, rcx, r8, r9)
     newPcb->stackFrame->rdi = instruction;
+    newPcb->stackFrame->rsi = (uint64_t) argv;
+    newPcb->stackFrame->rdx = (uint64_t) argc;
+
     newPcb->stackFrame->rip = (uint64_t) procContainer;
     newPcb->stackFrame->cs = CS_VALUE;
     newPcb->stackFrame->rflags = RFLAGS_VALUE;
@@ -220,13 +253,21 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     return newPcb;
 }
 
+static void initChildVector(pcbPtr pcb)
+{
+    for (int i = 0; i < MAX_CHILDREN; ++i)
+    {
+        pcb->childs[i] = PID_ERROR;
+    }
+}
+
 boolean procExists(pPid pid)
 {
     return isValidPid(pid) && array[pid] != NULL;
 }
 
 boolean isValidPid(pPid pid) {
-    return (pid <= maxPid && pid > INIT_PID ) || pid == NO_PARENT;
+    return (pid <= maxPid && pid >= INIT_PID ) || pid == NO_PARENT;
 }
 
 static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca tengo que liberar todo
@@ -238,6 +279,10 @@ static void freeProcess(pcbPtr proc)  // cada ves que agrego funcionalidad, aca 
         for(i = 0; proc->postBox->count > 0;i++)
         {
             dequeueMessage(proc->postBox, msg);
+            if(!msg)
+            {
+
+            }
             //kernelFree(msg->content); // todo solucionar esto
         }
         kernelFree(proc->postBox);
@@ -291,12 +336,7 @@ static pPid getNextPid()
 
 boolean isValidPState(int state)
 {
-    for (int i = BORN; i <= DEAD; ++i) {
-        if(state == i){
-            return TRUE;
-        }
-    }
-    return FALSE;
+    return (state >= BORN && state <= DEAD);
 }
 
 /** Si es necesrio, notificamos al algoritmo de scheduling para que haga lo necesario */
@@ -349,8 +389,13 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
  */
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason)
 {
-    if (!procExists(pid) || !isValidPState(newState)){
+    if (!procExists(pid)){
         simple_printf("Kernel message: ERROR: pid is not valid \n");
+        return FALSE;
+    }
+    if(!isValidPState(newState))
+    {
+        simple_printf("Kernel message: ERROR: not valid state \n");
         return FALSE;
     }
     array[pid]->state = newState;
@@ -411,11 +456,11 @@ void printSons(pPid parentPid)
  * de esta manera nos aseguramos que el sistema no muera
  * al hacer return
  * */
-int procContainer(uint64_t inst)
+int procContainer(uint64_t inst, char **argv, int argc)
 {
-    int(*func)(void) = (int (*)(void)) inst;
-    int ret = func();
-    simple_printf("Kernel Message: Process %s with pid %d died, with return=%d\n",getCurrentProc()->name, getCurrentProc()->pid, ret);
+    int(*func)(char **, int) = (int (*)(char **, int)) inst;
+    int ret = func(argv,argc);
+    simple_printf("pid=%d [%d]\n",getCurrentProc()->pid, ret);
 
     procsDeathCleanUp(getCurrentProc());
     switchToNext(); // cambio forzado de contexto sin esperar al timer tick
@@ -431,22 +476,25 @@ int procContainer(uint64_t inst)
 static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
 {
     // si es padre...
-    for (int i = 0; i < proc->childrenCount; ++i) {
-        pcbPtr child = array[proc->childs[i]];
-        child->ppid = INIT_PID;                     // asiganmos el hijo a INIT_PID
-        addChildToParentList(INIT_PID, child->pid); // a INIT le asignamos un hijo nuevo jeje re fiesta de egresados bariloche
-    }
-    // si es hijo lo sacamos de la lista del padre
-    pcbPtr parent = array[proc->ppid];
-    int i, j;
-    for (i = j = 0; i < parent->childrenCount; ++j, ++i) {
-        if(parent->childs[j] == proc->pid)
+    for (int i = 0; i < proc->childrenCount; ++i)
+    {
+        if(procExists(proc->childs[i]) )
         {
-            i++;
+            if(array[proc->childs[i]]->state != DEAD)
+            {
+                pcbPtr child = array[proc->childs[i]];
+                child->ppid = INIT_PID;                     // asiganmos el hijo a INIT_PID
+                addChildToParentList(INIT_PID, child->pid); // a INIT le asignamos un hijo nuevo
+            }
+            else
+            {
+                procsDeathCleanUp(array[proc->childs[i]]);
+            }
         }
-        parent->childs[j] = parent->childs[i];
+
     }
-    parent->childrenCount--;
+    // si es hijo NO lo sacamos de la lista del padre,
+    // eso será llevado a cabo por addChildToParent
     setProcessState(proc->pid,DEAD,NO_REASON);
 }
 

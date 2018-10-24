@@ -319,7 +319,7 @@ boolean rrUnblockWaiters(int reason)
         simple_printf("rrUnblockWaiters: invalid Reason\n");
         return FALSE;
     }
-    rrNodePtr node = normalQueuePop(&blockedArr[reason]);
+    rrNodePtr node = normalQueuePop(&(blockedArr[reason]));
     if (node == NULL)
     {
         DEBUG //simple_printf("rrUnblockWaiters: NO habia nadie a despertar\n");

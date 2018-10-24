@@ -95,7 +95,7 @@ void * initializeKernelBinary() // todo ver clearBSS
 void theAllMighty()
 {
     simple_printf("The all mighty\n");
-    pPid shellPid = createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE, INTERACTIVE);
+    pPid shellPid = createAndExecProcess("shell", (uint64_t) sampleCodeModuleAddress, getCurrentProc()->pid, TRUE, INTERACTIVE, NULL, 0);
     if (shellPid == PID_ERROR)
     {
         simple_printf("theAllMighty: ERROR: shell == NULL\n");

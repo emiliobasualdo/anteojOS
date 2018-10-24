@@ -11,14 +11,13 @@
 #include "ipcStructs.h"
 #include "dinamicMemory.h"
 
-#define MAX_PROC_NAME 70
+#define MAX_PROC_NAME 15
 #define INIT_PID 0
-#define BUSSY_WAITING (INIT_PID+1)
-#define MAX_PROCS 1000
-#define MAX_CHILDREN 60
-#define MAX_SECURITY_LIMITAION 3
-#define PID_ERROR (-1)
-#define HEAP_STACK_SIZE 4096
+#define BUSSY_WAITING INIT_PID+1
+#define MAX_PROCS 100
+#define MAX_CHILDREN 40
+#define PID_ERROR -1
+#define HEAP_STACK_SIZE 2048
 #define NO_PARENT 0
 #define CS_VALUE 8
 #define RFLAGS_VALUE 518
@@ -100,8 +99,9 @@ typedef pcb *pcbPtr;
 typedef pcbPtr *pArray;
 
 
-int procContainer(uint64_t inst);
-pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short i);
+int procContainer(uint64_t inst, char **argv, int argc);
+pcbPtr
+createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short i, char **argv, int argc);
 pcbPtr initProcessControl(char *name, uint64_t instruction);
 boolean procExists(pPid pid);
 void arrayAddInit(pArray array, pcbPtr init);

@@ -7,13 +7,14 @@ int S[N];                           /** un semáforo por filósofo */
 
 int procPid[N];                   /** arreglo con los PID de los filósofos */
 
-void eat();
+int eat();
 void think();
 void sleepPhil();
 int getCurrentPhil(int pid);
-void drawDiningTable();
 int qtyPhilosophers;
-char * getPhilName(int index);
+
+#define MAX_FOOD 1000000000
+#define MAX_PLATE (MAX_FOOD / 20) // va a comer 20 platos
 
 /** phnum: index del filósofo, de 0 a N-1 */
 void test(int phnum)
@@ -22,11 +23,11 @@ void test(int phnum)
 
         state[phnum] = EATING;
 
-        /*printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
-        printF("%s is eating\n", getPhilName(phnum));*/
-        drawDiningTable();
+        //printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
+        //printF("%s is eating\n", getPhilName(phnum));
+        drawDiningTable(state, qtyPhilosophers);
 
-        unlock(S[phnum]);
+        semPost(S[phnum]);
     }
 }
 
@@ -37,7 +38,7 @@ void takeFork(int phnum)
 
     state[phnum] = HUNGRY;                              /** registrar que el filósofo tiene hambre */
     //printF("Philosopher %d is hungry\n", phnum + 1);
-    //drawDiningTable();
+    drawDiningTable(state, qtyPhilosophers);
 
     /** eat if neighbours are not eating */
     test(phnum);                                        /** tratar de adquirir dos tenedores */
@@ -45,7 +46,7 @@ void takeFork(int phnum)
     unlock(mutex);                                  /** salir de la región crítica */
 
     /** if unable to eat wait to be signalled */
-    lock(S[phnum]);                               /** bloquearse si no se adquirieron los tenedores */
+    semWait(S[phnum]);                               /** bloquearse si no se adquirieron los tenedores */
 }
 
 /** philosopher phnum puts down forks */
@@ -53,15 +54,10 @@ void putFork(int phnum)
 {
     lock(mutex);                                  /** entrar en la región crítica */
 
-    /*if (state[phnum] != EATING)
-    {
-        printF("Philosofer %d tried putting down forks but he wasn't eating\n", phnum+1);
-        return;
-    }*/
     state[phnum] = THINKING;                            /** el filósofo terminó de comer */
-    /*printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
-    printF("%s is thinking\n", getPhilName(phnum), phnum + 1);*/
-    drawDiningTable();
+    //printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
+    //printF("%s is thinking\n", getPhilName(phnum), phnum + 1);
+    drawDiningTable(state, qtyPhilosophers);
 
     test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
     test(RIGHT);                                        /** ver si el vecino derecho ahora puede comer */
@@ -71,14 +67,13 @@ void putFork(int phnum)
 
 void * philosopher ()
 {
-    int aux = getCurrentPhil(userGetCurrentPid());
-    int * i = &aux;
-    while (1)
+    int i = getCurrentPhil(userGetCurrentPid());
+    while (TRUE)
     {
         think();
-        takeFork(*i);
+        takeFork(i);
         eat();
-        putFork(*i);
+        putFork(i);
     }
 }
 
@@ -92,59 +87,61 @@ int startPhilosophers (int num)
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
-        S[i] = newMutex(1);
+        S[i] = semStart(1);
         state[i] = THINKING;
     }
 
-    drawDiningTable();
+    drawDiningTableInit();
+    drawDiningTable(state, qtyPhilosophers);
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
         userSprintf(name,"%d-%s", i, NAME);
-        procPid[i] = userStartProcess(name, (uint64_t)philosopher, FALSE);
+        procPid[i] = userStartProcess(name, (uint64_t) philosopher, NULL, 0);
         //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
     }
 
     char c;
-    while((c = getChar()) != 'q')
+    while((c = (char) getChar()) != 'q')
     {
         switch (c)
         {
             case '1':
                 if (qtyPhilosophers == N)
                 {
-                    printF("ERROR: you've reached the maximum quantity of philosophers\n");
+                    //printF("ERROR: you've reached the maximum quantity of philosophers\n");
                 }
                 else
                 {
                     char newPhilName[10];
                     userSprintf(newPhilName,"%d-%s", i, NAME);
                     S[qtyPhilosophers] = newMutex(0);
-                    procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t)philosopher, FALSE);
+                    procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t) philosopher, NULL, 0);
                     //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
-                    state[qtyPhilosophers++] = THINKING;
-                    drawDiningTable();
+                    state[qtyPhilosophers] = THINKING;
+                    qtyPhilosophers++;
+                    drawDiningTable(state, qtyPhilosophers);
                 }
                 break;
             case '0':
                 if (qtyPhilosophers == 2)
                 {
-                    printF("ERROR: 2 philosophers are needed to perform the test\n");
+                    //printF("ERROR: 2 philosophers are needed to perform the test\n");
                 }
                 else
                 {
                     userKill(procPid[qtyPhilosophers-1], procPid[qtyPhilosophers-1]);
                     qtyPhilosophers--;
-                    drawDiningTable();
+                    clearPlate(qtyPhilosophers);
+                    drawDiningTable(state, qtyPhilosophers);
                 }
                 break;
-            default:
-                printF("ERROR: press 1 to increase the number of philosophers, 0 to decrease them or 'q' to quit\n");
-                break;
+            default:break;
         }
     }
 
     userKill(procPid[0], procPid[qtyPhilosophers-1]);
+    newWindow();
     return 1;
 }
 
@@ -153,7 +150,7 @@ void think()
     sleepPhil();
 }
 
-void eat()
+int eat()
 {
     sleepPhil();
 }
@@ -177,146 +174,6 @@ int getCurrentPhil(int pid)
         }
     }
     return -1;
-}
-
-/** dibuja la mesa con los comensales --> qtyPhil = {0, ... , N=5} --> depende de N */
-void drawDiningTable()
-{
-    newWindow();
-    char * states[N];                          /** N es la máxima cantidad de filósofos */
-    for (int i=0; i<qtyPhilosophers; i++)
-    {
-        states[i] = (state[i] == EATING ? "is eating  " : (state[i] == HUNGRY ? "is hungry  " : "is thinking"));
-    }
-
-    switch (qtyPhilosophers)
-    {
-        case 2:
-            printF("\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(                                  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (                                )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
-                   "\n", getPhilName(0), states[0], getPhilName(1), states[1]);
-            break;
-        case 3:
-            printF("\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(           %s %s  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (                                )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
-                   "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2]);
-            break;
-        case 4:
-            printF("\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(           %s %s  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (   %s %s           )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
-                   "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2], getPhilName(3), states[3]);
-            break;
-        case 5:
-            printF("\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\n"
-                   "\t\t     ==========================\n"
-                   "\t\t    (     %s %s     )\n"
-                   "\t\t   (                            )\n"
-                   "\t\t  ( %s %s         )\n"
-                   "\t\t (                                )\n"
-                   "\t\t(           %s %s  )\n"
-                   "\t\t|                                  |\n"
-                   "\t\t(                                  )\n"
-                   "\t\t (   %s %s           )\n"
-                   "\t\t  (                              )\n"
-                   "\t\t   (      %s %s )\n"
-                   "\t\t    (                          )\n"
-                   "\t\t     ==========================\n"
-                   "\n", getPhilName(0), states[0], getPhilName(1), states[1], getPhilName(2), states[2], getPhilName(3), states[3], getPhilName(4), states[4]);
-            break;
-        default: break;
-    }
 }
 
 char * getPhilName(int index)

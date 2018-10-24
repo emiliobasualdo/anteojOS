@@ -303,10 +303,10 @@ int destroyMutexK(int mutex)
 
 int semStartK(int initValue)
 {
-    if(positionMutexArray >= MAXSEMAPHORES)
+    if(positionMutexArray >= MAXMUTEXES)
     {
         int i;
-        for(i = 0; i < MAXSEMAPHORES; i++)
+        for(i = 0; i < MAXMUTEXES; i++)
         {
             if(semList[positionSemArray].nextProcessInLine == NULL)
             {
@@ -384,7 +384,6 @@ int semDestroyK(int sem)
     semList[sem].nextProcessInLine = NULL;
     return 1;
 }
-
 /**
  * MENSAJES
  */
@@ -392,7 +391,7 @@ int semDestroyK(int sem)
 static uint64_t id = 0;
 
 static boolean messageAlreadyInQueue(messageQueue *queue, msg_t message);
-static boolean sameMessage(msg_t message, msg_t message1);
+static boolean sameMessage(msg_t msg1, msg_t msg2);
 static void asyncReceive(msg_t * message);
 
 messageQueue * createNewMessageQueue()
@@ -416,8 +415,8 @@ static void createNewMessage(messageQueue* queue, uint64_t pidSender, uint64_t p
     msg_t message;
     message.pidReceiver = (int)pidReceiver;
     int length = strlen(messageBody);
-    message.content = kernelMalloc(length+1);
-    memcpy(message.content, messageBody,strlen(messageBody));
+    message.content = kernelMalloc(sizeof(char)*(length+1));
+    memcpy(message.content, messageBody, sizeof(char)*strlen(messageBody));
     message.content[length] = 0;
     message.pidSender = (int)pidSender;
     if(!messageAlreadyInQueue(queue, message))
@@ -465,12 +464,12 @@ void enqueueMessage(messageQueue* queue, msg_t message)
     }
     messageNode * mNode = kernelMalloc(sizeof(messageNode));
     int length = strlen(message.content);
-    mNode->message.content = kernelMalloc(length+1);
+    mNode->message.content = kernelMalloc(sizeof(char)*(length+1));
     mNode->message.content[length] = 0;
     mNode->next = NULL;
     mNode->message.pidSender = message.pidSender;
     mNode->message.pidReceiver = message.pidReceiver;
-    memcpy(mNode->message.content, message.content, length);
+    memcpy(mNode->message.content, message.content, (uint64_t)length);
     if(isEmptyMessageQueue(queue))
     {
         queue->first = mNode;
@@ -481,8 +480,6 @@ void enqueueMessage(messageQueue* queue, msg_t message)
     }
     queue->last = mNode;
     queue->count++;
-
-    return;
 }
 
 void dequeueMessage(messageQueue* queue, msg_t * message)
@@ -498,8 +495,8 @@ void dequeueMessage(messageQueue* queue, msg_t * message)
         message->pidSender = node->message.pidSender;
         message->pidReceiver = node->message.pidReceiver;
         int length = strlen(node->message.content);
-        message->content = kernelMalloc(strlen(node->message.content)+1);
-        memcpy(message->content, node->message.content, strlen(node->message.content));
+        message->content = kernelMalloc(sizeof(char)*(strlen(node->message.content)+1));
+        memcpy(message->content, node->message.content, (uint64_t) strlen(node->message.content));
         message->content[length] = 0;
         queue->first = queue->first->next;
         if(queue->count == 0)
@@ -536,7 +533,7 @@ static void asyncSend(pPid from, pPid to, char * body)
         pcbPtr aux = getPcbPtr(processNumber);
         if (aux->pid == to)
         {
-            createNewMessage(getPcbPtr(to)->postBox, from, to, body);
+            createNewMessage(getPcbPtr(to)->postBox, (uint64_t) from, (uint64_t) to, body);
 
             if(aux->postBox->count == 1 && aux->state != DEAD) //desbloqueo el proceso pq tengo un msj
             {
@@ -552,14 +549,12 @@ static void asyncSend(pPid from, pPid to, char * body)
     }
     //printPostBox(to);
     messageMutexUnlock();
-    return;
 }
 
 static void syncSend(pPid from, pPid to, char * body, msg_t * answer)
 {
     asyncSend(from, to, body);
     asyncReceive(answer);
-    return;
 }
 
 
@@ -569,13 +564,12 @@ static void syncSend(pPid from, pPid to, char * body, msg_t * answer)
 static void asyncReceive(msg_t * message)
 {
     pPid pid = getCurrentProc()->pid;
-    pPid comparePid;
 
     boolean endWhile = 1;
     int processNumber = 1;
     while(processNumber < MAX_PROCS && endWhile)
     {
-        if ((comparePid = getPcbPtr(processNumber)->pid) == pid)
+        if (getPcbPtr(processNumber)->pid == pid)
         {
             if(isEmptyMessageQueue(getPcbPtr(processNumber)->postBox))
             {
@@ -587,7 +581,6 @@ static void asyncReceive(msg_t * message)
         }
         processNumber++;
     }
-    return;
 }
 
 static void syncReceive(msg_t * message, void (*function)(char*))
@@ -612,8 +605,8 @@ uint64_t sendMessage(pPid receiver, char * content, char ** answer, boolean flag
     msg_t aux;
     syncSend(pid, receiver, content, &aux);
     int length = strlen(aux.content);
-    *answer = kernelMalloc(length+1);
-    memcpy((*answer),aux.content, length);
+    *answer = kernelMalloc(sizeof(char)*(length+1));
+    memcpy((*answer),aux.content, (uint64_t)length);
     (*answer)[length] = 0;
     return 0;
 }
@@ -628,8 +621,8 @@ uint64_t receiveMessage(char ** message, void (*function)(char*), boolean flag)/
     }
     asyncReceive(&aux);
     int length = strlen(aux.content);
-    *message = kernelMalloc(length+1);
-    memcpy((*message), aux.content, length);
+    *message = kernelMalloc(sizeof(char)*(length+1));
+    memcpy((*message), aux.content, (uint64_t) length);
     (*message)[length] = 0;
     return 1;
 }

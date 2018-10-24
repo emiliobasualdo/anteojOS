@@ -46,7 +46,7 @@ int executeCommand(int argc, argVector argv)
         execProcInBackground(commands[cmd].name, (uint64_t) commands[cmd].fn);
         return AMPRESAND_CMD;
     }
-/*    else
+    else
     {
         for (int i = 0; i < argc; ++i)
         {
@@ -57,7 +57,7 @@ int executeCommand(int argc, argVector argv)
             }
         }
 
-    }*/
+    }
     return (*commands[cmd].fn)(argc,argv);
 }
 
@@ -79,7 +79,7 @@ int execProcInBackground(char *name, uint64_t intstruction)
     if (pid == -1)
         printF("Shell: Error executing process in background\n");
     else
-        printF("Shell: Process executed in background.\n");
+        printF("pid=%d\n", pid);
     return pid;
 }
 

@@ -77,7 +77,7 @@ int execProcInBackground(char *name, uint64_t intstruction)
 {
     int pid = userStartProcess(name, intstruction, NULL, 0);
     if (pid == -1)
-        printF("Shell: Error executing process in background\n");
+        printF("pid=%d\n", pid);
     else
         printF("Shell: Process executed in background.\n");
     return pid;

@@ -33,10 +33,6 @@ uint64_t writeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t
 
     return (uint64_t) writePipeK(pipe, buffer, (uint64_t)length);
 
-    /*old
-     *drawString((const char *) rdi);
-     *return 0;
-     */
 }
 uint64_t readK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -52,12 +48,6 @@ uint64_t readK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t 
     pipe_t * pipe = getPipeFromPipeList(process->fd[fd]);
 
     return (uint64_t) readPipeK(pipe, buffer, (uint64_t) length);
-
-
-    //proc | proc2
-    /*old
-     * return (uint64_t) getNextChar();
-     * */
 
 }
 uint64_t getHour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -245,11 +235,17 @@ uint64_t kernelSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 }
 uint64_t openPipe(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) addPipeK();
+    return (uint64_t) addPipeToSC();
 }
 uint64_t closeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t)closePipeK((pipe_t *) rdi);
+    int pipe = (int) rdi;
+    if(pipe < 0 ||pipe >= FD_AMOUNT)
+    {
+        return 0;
+    }
+    pipe_t * aux = getPipeFromPipeList(getCurrentProc()->fd[pipe]);
+    return (uint64_t)closePipeK(aux);
 }
 uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {

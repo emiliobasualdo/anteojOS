@@ -113,7 +113,7 @@ int echo (int argc, argVector argv)
     }
     if(argc == -1) // leemos de stdin
     {
-        while
+        
     }
     for (int i=1; i<argc; i++)
     {

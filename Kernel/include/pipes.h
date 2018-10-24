@@ -11,6 +11,7 @@
 #define MAXPIPES 100
 
 pipe_t * addPipeK();
+int addPipeToSC();
 int writePipeK(pipe_t *pipe, char *buffer, uint64_t size);
 int readPipeK(pipe_t *pipe, char *buffer, uint64_t size);
 int closePipeK(pipe_t * pipe);

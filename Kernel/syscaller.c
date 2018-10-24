@@ -102,6 +102,11 @@ uint64_t putChar(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_
 }
 uint64_t removeChar(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
+    pcbPtr process = getCurrentProc();
+    if(process == NULL ||process->fd[STDOUT] != STDOUT)
+    {
+        return 1;
+    }
     backSpace();
     return 0;
 }

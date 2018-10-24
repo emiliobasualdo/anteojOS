@@ -211,43 +211,43 @@ static void drawNameAndState(int x0, int y0, char * name, int state)
     int size = strlen(name);
     for (int i=0; i<size; i++)
     {
-        putChar(name[i]);
+        drawCharU(name[i]);
     }
-    putChar(' ');
-    putChar('i');
-    putChar('s');
-    putChar(' ');
+    drawCharU(' ');
+    drawCharU('i');
+    drawCharU('s');
+    drawCharU(' ');
     switch (state)
     {
         case EATING:
-            putChar('e');
-            putChar('a');
-            putChar('t');
-            putChar('i');
-            putChar('n');
-            putChar('g');
-            putChar(' ');
-            putChar(' ');
+            drawCharU('e');
+            drawCharU('a');
+            drawCharU('t');
+            drawCharU('i');
+            drawCharU('n');
+            drawCharU('g');
+            drawCharU(' ');
+            drawCharU(' ');
             break;
         case HUNGRY:
-            putChar('h');
-            putChar('u');
-            putChar('n');
-            putChar('g');
-            putChar('r');
-            putChar('y');
-            putChar(' ');
-            putChar(' ');
+            drawCharU('h');
+            drawCharU('u');
+            drawCharU('n');
+            drawCharU('g');
+            drawCharU('r');
+            drawCharU('y');
+            drawCharU(' ');
+            drawCharU(' ');
             break;
         case THINKING:
-            putChar('t');
-            putChar('h');
-            putChar('i');
-            putChar('n');
-            putChar('k');
-            putChar('i');
-            putChar('n');
-            putChar('g');
+            drawCharU('t');
+            drawCharU('h');
+            drawCharU('i');
+            drawCharU('n');
+            drawCharU('k');
+            drawCharU('i');
+            drawCharU('n');
+            drawCharU('g');
             break;
         default:
             break;

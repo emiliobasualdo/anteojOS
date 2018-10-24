@@ -3,33 +3,34 @@
 int state[N];                          /** arreglo para seguir el estado de todos los comensales */
 
 int mutex;                           /** mutex para regiones críticas */
+
 int S[N];                           /** un semáforo por filósofo */
 
 int procPid[N];                   /** arreglo con los PID de los filósofos */
+
+int qtyPhilosophers;                /** cantidad de filosofos (menor o igual a N) */
+
+int runningState[N];                /** estado de ejecucion de los filosofos: 1 para que corran, 0 para que dejen de correr */
+
+int mutexToAdd;                     /** mutex para agregar un filosofo */
 
 void eat();
 void think();
 void sleepPhil();
 int getCurrentPhil(int pid);
-int qtyPhilosophers;
 
 /** phnum: index del filósofo, de 0 a N-1 */
 void test(int phnum)
 {
-    if (state[phnum] == HUNGRY && state[(LEFT==-1)?qtyPhilosophers-1:LEFT] != EATING && state[(RIGHT == qtyPhilosophers)? 0 : RIGHT] != EATING)
-    {
+    if (state[phnum] == HUNGRY && state[(LEFT==-1)?qtyPhilosophers-1:LEFT] != EATING && state[(RIGHT == qtyPhilosophers)?0:RIGHT] != EATING) {
+
         state[phnum] = EATING;
 
         printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
         printF("%s is eating\n", getPhilName(phnum));
-        //drawDiningTable(state, qtyPhilosophers);
+        drawDiningTable(state, qtyPhilosophers);
 
         semPost(S[phnum]);
-    }
-    else
-    {
-        printF("%s cannot eat, i'm in a %d state, my left neighbour is in a %d state and my right neighbour is un a %d state\n", getPhilName(phnum), state[phnum], state[(LEFT==-1)?qtyPhilosophers-1:LEFT], state[(RIGHT == qtyPhilosophers)? 0 : RIGHT]);
-        printF("my left neighbour is %d and my right beighbour is %d\n", (LEFT==-1)?qtyPhilosophers-1:LEFT, (RIGHT == qtyPhilosophers)? 0 : RIGHT);
     }
 }
 
@@ -40,7 +41,7 @@ void takeFork(int phnum)
 
     state[phnum] = HUNGRY;                              /** registrar que el filósofo tiene hambre */
     printF("Philosopher %d is hungry\n", phnum + 1);
-    //drawDiningTable(state, qtyPhilosophers);
+    drawDiningTable(state, qtyPhilosophers);
 
     /** eat if neighbours are not eating */
     test(phnum);                                        /** tratar de adquirir dos tenedores */
@@ -59,20 +60,10 @@ void putFork(int phnum)
     state[phnum] = THINKING;                            /** el filósofo terminó de comer */
     printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
     printF("%s is thinking\n", getPhilName(phnum), phnum + 1);
-    //drawDiningTable(state, qtyPhilosophers);
+    drawDiningTable(state, qtyPhilosophers);
 
-    if ((LEFT==-1)?qtyPhilosophers-1:LEFT == (RIGHT == qtyPhilosophers)? 0 : RIGHT)
-    {
-        printF("Testing neighbour on position #%d\n", (RIGHT == qtyPhilosophers)? 0 : RIGHT);
-        test((RIGHT == qtyPhilosophers)? 0 : RIGHT);
-    }
-    else
-    {
-        printF("Testing neighbour on position #%d\n", (LEFT==-1)?qtyPhilosophers-1:LEFT);
-        test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
-        printF("Testing neighbour on position #%d\n", (RIGHT == qtyPhilosophers)? 0 : RIGHT);
-        test((RIGHT == qtyPhilosophers)? 0 : RIGHT);    /** ver si el vecino derecho ahora puede comer */
-    }
+    test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
+    test((RIGHT == qtyPhilosophers)?0:RIGHT);           /** ver si el vecino derecho ahora puede comer */
 
     unlock(mutex);                                     /** salir de la región crítica */
 }
@@ -80,7 +71,7 @@ void putFork(int phnum)
 void philosopher ()
 {
     int i = getCurrentPhil(userGetCurrentPid());
-    while (TRUE)
+    while (runningState[i])
     {
         think();
         takeFork(i);
@@ -91,27 +82,29 @@ void philosopher ()
 
 int startPhilosophers (int num)
 {
-
     int i;
     char name[10];
     qtyPhilosophers = num;
 
     mutex = newMutex(0);
+    mutexToAdd = newMutex(1);
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
         S[i] = semStart(0);
         state[i] = THINKING;
+        runningState[i] = 1;
     }
-
-    //drawDiningTableInit();
-    //drawDiningTable(state, qtyPhilosophers);
+    drawDiningTableInit();
+    drawDiningTable(state, qtyPhilosophers);
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
         userSprintf(name,"%d-%s", i, NAME);
-        procPid[i] = userStartProcess(name, (uint64_t) philosopher, NULL, 0);
+        procPid[i] = createProc(name, (uint64_t) philosopher, NULL, 0);
         printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
+        pipesToStds(procPid[i], 2);
+        startProc(procPid[i]);
     }
 
     char c;
@@ -126,14 +119,22 @@ int startPhilosophers (int num)
                 }
                 else
                 {
-                    char newPhilName[10];
-                    userSprintf(newPhilName,"%d-%s", i, NAME);
-                    S[qtyPhilosophers] = newMutex(0);
-                    procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t) philosopher, NULL, 0);
-                    printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
-                    state[qtyPhilosophers] = THINKING;
-                    qtyPhilosophers++;
-                    //drawDiningTable(state, qtyPhilosophers);
+                    //unlock(mutexToAdd);
+                    while (state[0] != THINKING && state[qtyPhilosophers-1] != THINKING)
+                    {}
+                    if (state[0] == THINKING && state[qtyPhilosophers-1] == THINKING)
+                    {
+                        char newPhilName[10];
+                        userSprintf(newPhilName,"%d-%s", i, NAME);
+                        S[qtyPhilosophers] = newMutex(0);
+                        procPid[qtyPhilosophers] = userStartProcess(newPhilName, (uint64_t) philosopher, NULL, 0);
+                        printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
+                        state[qtyPhilosophers] = THINKING;
+                        runningState[qtyPhilosophers] = 1;
+                        qtyPhilosophers++;
+                        drawDiningTable(state, qtyPhilosophers);
+                    }
+                    //lock(mutexToAdd);
                 }
                 break;
             case '0':
@@ -143,10 +144,16 @@ int startPhilosophers (int num)
                 }
                 else
                 {
-                    userKill(procPid[qtyPhilosophers-1], procPid[qtyPhilosophers-1]);
-                    qtyPhilosophers--;
-                    clearPlate(qtyPhilosophers);
-                    //drawDiningTable(state, qtyPhilosophers);
+                    while (state[qtyPhilosophers-1] != THINKING && state[0] != THINKING)
+                    {
+                    }
+                    if (state[qtyPhilosophers-1] == THINKING && state[0] == THINKING)
+                    {
+                        qtyPhilosophers--;
+                        runningState[qtyPhilosophers] = 0;
+                        clearPlate(qtyPhilosophers);
+                        drawDiningTable(state, qtyPhilosophers);
+                    }
                 }
                 break;
             default:break;

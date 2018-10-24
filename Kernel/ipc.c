@@ -322,10 +322,10 @@ int destroyMutexK(int mutex)
 
 int semStartK(int initValue)
 {
-    if(positionMutexArray >= MAXMUTEXES)
+    if(positionMutexArray >= MAXSEMAPHORES)
     {
         int i;
-        for(i = 0; i < MAXMUTEXES; i++)
+        for(i = 0; i < MAXSEMAPHORES; i++)
         {
             if(semList[positionSemArray].nextProcessInLine == NULL)
             {

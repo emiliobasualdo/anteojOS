@@ -115,7 +115,7 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         int i = 0;
         while(i < size)
         {
-            if (pipe->charsToRead >= (PIPEBUFFERSIZE-1))//significa que el buffer esta lleno
+            if (pipe->charsToRead >= PIPEBUFFERSIZE)//significa que el buffer esta lleno
             {
                 unlockMutex(pipe->mutex);
 
@@ -129,8 +129,7 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
                 int index = (i + pipe->bufferWritePosition) % PIPEBUFFERSIZE;
                 pipe->bufferWritePosition = (pipe->bufferWritePosition+1)%PIPEBUFFERSIZE;
                 pipe->buffer[index]= buffer[i];
-                if(i != 0)
-                    pipe->charsToRead+=1;
+                pipe->charsToRead+=1;
                 i++;
             }
             tryToLockMutex(pipe->writeMutex);
@@ -138,7 +137,6 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         if (pipe->charsToRead < PIPEBUFFERSIZE-1)
         {
             pipe->buffer[pipe->bufferWritePosition] = EOF;
-            pipe->charsToRead++;
         }
     }
 
@@ -199,6 +197,9 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         unlockMutex(pipe->writeMutex);
 
     unlockMutex(pipe->mutex);
+
+    if(size == 1 && buffer[0] == EOF)
+        return EOF;
 
     return size;
 }
@@ -318,7 +319,7 @@ int addPipeToSC()
 //si 1 stdout nomas
 //si 2 stdin nomas
 //si no ambos
-int change(pPid proc, int flag)
+int changeToStds(pPid proc, int flag)
 {
     pcbPtr process = getPcbPtr(proc);
     if(process == NULL)
@@ -335,16 +336,26 @@ int change(pPid proc, int flag)
             {
                 closePipeK(in);
             }
+            process->fd[STDIN] = 0;
             break;
         case 2:
             if(out->pipeId != STDOUT)
             {
-                closePipeK(in);
+                closePipeK(out);
             }
-
+            process->fd[STDOUT] = 1;
             break;
         default:
-
+            if(in->pipeId != STDIN)
+            {
+                closePipeK(in);
+            }
+            if(out->pipeId != STDOUT)
+            {
+                closePipeK(out);
+            }
+            process->fd[STDIN] = 0;
+            process->fd[STDOUT] = 1;
             break;
     }
 }

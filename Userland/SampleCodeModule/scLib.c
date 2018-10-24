@@ -63,7 +63,6 @@ int notifyExitRequest()
 int putChar(char c)
 {
     return (int) syscall(1,1,(uint64_t) (&c),1,0,0);
-    //return (int) syscall(12, (uint64_t) c, 0, 0, 0, 0);
 }
 int removeChar()
 {
@@ -205,4 +204,13 @@ int createProc(char *name, uint64_t instruct, char **argv, int argc)
 int startProc(int pid)
 {
     return (int) syscall(43, (uint64_t) pid,  0,  0,  0, 0);
+}
+int pipesToStds(int pid, int flag)
+{
+    return (int) syscall(44, (uint64_t) pid,  (uint64_t) flag,  0,  0, 0);
+}
+
+void drawCharU(char c)
+{
+    syscall(45,(uint64_t)c,0,0,0,0);
 }

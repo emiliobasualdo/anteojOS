@@ -27,6 +27,10 @@ void int_20() // todo esto no lo estoy usando, solucionar
 
 void int_21()
 {
+	//simple_printf("hola ");
 	if (keyboardInterpreter())
+	{
+		//simple_printf("SII \n");
 		wakeUpBlocked(KEYBOARD);
+	}
 }

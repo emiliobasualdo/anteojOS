@@ -20,7 +20,7 @@ command commands[]={
         {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo> or kill <p pid>", kill},
         {"prod_cons", "Simulates de Producer Consumer Problem", prodCons},
         {"allocator_test", "Performs a test to prove the physical memory management functionality", allocatorTest},
-        {"message_test","Performs a test of Message Passing", messageTesting},
+        //{"message_test","Performs a test of Message Passing", messageTesting},
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
@@ -77,7 +77,7 @@ int execProcInBackground(char *name, uint64_t intstruction)
 {
     int pid = userStartProcess(name, intstruction, NULL, 0);
     if (pid == -1)
-        printF("pid=%d\n", pid);
+        printF("Shell: erro while creating process\n", pid);
     else
         printF("pid=%d\n", pid);
     return pid;
@@ -213,13 +213,6 @@ int changeColour(void(*f)(Colour), int flag)
     return changed;
 }
 
-int digital_clock(int argc, argVector argv)
-{
-    showClock(NORMAL_MODE);
-    clear(argc,argv);
-    return 1;
-}
-
 int timezone(int argc, argVector argv)
 {
     if (argc != 2)
@@ -329,7 +322,6 @@ int printPs(int argc, argVector argv)
         default:
             printF("Usage: Usage: ps or ps <q> or ps <p pid>\n");
     }
-
     return TRUE;
 }
 
@@ -420,9 +412,9 @@ int columnTest(int argc, argVector argv)
     printF("We are going to execute many identical process, they are all set to do the same task, but their priorities vary\n");
     printF("How many process do you want to execute?: ");
     int num;
-    while ((num = getNum()) < 0 || num > 40 )
+    while ((num = getNum()) < 0 || num > 10 )
     {
-        printF("\nPlease type a number between 0 and 40: ");
+        printF("\nPlease type a number between 0 and 10: ");
     }
     printF("\n");
     int agening;

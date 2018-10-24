@@ -17,7 +17,7 @@ void printBlock(int, int, short priority);
 
 void setVariables(short procsCant);
 
-void drawLoop()
+void drawLoop(char **argv, int argc)
 {
     //simple_printf("%d %d %s\n", getCurrentProc()->priority,getCurrentProc()->priorityType, getCurrentProc()->name);
     unsigned long long counter = 0;
@@ -27,12 +27,10 @@ void drawLoop()
         if(counter % LEVEL == 0) // por cada nivel imprimimos un bloque
         {
             //simple_printf("loopeando\n");
-            int flag, procNum;
-            kernelToInt(getCurrentProc()->name, &procNum, &flag);
-            printBlock((int) ((counter / LEVEL) * 2), procNum*2 +1 , getCurrentProc()->priority);
+            printBlock((int) ((counter / LEVEL) * 2), (argc*2) +1 , getCurrentProc()->priority);
         }
     }
-    setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
+    //setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
 }
 
 void printBlock(int i, int j, short priority)
@@ -78,8 +76,8 @@ void columnTest(short cantProcs, boolean ageing)
     for (int i = 0; i < cantProcs; ++i)
     {
         priority = (short) (i % PRIORITY_LEVELS);
-        simple_sprintf(name,"%d-%s-%d", i, NAME, priority); // la congurencia nunca va a quedar 5
-        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, 0);
+        simple_sprintf(name,"%d-%s-%d", NAME, priority); // la congurencia nunca va a quedar 5
+        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, i);
         if(!ageing)
             setProcessPriority(pid, priority);
     }

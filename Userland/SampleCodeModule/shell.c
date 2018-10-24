@@ -105,7 +105,7 @@ void turnOnOff()
     //newWindow();
     changeFontColour(getCurrentFontColour());
     changeBackgroundColour(getCurrentBackgroundColour());
-    setPresentationImageCoordinates(&x, &y, GLASSESWIDTH, GLASSESWIDTH);
+    //setPresentationImageCoordinates(&x, &y, GLASSESWIDTH, GLASSESWIDTH);
     //drawImageFromHexaMap((unsigned int) x, (unsigned int) y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
     //sleep();
     //sleep();

@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include "video.h"
 #include "scLib.h"
-#include "clock.h"
 #include "shellCommands.h"
 #include "stdlib.h"
 #include "stdio.h"

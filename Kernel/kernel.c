@@ -102,7 +102,6 @@ void theAllMighty()
         return;
     }
     addStandardPipes(shellPid);
-
     simple_printf("theAllMighty: cargando IDT\n");
     loadIDT();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);

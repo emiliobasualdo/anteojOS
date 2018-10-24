@@ -137,21 +137,19 @@ uint64_t sysFree (uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64
 uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     if (rdi == 'q')
-    {
         printProcQueues();
-    }
     else if(rdi == 'p')
-    {
         printSons((pPid) rsi);
-    }
     else
         printAllProcs();
     return 0;
 }
 uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t fore, uint64_t argv, uint64_t argc)
 {
-    return (uint64_t) createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) fore,
-                                           DEFAULT_PRIORITY, (char **) argv, (int) argc);
+    pPid  pid = createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) fore,
+            DEFAULT_PRIORITY, (char **) argv, (int) argc);
+    //simple_printf("pid %d\n",pid);
+    return (uint64_t)pid ;
 }
 uint64_t kill(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -244,17 +242,14 @@ uint64_t kernelSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
     setQuantum((int) rdi);
     return 1;
 }
-
 uint64_t openPipe(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t) addPipeK();
 }
-
 uint64_t closeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t)closePipeK((pipe_t *) rdi);
 }
-
 uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t)dupProc((pPid) rdi, (pPid) rsi);

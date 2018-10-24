@@ -17,8 +17,8 @@ static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
 static void initChildVector(pcbPtr pcb);
-
 static void initChildVector(pcbPtr pcb);
+static void initArray();
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -51,17 +51,27 @@ pcbPtr initProcessControl(char *name, uint64_t instruction)
     // iniciamos el array de pcbPtrs
     arrSize = MAX_PROCS;
     maxPid = arrSize-1; // cond dinamica tiene sentido, aca no todo
+    initArray();
     // creamos el nuevo proceso
-    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, DEFAULT_PRIORITY, NULL, 0);
-    if (!init) {
+    pcbPtr init = newProcess(name, instruction, PID_ERROR, INIT_PID, TRUE, MAX_PRIORITY, NULL, 0);
+    if (!init)
+    {
         simple_printf("ERROR: initProcessControl: Alguno es null\n");
         freeProcess(init);
         return NULL;
     }
     bussyWaitingProcPcb = newProcess("BussyWaiting", (uint64_t) bussyWaitingProc, INIT_PID, BUSSY_WAITING, FALSE,
-                                     DEFAULT_PRIORITY, NULL, 0);
+                                     MAX_PRIORITY, NULL, 0);
     nextPid = BUSSY_WAITING + 1;
     return init;
+}
+
+static void initArray()
+{
+    for (int i = 0; i < MAX_PROCS; ++i)
+    {
+        array[i] = NULL;
+    }
 }
 
 /**
@@ -86,11 +96,6 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
     if(!isValidPriority(priority))
     {
         simple_printf("ERROR: %d is not a valid priority\n",priority);
-        return NULL;
-    }
-    if((argv == NULL && argc != 0) || (argc == 0 && argv != NULL) || argc < 0)
-    {
-        simple_printf("ERROR: argc or argv are illegal\n",priority);
         return NULL;
     }
     pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground, priority, argv, argc);
@@ -224,7 +229,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
     initChildVector(newPcb);
-    newPcb->postBox = createNewMessageQueue();
+    //newPcb->postBox = createNewMessageQueue();
 
     for (int i = 0; i < FD_AMOUNT; ++i)
     {
@@ -434,6 +439,8 @@ void printAllProcs()
     {
         if(array[i] != NULL)
             printProc(array[i]);
+        else
+            return;
     }
     simple_printf("\n");
 }

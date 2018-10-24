@@ -131,7 +131,7 @@ void switchToNext()
 
 boolean wakeUpBlocked(reasonT reason)
 {
-    //simple_printf("wakeUpBlocked: reason=%d\n", reason);
+    DEBUG //simple_printf("wakeUpBlocked: reason=%d\n", reason);
     switch (reason) // todo limpiar esto
     {
         case KEYBOARD:

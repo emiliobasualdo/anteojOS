@@ -72,10 +72,6 @@ void shell()
         {
             printF("%s\n",ILLEGAL_INPUT_MSG);
         }
-        else if (resp == AMPRESAND_CMD)
-        {
-            printF("%s\n",AMPRESAND_MSG);
-        }
     }
     doBeforeExit();
 }

@@ -17,6 +17,8 @@ static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
 
+static void initChildVector(pcbPtr pcb);
+
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
 static unsigned int arrSize;
@@ -108,17 +110,29 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid) {
     if (parent->childrenCount >= MAX_CHILDREN)
     {
         simple_printf("Kernel Message: ERROR: parent has already reached kids limit.... stop fornicating\n");
-        //programacion defensiva;
-        parent->creationLimit++;
-        if(parent->creationLimit > MAX_SECURITY_LIMITAION)
-        {
-            simple_printf("!Kernel: killing process's %s sons because it seems harmfull to the OS!!\n", array[parentPid]->name);
-            killAllDescendants(parentPid);
-        }
         return FALSE;
     }
-    parent->childs[parent->childrenCount++] = childPid;
-    return TRUE;
+    for (int i = 0; i < MAX_CHILDREN; ++i)
+    {
+        if(parent->childs[i] == PID_ERROR )
+        {
+            parent->childs[i] = childPid;
+            parent->childrenCount++;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]] == NULL)
+        {
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]]->state == DEAD)
+        {
+            procsDeathCleanUp(array[parent->childs[i]]);
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /**
@@ -186,6 +200,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->foreground = foreground;
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
+    initChildVector(newPcb);
     //newPcb->postBox = createNewMessageQueue();
 
     if(priority == INTERACTIVE)
@@ -228,6 +243,14 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
         }
     }
     return newPcb;
+}
+
+static void initChildVector(pcbPtr pcb)
+{
+    for (int i = 0; i < MAX_CHILDREN; ++i)
+    {
+        pcb->childs[i] = PID_ERROR;
+    }
 }
 
 boolean procExists(pPid pid)
@@ -425,7 +448,7 @@ int procContainer(uint64_t inst, char **argv, int argc)
 {
     int(*func)(char **, int) = (int (*)(char **, int)) inst;
     int ret = func(argv,argc);
-    simple_printf("Kernel Message: Process %s with pid %d died, with return=%d\n",getCurrentProc()->name, getCurrentProc()->pid, ret);
+    simple_printf("pid=%d [%d]\n",getCurrentProc()->pid, ret);
 
     procsDeathCleanUp(getCurrentProc());
     switchToNext(); // cambio forzado de contexto sin esperar al timer tick
@@ -441,22 +464,25 @@ int procContainer(uint64_t inst, char **argv, int argc)
 static void procsDeathCleanUp(pcbPtr proc) // todo aca creo que hay un error
 {
     // si es padre...
-    for (int i = 0; i < proc->childrenCount; ++i) {
-        pcbPtr child = array[proc->childs[i]];
-        child->ppid = INIT_PID;                     // asiganmos el hijo a INIT_PID
-        addChildToParentList(INIT_PID, child->pid); // a INIT le asignamos un hijo nuevo jeje re fiesta de egresados bariloche
-    }
-    // si es hijo lo sacamos de la lista del padre
-    pcbPtr parent = array[proc->ppid];
-    int i, j;
-    for (i = j = 0; i < parent->childrenCount; ++j, ++i) {
-        if(parent->childs[j] == proc->pid)
+    for (int i = 0; i < proc->childrenCount; ++i)
+    {
+        if(procExists(proc->childs[i]) )
         {
-            i++;
+            if(array[proc->childs[i]]->state != DEAD)
+            {
+                pcbPtr child = array[proc->childs[i]];
+                child->ppid = INIT_PID;                     // asiganmos el hijo a INIT_PID
+                addChildToParentList(INIT_PID, child->pid); // a INIT le asignamos un hijo nuevo
+            }
+            else
+            {
+                procsDeathCleanUp(array[proc->childs[i]]);
+            }
         }
-        parent->childs[j] = parent->childs[i];
+
     }
-    parent->childrenCount--;
+    // si es hijo NO lo sacamos de la lista del padre,
+    // eso será llevado a cabo por addChildToParent
     setProcessState(proc->pid,DEAD,NO_REASON);
 }
 

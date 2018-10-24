@@ -141,7 +141,6 @@ void kernelColumnTest(int num, int ageing)
 
 void userKillAllDescendants(int pid)
 {
-    printF("%d pid ", pid);
     syscall(32, (uint64_t) pid, 0, 0, 0, 0);
 }
 int semStart(int amount)

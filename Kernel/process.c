@@ -98,11 +98,6 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
         simple_printf("ERROR: %d is not a valid priority\n",priority);
         return NULL;
     }
-    if((argv == NULL && argc != 0) || (argc == 0 && argv != NULL) || argc < 0)
-    {
-        simple_printf("ERROR: argc or argv are illegal\n",priority);
-        return NULL;
-    }
     pcbPtr newPcb = newProcess(name, instruction, parentPid, PID_ERROR, foreground, priority, argv, argc);
     if (!newPcb)
     {
@@ -234,7 +229,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->rsp = newPcb->stackBase - sizeof(stackFrame_t) + 1;
     newPcb->childrenCount = 0;
     initChildVector(newPcb);
-    newPcb->postBox = createNewMessageQueue();
+    //newPcb->postBox = createNewMessageQueue();
 
     for (int i = 0; i < FD_AMOUNT; ++i)
     {

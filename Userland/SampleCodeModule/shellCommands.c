@@ -20,7 +20,7 @@ command commands[]={
         {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo> or kill <p pid>", kill},
         {"prod_cons", "Simulates de Producer Consumer Problem", prodCons},
         {"allocator_test", "Performs a test to prove the physical memory management functionality", allocatorTest},
-        {"message_test","Performs a test of Message Passing", messageTesting},
+        //{"message_test","Performs a test of Message Passing", messageTesting},
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
@@ -412,9 +412,9 @@ int columnTest(int argc, argVector argv)
     printF("We are going to execute many identical process, they are all set to do the same task, but their priorities vary\n");
     printF("How many process do you want to execute?: ");
     int num;
-    while ((num = getNum()) < 0 || num > 40 )
+    while ((num = getNum()) < 0 || num > 10 )
     {
-        printF("\nPlease type a number between 0 and 40: ");
+        printF("\nPlease type a number between 0 and 10: ");
     }
     printF("\n");
     int agening;

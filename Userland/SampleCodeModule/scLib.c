@@ -98,7 +98,6 @@ void userPs(char type, int pid)
 int userStartProcess(char *name, uint64_t instruct, char **argv, int argc)
 {
     int pid  = (int) syscall(19, (uint64_t) name, instruct, (uint64_t) FALSE, (uint64_t) argv, (uint64_t) argc);;
-    printF("pid = %d", pid);
     return pid;
 }
 int userKill(int fromPid, int toPid)

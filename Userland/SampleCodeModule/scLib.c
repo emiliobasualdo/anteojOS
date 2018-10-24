@@ -162,6 +162,7 @@ void userKillAllDescendants(int pid)
 {
     syscall(32, (uint64_t) pid, 0, 0, 0, 0);
 }
+
 int semStart(int amount)
 {
     return (int) syscall(33, (uint64_t) amount, 0, 0, 0,0);
@@ -195,4 +196,14 @@ void userSetQuantum(int pid)
 int pipe(int p1, int p2)
 {
     return (int) syscall(41, (uint64_t) p1, (uint64_t) p2, 0, 0, 0);
+}
+
+int createProc(char *name, uint64_t instruct, char **argv, int argc)
+{
+    return (int) syscall(42, (uint64_t) name, (uint64_t) instruct, (uint64_t) argv, (uint64_t) argc, 0);
+}
+
+int startProc(int pid)
+{
+    return (int) syscall(43, (uint64_t) pid,  0,  0,  0, 0);
 }

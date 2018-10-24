@@ -418,7 +418,7 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason)
 {
     if (!procExists(pid)){
-        simple_printf("Kernel message: ERROR: pid is not valid \n");
+        simple_printf("Kernel message: ERROR: pid %d is not valid , pid \n");
         return FALSE;
     }
     if(!isValidPState(newState))

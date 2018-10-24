@@ -127,4 +127,8 @@ int userGetQuantum();
 void userSetQuantum(int pid);
 
 int pipe(int p1, int p2);
+
+int createProc(char *name, uint64_t instruct, char **argv, int argc);
+
+int startProc(int pid);
 #endif

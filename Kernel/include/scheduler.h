@@ -20,5 +20,8 @@ boolean schedulerAddProcPid(pPid proc);
 void schedulerNotifyProcessStateChange(pPid pid);
 void schedulerNotifyProcessPriorityChange(pPid pid);
 unsigned long long getProcRunTime(pPid pid);
+pPid createNotExecProcess(char *name, uint64_t instruction, pPid parent, boolean foreground, short priority, char **argv,
+                          int argc);
+boolean execProc(pPid pid);
 
 #endif

@@ -7,10 +7,11 @@ func_type fList[] = {writeK, readK, getHour, getMin, getSec, beep,
                                sleep, userDrawPixel, getResolutions, changeFontColour,
                                myExit, putChar, removeChar, changeBackgroundColour,
                                setCoordinates, sysMalloc, sysFree,
-                               printProcess, startProcess, kill, procBomb, getCurrentPid, send, receive,
+                               printProcess, kernelCreateAndExProcess, kill, procBomb, getCurrentPid, send, receive,
                                createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
                                nice, kernelColumnTest,kernelKillAllDescendants, kernelCreateSemaphore, kernelSemWait,
-                               kernelSemPost, kernelSemDestroy, kernelGetQuantum, kernelSetQuantum, openPipe, closeK, pipeK};
+                               kernelSemPost, kernelSemDestroy, kernelGetQuantum, kernelSetQuantum, openPipe, closeK, pipeK,
+                                kernelCreateProcess};
 
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
@@ -144,7 +145,7 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
         printAllProcs();
     return 0;
 }
-uint64_t startProcess(uint64_t name, uint64_t inst, uint64_t fore, uint64_t argv, uint64_t argc)
+uint64_t kernelCreateAndExProcess(uint64_t name, uint64_t inst, uint64_t fore, uint64_t argv, uint64_t argc)
 {
     pPid  pid = createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) fore,
             DEFAULT_PRIORITY, (char **) argv, (int) argc);
@@ -253,4 +254,12 @@ uint64_t closeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t
 uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     return (uint64_t)dupProc((pPid) rdi, (pPid) rsi);
+}
+uint64_t kernelCreateProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
+}
+uint64_t kernelStartProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+{
+    return (uint64_t) execProc((pPid) rdi);
 }

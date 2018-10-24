@@ -13,7 +13,7 @@
 #include "messageTest.h"
 #include "philosophers.h"
 
-#define MAX_BUFFER_SIZE 10000
+#define MAX_BUFFER_SIZE 1000
 #define MAX_ARGS 10
 #define MAX_ARG_LENGTH (MAX_BUFFER_SIZE - (MAX_ARGS) )/MAX_ARGS  // por los espacios
 
@@ -47,7 +47,7 @@ int commandExists(const char *);
 int executeCommand(int argc, argVector argv);
 
 /* executes a command in background*/
-int execProcInBackground(char *name, uint64_t instruct);
+int execProcInBackground(char *name, uint64_t intstruction, int argc, argVector argv);
 
 /* changes a determined colour, background or font */
 int changeColour(void(*f)(Colour), int flag);

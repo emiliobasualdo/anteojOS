@@ -15,7 +15,7 @@
 
 #define MAX_BUFFER_SIZE 1000
 #define MAX_ARGS 10
-#define MAX_ARG_LENGTH (MAX_BUFFER_SIZE - (MAX_ARGS) )/MAX_ARGS  // por los espacios
+#define MAX_ARG_LENGTH ((MAX_BUFFER_SIZE - (MAX_ARGS) )/MAX_ARGS)  // por los espacios
 
 #define CERO_ARGUMENTS_ERROR      "Error: Too many arguments passed, function takes 0 arguments."
 #define SET_FONT_MSSG             "Choose a colour by typing a number, or press 'q' exit."

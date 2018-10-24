@@ -17,8 +17,9 @@ static void procsDeathCleanUp(pcbPtr proc);
 static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
 static void initChildVector(pcbPtr pcb);
-static void initChildVector(pcbPtr pcb);
 static void initArray();
+
+static char **copyArgs(char **pString, int i);
 
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
@@ -230,12 +231,6 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     newPcb->childrenCount = 0;
     initChildVector(newPcb);
     //newPcb->postBox = createNewMessageQueue();
-
-    for (int i = 0; i < FD_AMOUNT; ++i)
-    {
-        newPcb->fd[i] = -1;
-    }
-
     newPcb->fd[STDIN] = createPipeK()->pipeId;
     newPcb->fd[STDOUT] = createPipeK()->pipeId;
 
@@ -260,7 +255,7 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
     // https://aaronbloomfield.github.io/pdr/book/x86-64bit-ccc-chapter.pdf
     //To pass parameters to the subroutine, we put up to six of them into registers (in order: rdi, rsi,rdx, rcx, r8, r9)
     newPcb->stackFrame->rdi = instruction;
-    newPcb->stackFrame->rsi = (uint64_t) argv;
+    newPcb->stackFrame->rsi = (uint64_t) copyArgs(argv, argc);
     newPcb->stackFrame->rdx = (uint64_t) argc;
 
     newPcb->stackFrame->rip = (uint64_t) procContainer;
@@ -279,6 +274,46 @@ static pcbPtr newProcess(char *name, uint64_t instruction, pPid parentPid, int d
         }
     }
     return newPcb;
+}
+
+static char **copyArgs(char **pString, int argc)
+{
+    if(argc <= 0)
+    {
+        return NULL;
+    }
+    unsigned int length = 0;
+    int j;
+    char ** resp = kernelMalloc(sizeof(char*)*argc);
+    if(!resp)
+    {
+        return NULL;
+    }
+    for (int i = 0; i < argc; ++i) // para cada arg
+    {
+        j = 0;
+        while (pString[i][j++]) // para cada char sumo
+        {
+            length++;
+        }
+        length++; // sumo para el \0
+        resp[i] = kernelMalloc(sizeof(char)*length);
+        if(!resp[i]) // liberamos
+        {
+            for (int k = 0; k < i; ++k)
+            {
+                kernelFree(resp[k]);
+            }
+            return NULL;
+        }
+        myStrncpy(resp[i], pString[i], length);
+    }
+    int k = 0;
+    while(k < argc)
+    {
+        simple_printf("%s", pString[k++]);
+    }
+    return resp;
 }
 
 static void initChildVector(pcbPtr pcb)
@@ -370,9 +405,14 @@ boolean isValidPState(int state)
 /** Si es necesrio, notificamos al algoritmo de scheduling para que haga lo necesario */
 boolean setProcessState(pPid pid, pState newState, reasonT reason)
 {
-    //simple_printf("pid=%d, name=%s, pid=%d, newState=%d, reason=%d\n",getCurrentProc()->pid, getCurrentProc()->name,pid,newState, reason);
-    if (!procExists(pid) || !isValidPState(newState)){
-        simple_printf("Kernel message: ERROR: pid or state is not valid \n");
+    DEBUG //simple_printf("pid=%d, name=%s, pid=%d, newState=%d, reason=%d\n",getCurrentProc()->pid, getCurrentProc()->name, pid, newState, reason);
+    DEBUG //printAllProcs();
+    if (!procExists(pid) ){
+        simple_printf("Kernel message:set: ERROR: pid %d is not valid \n", pid);
+        return FALSE;
+    }
+    if (!isValidPState(newState)){
+        simple_printf("Kernel message: ERROR: state %d is not valid \n", newState);
         return FALSE;
     }
     // solo 1 procesos puede estar running y el
@@ -418,7 +458,7 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason)
 {
     if (!procExists(pid)){
-        simple_printf("Kernel message: ERROR: pid %d is not valid , pid \n");
+        simple_printf("Kernel message:direct: ERROR: pid %d is not valid , pid \n");
         return FALSE;
     }
     if(!isValidPState(newState))

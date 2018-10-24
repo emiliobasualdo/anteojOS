@@ -20,7 +20,7 @@ void shell()
     int resp = NULL_CMMD;
     int c;
     cmdBufferLast = viewIndex = 0;
-    turnOnOff();
+    //turnOnOff();
     while(run)
     {
         c = 0;
@@ -101,16 +101,16 @@ void putLastBuffer(int dir)
 void turnOnOff()
 {
     int x, y;
-    //kernelBeep();
-    //newWindow();
+    kernelBeep();
+    newWindow();
     changeFontColour(getCurrentFontColour());
     changeBackgroundColour(getCurrentBackgroundColour());
-    //setPresentationImageCoordinates(&x, &y, GLASSESWIDTH, GLASSESWIDTH);
-    //drawImageFromHexaMap((unsigned int) x, (unsigned int) y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
-    //sleep();
-    //sleep();
-    //sleep();
-    //newWindow();
+    setPresentationImageCoordinates(&x, &y, GLASSESWIDTH, GLASSESWIDTH);
+    drawImageFromHexaMap((unsigned int) x, (unsigned int) y, eyeGlassesSmall, GLASSESWIDTH, GLASSESHEIGHT);
+    sleep();
+    sleep();
+    sleep();
+    newWindow();
 }
 
 void newShell()
@@ -201,6 +201,7 @@ int parseAndInterpret(const char *string) // se lee desde indice 0 hasta un \n
                     state = SPACE;
                 }
                 argsVector[argIndex][letterIndex++] = *c;
+            default:break;
         }
 
         argsVector[argIndex][letterIndex] = 0;

@@ -79,3 +79,4 @@ char * kernelToInt(char * string, int * k, int * resp)
     }
     return string;
 }
+

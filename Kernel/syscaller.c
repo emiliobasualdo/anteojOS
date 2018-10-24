@@ -258,7 +258,9 @@ uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t 
 }
 uint64_t kernelCreateProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
+    int pid  = createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
+    simple_printf("pid %d", pid);
+    return (uint64_t) pid;
 }
 uint64_t kernelStartProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {

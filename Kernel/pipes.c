@@ -287,8 +287,6 @@ int dupProc(pPid pidOut, pPid pidIn)
     pcbPtr p1 = getPcbPtr(pidOut);
     pcbPtr p2 = getPcbPtr(pidIn);
 
-    pipe_t * newPipe = addPipeK();
-
     if(p1 != NULL && p2 != NULL)
     {
         int aux = addPipeProcess();

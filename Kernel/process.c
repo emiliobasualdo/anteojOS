@@ -442,14 +442,10 @@ void printAllProcs()
     simple_printf(" PID - NAME - STATE - FOREGROUND - PRIORITY - PRIORITY STATE - RUN TIME - CHILD_COUNT - HEAP+STACK SIZE Bytes. \n");
     for (int i = 0; i < MAX_PROCS; ++i)
     {
-        simple_printf("loopin \n");
         if(array[i] != NULL)
-        {
-            simple_printf("i=%d", i);
             printProc(array[i]);
-        }
-
-        simple_printf("loop out \n");
+        else
+            return;
     }
     simple_printf("\n");
 }

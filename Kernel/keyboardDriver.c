@@ -71,7 +71,7 @@ void charToBuffer(unsigned char c)
 
 char getNextChar()
 {
-    char * nextChar = kernelMalloc(sizeof(char));
-    int read = readPipeK(myStdin, nextChar, 1);
-    return (*nextChar);
+    char nextChar;
+    readPipeK(myStdin, &nextChar, 1);
+    return nextChar;
 }

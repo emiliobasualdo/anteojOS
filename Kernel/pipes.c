@@ -57,34 +57,6 @@ pipe_t * addPipeK()
     return NULL;
 }
 
-//pipe_t * addPipeWithId(int id)
-//{
-//    pcbPtr process = getCurrentProc();
-//    if (process == NULL)
-//    {
-//        return NULL;
-//    }
-//    int i;
-//    for ( i = 0; i < FD_AMOUNT; ++i)
-//    {
-//        if(process->fd[i] != NULL && process->fd[i]->pipeId == id)
-//        {
-//            return process->fd[i];
-//        }
-//    }
-//    for (i = 0; i < FD_AMOUNT; ++i)
-//    {
-//        if(process->fd[i] == NULL)
-//        {
-//            process->fd[i] = getPipeFromPipeList(id);
-//            return process->fd[i];
-//        }
-//
-//    }
-//    return NULL;
-//}
-
-
 pipe_t * createPipeK()
 {
     int j;
@@ -110,20 +82,13 @@ pipe_t * createPipeK()
 
             pipe->mutex = startMutex(0);
 
-            //simple_printf("mutex: %d\n", pipe->mutex);
-            for (int i = 0; i < 400000; ++i) {
-
-            }
-
             pipe->readMutex = startMutex(1);
-            //simple_printf("readmutex: %d\n", pipe->readMutex);
 
             pipe->writeMutex = startMutex(1);
-            //simple_printf("writemutex: %d\n", pipe->writeMutex);
 
             pipeList[j] = pipe;
             unlockMutex(pipeListMutex);
-            //printIpcsQueues();
+
             return pipe;
         }
     }
@@ -133,7 +98,6 @@ pipe_t * createPipeK()
 
 int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
 {
-    //simple_printf("entro al write\n");
     int size = (int)sizeP;
     if(pipe == NULL)
     {
@@ -156,17 +120,11 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
 
                 lockMutex(pipe->writeMutex); //espero hasta que se lea algo
 
-                //simple_printf("Got b4 mutexlock2 %d\n", pipe->mutex);
                 lockMutex(pipe->mutex);
-                //simple_printf("Got past mutexlock2 %d\n", pipe->mutex);
 
             }
             else
             {
-//                for (int j = 0;j < pipe->charsToRead;j++)
-//                {
-//                    simple_printf("%d: %d\n", j, pipe->buffer[j+pipe->bufferReadPosition]);
-//                }
                 int index = (i + (pipe->bufferWritePosition)++) % PIPEBUFFERSIZE;
                 pipe->buffer[index]= buffer[i];
                 pipe->charsToRead+=1;
@@ -174,18 +132,15 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
             }
             tryToLockMutex(pipe->writeMutex);
         }
-        //drawPipeBuffer(pipe);
     }
 
     if(size>0 && buffer != 0)
     {
-        //simple_printf("apa la papa\n");
         unlockMutex(pipe->readMutex);
     }
-    //simple_printf("final del write\n");
     unlockMutex(pipe->mutex);
 
-    return (int)size;
+    return size;
 }
 
 int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
@@ -195,9 +150,7 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
         return -1;
     }
     int size = (int)sizeP;
-    //simple_printf("Got in read ");
     lockMutex(pipe->mutex);
-    //simple_printf("Not bloqued ");
 
     if(pipe->pipeId == STDOUT)
     {
@@ -207,42 +160,32 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
     int i = 0;
     while(i < size)
     {
-        if (pipe->charsToRead == 0)//significa que el buffer esta lleno
+        if (pipe->charsToRead == 0)//significa que el buffer esta vacio
         {
             unlockMutex(pipe->mutex);
 
-            //simple_printf("entre al lockreadmutex \n");
 
             if(pipe->pipeId == STDIN)
                 lockMutexKeyboard(pipe->readMutex);
             else
                 lockMutex(pipe->readMutex);
 
-            //simple_printf("lock: %d\n", a);
 
             for (int j = 0; j < 4000000; ++j) {}
 
-            //simple_printf("sali del  lockreadmutex\n");
 
             lockMutex(pipe->mutex);
 
-
-            //simple_printf("no me trave con el lockmutex\n");
-        }
+            }
         else
         {
             int index = (i + pipe->bufferReadPosition++) % PIPEBUFFERSIZE;
-            //simple_printf("entro al else\n");
             buffer[i] = pipe->buffer[index];
             pipe->charsToRead--;
-            //simple_printf("estoy en read\n");
             i++;
         }
         tryToLockMutex(pipe->readMutex);
-        //drawPipeBuffer(pipe);
-        //simple_printf("charsToRead %d %d\n", pipe->charsToRead, pipe->bufferWritePosition);
     }
-    //simple_printf("sali del while\n");
     if(size>0)
         unlockMutex(pipe->writeMutex);
 

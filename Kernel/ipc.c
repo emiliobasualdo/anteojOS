@@ -625,6 +625,10 @@ uint64_t sendMessage(pPid receiver, char * content, char ** answer, boolean flag
     msg_t aux;
     syncSend(pid, receiver, content, &aux);
     int length = strlen(aux.content);
+    if(*answer != NULL)
+    {
+        kernelFree(*answer);
+    }
     *answer = kernelMalloc(sizeof(char)*(length+1));
     memcpy((*answer),aux.content, (uint64_t)length);
     (*answer)[length] = 0;

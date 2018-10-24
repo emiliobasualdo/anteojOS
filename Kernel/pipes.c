@@ -320,7 +320,7 @@ int addPipeToSC()
 //si 1 stdout nomas
 //si 2 stdin nomas
 //si no ambos
-int change(pPid proc, int flag)
+int changeToStds(pPid proc, int flag)
 {
     pcbPtr process = getPcbPtr(proc);
     if(process == NULL)
@@ -337,13 +337,14 @@ int change(pPid proc, int flag)
             {
                 closePipeK(in);
             }
+            process->fd[STDIN] = 0;
             break;
         case 2:
             if(out->pipeId != STDOUT)
             {
-                closePipeK(in);
+                closePipeK(out);
             }
-
+            process->fd[STDOUT] = 1;
             break;
         default:
             if(in->pipeId != STDIN)
@@ -352,8 +353,10 @@ int change(pPid proc, int flag)
             }
             if(out->pipeId != STDOUT)
             {
-                closePipeK(in);
+                closePipeK(out);
             }
+            process->fd[STDIN] = 0;
+            process->fd[STDOUT] = 1;
             break;
     }
 }

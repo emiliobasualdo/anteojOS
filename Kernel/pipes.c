@@ -154,7 +154,7 @@ int writePipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
             {
                 unlockMutex(pipe->mutex);
 
-                lockMutexKeyboard(pipe->writeMutex); //espero hasta que se lea algo
+                lockMutex(pipe->writeMutex); //espero hasta que se lea algo
 
                 //simple_printf("Got b4 mutexlock2 %d\n", pipe->mutex);
                 lockMutex(pipe->mutex);

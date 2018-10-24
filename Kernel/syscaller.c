@@ -11,7 +11,7 @@ func_type fList[] = {writeK, readK, getHour, getMin, getSec, beep,
                                createMutex, kernelLock, kernelUnlock, destroyMutexKernel, sysAllocatorTest,
                                nice, kernelColumnTest,kernelKillAllDescendants, kernelCreateSemaphore, kernelSemWait,
                                kernelSemPost, kernelSemDestroy, kernelGetQuantum, kernelSetQuantum, openPipe, closeK, pipeK,
-                                kernelCreateProcess};
+                                kernelCreateProcess, kernelStartProcess};
 
 
 uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)

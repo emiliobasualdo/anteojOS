@@ -18,6 +18,8 @@ static void printProc(pcbPtr pcb);
 static boolean isValidPriority(int priority);
 static void initChildVector(pcbPtr pcb);
 
+static void initChildVector(pcbPtr pcb);
+
 /** arraya de punteros a pcbs */
 static pcbPtr array[MAX_PROCS]; // dinámica todo
 static unsigned int arrSize;
@@ -110,14 +112,27 @@ static boolean addChildToParentList(pPid parentPid, pPid childPid)
     if (parent->childrenCount >= MAX_CHILDREN)
     {
         simple_printf("Kernel Message: ERROR: parent has already reached kids limit.... stop fornicating\n");
-        //programacion defensiva;
-        parent->creationLimit++;
-        if(parent->creationLimit > MAX_SECURITY_LIMITAION)
-        {
-            simple_printf("!Kernel: killing process's %s sons because it seems harmfull to the OS!!\n", array[parentPid]->name);
-            killAllDescendants(parentPid);
-        }
         return FALSE;
+    }
+    for (int i = 0; i < MAX_CHILDREN; ++i)
+    {
+        if(parent->childs[i] == PID_ERROR )
+        {
+            parent->childs[i] = childPid;
+            parent->childrenCount++;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]] == NULL)
+        {
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
+        else if(array[parent->childs[i]]->state == DEAD)
+        {
+            procsDeathCleanUp(array[parent->childs[i]]);
+            parent->childs[i] = childPid;
+            return TRUE;
+        }
     }
     for (int i = 0; i < MAX_CHILDREN; ++i)
     {

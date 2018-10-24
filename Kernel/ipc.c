@@ -317,15 +317,9 @@ int semWaitK(int sem)
         return -1;
     }
 
-//    int i;
-//    for(i = 0; i <= semMutex.nextProcessInLine->size; i++)
-//    {
-//        simple_printf("-> %d ",semMutex.nextProcessInLine->array[(semMutex.nextProcessInLine->front+i)%MAXINQUEUE]);
-//    }
-//    simple_printf("\n");
     semMutexLock();
     semList[sem].value--;
-    semMutexUnlock();
+
 
     if(semList[sem].value<0)
     {
@@ -335,6 +329,7 @@ int semWaitK(int sem)
             setProcessState(process, BLOCKED, MUTEX_BLOCK);
         }
     }
+    semMutexUnlock();
     return 0;
 }
 
@@ -348,23 +343,22 @@ int semPostK(int sem)
     {
         semMutexLock();
         semList[sem].value++;
-        semMutexUnlock();
         if(semList[sem].value < 0)
         {
             if(!isEmpty(semList[sem].nextProcessInLine))
             {
-                semMutexLock();
                 semList[sem].value--;
-                semMutexUnlock();
 
                 pPid process = dequeue(semList[sem].nextProcessInLine);
-             //   printSemList(sem);
+                //   printSemList(sem);
 
                 setProcessState(process, READY, MUTEX_BLOCK);
                 setProcessPriority(process, MAX_PRIORITY);
 
             }
         }
+        semMutexUnlock();
+
     }
     return 0;
 }

@@ -420,7 +420,8 @@ boolean setProcessState(pPid pid, pState newState, reasonT reason)
     if (pid == getCurrentProc()->pid && (newState == BLOCKED || newState == DEAD))
     {
         DEBUG //simple_printf("setProcessState: blocking/Deading el current\n");
-        _hlt();
+        //_hlt();
+        asm volatile ("int $20");
         DEBUG //simple_printf("setProcessState: volvimos %d\n", getCurrentProc()->state);
     }
     return TRUE;

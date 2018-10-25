@@ -75,9 +75,9 @@ void drawDiningTable(int * state, int size)
 
     int x0, y0;
 
-    /*printF("To increase the number of philosophers, press 1. Up to 5 philosophers are available.\n"
+    printF("To increase the number of philosophers, press 1. Up to 5 philosophers are available.\n"
            "To lower the number of philosophers, press 0.\n"
-           "To quit, press 'q'.\n");*/
+           "To quit, press 'q'.\n");
 
     for (int i=0; i<size; i++)
     {
@@ -169,6 +169,7 @@ void clearPlate (int index)
     drawCircle(xRes/2, yRes/2, yRes/3, white);
 }
 
+/** source = https://en.m.wikipedia.org/wiki/Midpoint_circle_algorithm */
 static void drawCircle(int x0, int y0, int radius, Colour colour)
 {
     int x = radius-1;

@@ -16,6 +16,7 @@ typedef struct pipe_t {
     int mutex;
     int readMutex;
     int writeMutex;
+
 } pipe_t;
 
 typedef struct message_t

@@ -456,7 +456,7 @@ int columnTest(int argc, argVector argv)
         printF("\n[y=TRUE][n=FALSE]: ");
     }
     printF("\n");
-    printF("All right, we can now start the test. ¡REMEMBER you can always exit the test by typing 'q'!\n");
+    printF("All right, we can now start the test.\\n ¡REMEMBER you can change the round robin quantum by typing any number between 1-9. Also you can always exit the test by typing 'q'!\\n");
     printF("Press any key to start!\n");
     getChar();
     kernelColumnTest(num, agening=='y');

@@ -219,3 +219,34 @@ static void printAnteojOS()
     printF("\n");
 }
 
+
+// Prod Cons con Pipes
+void producerPipes()
+{
+    char perro[] = {'p', 'e', 'r', 'r', 'o'};
+    while(run)
+    {
+        int value = rand() % 5 + 1;
+        while(value > 0)
+        {
+            putChar(perro[5-value]);
+            value--;
+        }
+    }
+}
+
+void consumerPipes()
+{
+    while(run)
+    {
+        int value = rand() % 5 + 1;
+        while(value > 0)
+        {
+            putChar((char)getChar());
+            value--;
+        }
+        putChar('\n');
+    }
+}
+
+

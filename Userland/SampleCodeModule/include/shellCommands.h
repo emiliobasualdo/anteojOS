@@ -126,4 +126,8 @@ int philoTest(int argc, argVector argv);
 
 int mutTest(int argc, argVector argv);
 
+int producerP(int argc, argVector argv);
+
+int consumerP(int argc, argVector argv);
+
 #endif

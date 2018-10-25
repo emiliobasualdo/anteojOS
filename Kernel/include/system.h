@@ -23,7 +23,6 @@ typedef int boolean;
 #define EOF (-1)
 
 #define PIPEBUFFERSIZE 1024
-
 char *myStrncpy(char *dst, const char*src, unsigned int n);
 int strcmp(char *, char *);
 int strlen(char *);

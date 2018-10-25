@@ -12,8 +12,6 @@ int qtyPhilosophers;                /** cantidad de filosofos (menor o igual a N
 
 int runningState[N];                /** estado de ejecucion de los filosofos: 1 para que corran, 0 para que dejen de correr */
 
-int mutexToAdd;                     /** mutex para agregar un filosofo */
-
 void eat();
 void think();
 void sleepPhil();
@@ -26,10 +24,7 @@ void test(int phnum)
 
         state[phnum] = EATING;
 
-        //printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
-        //printF("%s is eating\n", getPhilName(phnum));
-
-                drawDiningTable(state, qtyPhilosophers);
+        drawDiningTable(state, qtyPhilosophers);
 
         semPost(S[phnum]);
     }
@@ -39,9 +34,8 @@ void test(int phnum)
 void takeFork(int phnum)
 {
     lock(mutex);                                         /** entrar en la región crítica */
-    //sleepPhil();
+
     state[phnum] = HUNGRY;                              /** registrar que el filósofo tiene hambre */
-    //printF("Philosopher %d is hungry\n", phnum + 1);
 
     drawDiningTable(state, qtyPhilosophers);
 
@@ -59,10 +53,9 @@ void takeFork(int phnum)
 void putFork(int phnum)
 {
     lock(mutex);                                  /** entrar en la región crítica */
-    //sleepPhil();
+
     state[phnum] = THINKING;                            /** el filósofo terminó de comer */
-    //printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
-    //printF("%s is thinking\n", getPhilName(phnum), phnum + 1);
+
     drawDiningTable(state, qtyPhilosophers);
 
     test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
@@ -107,7 +100,6 @@ int startPhilosophers (int num)
     {
         userSprintf(name,"%d-%s", i, NAME);
         procPid[i] = createProc(name, (uint64_t) philosopher, NULL, 0);
-        //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
         pipesToStds(procPid[i], 2);
         startProc(procPid[i]);
     }
@@ -118,13 +110,8 @@ int startPhilosophers (int num)
         switch (c)
         {
             case '1':
-                if (qtyPhilosophers == N)
+                if (qtyPhilosophers != N)
                 {
-                    //printF("ERROR: you've reached the maximum quantity of philosophers\n");
-                }
-                else
-                {
-                    //unlock(mutexToAdd);
                     while (state[0] != THINKING && state[qtyPhilosophers-1] != THINKING)
                     {}
                     if (state[0] == THINKING && state[qtyPhilosophers-1] == THINKING)
@@ -133,7 +120,6 @@ int startPhilosophers (int num)
                         userSprintf(newPhilName,"%d-%s", i, NAME);
                         S[qtyPhilosophers] = semStart(0);
                         procPid[qtyPhilosophers] = createProc(newPhilName, (uint64_t) philosopher, NULL, 0);
-                        //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
                         state[qtyPhilosophers] = THINKING;
                         runningState[qtyPhilosophers] = 1;
                         pipesToStds(procPid[qtyPhilosophers], 2);
@@ -141,19 +127,13 @@ int startPhilosophers (int num)
                         startProc(procPid[qtyPhilosophers-1]);
                         drawDiningTable(state, qtyPhilosophers);
                     }
-                    //lock(mutexToAdd);
                 }
                 break;
             case '0':
-                if (qtyPhilosophers == 2)
-                {
-                    //printF("ERROR: 2 philosophers are needed to perform the test\n");
-                }
-                else
+                if (qtyPhilosophers != 2)
                 {
                     while (state[qtyPhilosophers-1] != THINKING && state[0] != THINKING)
-                    {
-                    }
+                    {}
                     if (state[qtyPhilosophers-1] == THINKING && state[0] == THINKING)
                     {
                         qtyPhilosophers--;
@@ -163,7 +143,8 @@ int startPhilosophers (int num)
                     }
                 }
                 break;
-            default:break;
+            default:
+                break;
         }
     }
 

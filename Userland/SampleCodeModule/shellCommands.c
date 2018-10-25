@@ -62,9 +62,12 @@ int executeCommand(int argc, argVector argv)
                     {
                         return NULL_CMMD;
                     }
+                    // creamos un proceso pero no lo ejecutamos
                     int pid2 = createProc(commands[cmd2].name, (uint64_t) commands[cmd2].fn, (char **) (argv + i + 1), 0);
+                    // pipeamos
                     pipe(userGetCurrentPid(),pid2);
                     pipesToStds(pid2,2);
+                    // ejecutamos
                     startProc(pid2);
                 }
             }
@@ -125,7 +128,6 @@ int echo (int argc, argVector argv)
         {
             putChar(c);
         }
-        printF("exitting \n");
         return TRUE;
     }
     for (int i=1; i<argc; i++)

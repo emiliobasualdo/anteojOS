@@ -12,6 +12,7 @@ int qtyPhilosophers;                /** cantidad de filosofos (menor o igual a N
 
 int runningState[N];                /** estado de ejecucion de los filosofos: 1 para que corran, 0 para que dejen de correr */
 
+
 void eat();
 void think();
 void sleepPhil();
@@ -83,7 +84,6 @@ int startPhilosophers (int num)
     qtyPhilosophers = num;
 
     mutex = newMutex(0);
-    mutexToAdd = newMutex(1);
 
     for (i = 0; i < qtyPhilosophers; i++)
     {

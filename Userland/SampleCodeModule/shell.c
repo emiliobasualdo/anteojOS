@@ -20,8 +20,8 @@ void shell()
     int resp = NULL_CMMD;
     int c;
     cmdBufferLast = viewIndex = 0;
-    //newWindow();
-    //turnOnOff();
+    newWindow();
+    turnOnOff();
     while(run)
     {
         pipesToStds(userGetCurrentPid(),0);

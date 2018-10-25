@@ -104,6 +104,8 @@ void theAllMighty()
     addStandardPipes(shellPid);
     simple_printf("theAllMighty: cargando IDT\n");
     loadIDT();
+    //printRRQueues();
+    //printAllProcs();
     setProcessState(getCurrentProc()->pid, BLOCKED, NO_REASON);
     simple_printf("theAllMighty: despues de bloquearse\n");
     simple_printf("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
@@ -114,31 +116,37 @@ void theAllMighty()
 
 int main()
 {
+    simple_printf("kernel: initializeAllocator\n");
     if (!initializeAllocator())
     {
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;
     }
-    if(!initIPCS())
-    {
-        simple_printf("kernel: ERROR: initIPCs retornó FALSE\n");
-        return 0;
-    }
-    if(!initPipes())
-    {
-        simple_printf("kernel: ERROR: initPipes retornó FALSE\n");
-    }
-    if(!initKeyboardDriver())
-    {
-        simple_printf("kernel: ERROR: initKeyboardDriver retornó FALSE\n");
-        return 0;
-    }
+    simple_printf("kernel: initScheduler\n");
     pcbPtr pacientCero = initScheduler("theAllMighty", (uint64_t) theAllMighty);
     if (!pacientCero)
     {
         simple_printf("kernel: ERROR: initScheduler retornó FALSE\n");
         return 0;
     }
+    simple_printf("kernel: initIPCS\n");
+    if(!initIPCS())
+    {
+        simple_printf("kernel: ERROR: initIPCs retornó FALSE\n");
+        return 0;
+    }
+    simple_printf("kernel: initPipes\n");
+    if(!initPipes())
+    {
+        simple_printf("kernel: ERROR: initPipes retornó FALSE\n");
+    }
+    simple_printf("kernel: initKeyboardDriver\n");
+    if(!initKeyboardDriver())
+    {
+        simple_printf("kernel: ERROR: initKeyboardDriver retornó FALSE\n");
+        return 0;
+    }
+
     simple_printf("kernel: switchdinggg\n");
     switchToNext();
     simple_printf("kernel: volviendo de switch\n");

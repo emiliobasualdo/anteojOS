@@ -12,6 +12,7 @@
 #include "prodcons.h"
 #include "messageTest.h"
 #include "philosophers.h"
+#include "mutexTest.h"
 
 #define MAX_BUFFER_SIZE 1000
 #define MAX_ARGS 10
@@ -122,5 +123,7 @@ int columnTest(int argc, argVector argv);
 int getQuantum(int argc, argVector argv);
 
 int philoTest(int argc, argVector argv);
+
+int mutTest(int argc, argVector argv);
 
 #endif

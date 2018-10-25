@@ -25,6 +25,7 @@ command commands[]={
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
         {"philosophers","Performs the dining philosophers problem. Usage: philosophers <2-5>", philoTest},
+        {"mutex_test","Performs a mutex test",mutTest},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
 };
 
@@ -570,4 +571,22 @@ int philoTest(int argc, argVector argv)
         return 0;
     }
     return startPhilosophers(resp);
+}
+
+int mutTest(int argc, argVector argv)
+{
+    if (argc != 2)
+    {
+        printF("Usage: mutex_test <amountOfProcesses>\n");
+        return 0;
+    }
+    int aux, resp;
+    toInt(argv[1], &resp, &aux);
+    if (resp <= 0)
+    {
+        printF("Error: argument must be a number bigger than 0\n");
+        return 0;
+    }
+    initTest(resp);
+    return 0;
 }

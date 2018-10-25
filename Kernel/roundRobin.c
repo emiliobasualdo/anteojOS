@@ -273,6 +273,8 @@ static boolean changeToRespectiveQueue(rrNodePtr node)
         case DEAD:
             removeNode(node);
             return TRUE;
+        default:
+            simple_printf("changeToRespectiveQueue: ERROR default case\n");
     }
     return TRUE;
 }

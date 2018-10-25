@@ -1,4 +1,5 @@
 #include <scheduler.h>
+#include <process.h>
 
 static uint64_t schedulerNextRsp(uint64_t rsp);
 static boolean  schedulerAddProc(pcbPtr proc);

@@ -5,6 +5,8 @@ pipe_t * pipeList[MAXPIPES];
 
 int pipeListMutex;
 
+pipe_t * createPipeInit();
+
 /** inicia los pipes en kernel */
 int initPipes()
 {
@@ -12,12 +14,12 @@ int initPipes()
     int i;
     pipeListMutex = startMutex(0);          /** mutex para cambiar el array de pipes pipeList */
     simple_printf("pipeListMutex = %d\n", pipeListMutex);
-    pipeList[0] = createPipeK();            /** el primer pipe es para el stdin */
+    pipeList[0] = createPipeInit();            /** el primer pipe es para el stdin */
     if(pipeList[0] == NULL)
     {
         return 0;
     }
-    pipeList[1] = createPipeK();            /** el segundo pipe es para el stdout */
+    pipeList[1] = createPipeInit();            /** el segundo pipe es para el stdout */
     if(pipeList[1] == NULL)
     {
         return 0;
@@ -98,6 +100,42 @@ pipe_t * createPipeK()
         }
     }
     unlockMutex(pipeListMutex);
+    return NULL;
+}
+
+/** crea un pipe */
+pipe_t * createPipeInit()
+{
+    int j;
+    for ( j = 0; j < MAXPIPES; ++j) {
+        if(pipeList[j] == NULL)
+        {
+            pipe_t * pipe = kernelMalloc(sizeof(pipe_t));
+            if (pipe == NULL)
+            {
+                simple_printf("Error: Malloc returned 0 on pipe creation\n");
+                return NULL;
+            }
+
+            pipe->bufferReadPosition = 0;          /** donde arranca a leer el buffer */
+
+            pipe->bufferWritePosition = 0;         /** donde arranca a escribir el buffer */
+
+            pipe->charsToRead = 0;
+
+            pipe->pipeId = j;                       /** posicion en la lista de pipes */
+
+            pipe->mutex = startMutex(0);
+
+            pipe->readMutex = startMutex(1);
+
+            pipe->writeMutex = startMutex(1);
+
+            pipeList[j] = pipe;
+
+            return pipe;
+        }
+    }
     return NULL;
 }
 

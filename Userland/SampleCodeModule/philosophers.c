@@ -26,9 +26,10 @@ void test(int phnum)
 
         state[phnum] = EATING;
 
-        printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
-        printF("%s is eating\n", getPhilName(phnum));
-        //drawDiningTable(state, qtyPhilosophers);
+        //printF("%s takes fork %d and %d\n", getPhilName(phnum), (LEFT==-1)?qtyPhilosophers:LEFT + 1, phnum + 1);
+        //printF("%s is eating\n", getPhilName(phnum));
+
+                drawDiningTable(state, qtyPhilosophers);
 
         semPost(S[phnum]);
     }
@@ -41,7 +42,8 @@ void takeFork(int phnum)
     //sleepPhil();
     state[phnum] = HUNGRY;                              /** registrar que el filósofo tiene hambre */
     //printF("Philosopher %d is hungry\n", phnum + 1);
-    //drawDiningTable(state, qtyPhilosophers);
+
+    drawDiningTable(state, qtyPhilosophers);
 
     /** eat if neighbours are not eating */
     test(phnum);                                        /** tratar de adquirir dos tenedores */
@@ -59,9 +61,9 @@ void putFork(int phnum)
     lock(mutex);                                  /** entrar en la región crítica */
     //sleepPhil();
     state[phnum] = THINKING;                            /** el filósofo terminó de comer */
-    printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
-    printF("%s is thinking\n", getPhilName(phnum), phnum + 1);
-    //drawDiningTable(state, qtyPhilosophers);
+    //printF("%s putting fork %d and %d down\n", getPhilName(phnum), (LEFT + 1) == 0 ? qtyPhilosophers : (LEFT + 1), phnum + 1);
+    //printF("%s is thinking\n", getPhilName(phnum), phnum + 1);
+    drawDiningTable(state, qtyPhilosophers);
 
     test((LEFT==-1)?qtyPhilosophers-1:LEFT);            /** ver si el vecino izquierdo ahora puede comer */
     test((RIGHT == qtyPhilosophers)?0:RIGHT);           /** ver si el vecino derecho ahora puede comer */
@@ -96,14 +98,16 @@ int startPhilosophers (int num)
         state[i] = THINKING;
         runningState[i] = 1;
     }
-    //drawDiningTableInit();
-    //drawDiningTable(state, qtyPhilosophers);
+
+    drawDiningTableInit();
+
+    drawDiningTable(state, qtyPhilosophers);
 
     for (i = 0; i < qtyPhilosophers; i++)
     {
         userSprintf(name,"%d-%s", i, NAME);
         procPid[i] = createProc(name, (uint64_t) philosopher, NULL, 0);
-        printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
+        //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
         pipesToStds(procPid[i], 2);
         startProc(procPid[i]);
     }
@@ -116,7 +120,7 @@ int startPhilosophers (int num)
             case '1':
                 if (qtyPhilosophers == N)
                 {
-                    printF("ERROR: you've reached the maximum quantity of philosophers\n");
+                    //printF("ERROR: you've reached the maximum quantity of philosophers\n");
                 }
                 else
                 {
@@ -129,7 +133,7 @@ int startPhilosophers (int num)
                         userSprintf(newPhilName,"%d-%s", i, NAME);
                         S[qtyPhilosophers] = semStart(0);
                         procPid[qtyPhilosophers] = createProc(newPhilName, (uint64_t) philosopher, NULL, 0);
-                        printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
+                        //printF("%s is thinking, with PID: %d\n", getPhilName(i), procPid[i]);
                         state[qtyPhilosophers] = THINKING;
                         runningState[qtyPhilosophers] = 1;
                         pipesToStds(procPid[qtyPhilosophers], 2);
@@ -143,7 +147,7 @@ int startPhilosophers (int num)
             case '0':
                 if (qtyPhilosophers == 2)
                 {
-                    printF("ERROR: 2 philosophers are needed to perform the test\n");
+                    //printF("ERROR: 2 philosophers are needed to perform the test\n");
                 }
                 else
                 {

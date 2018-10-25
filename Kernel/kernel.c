@@ -122,13 +122,7 @@ int main()
         simple_printf("kernel: ERROR: initKernelAlloc retornó FALSE\n");
         return 0;
     }
-    simple_printf("kernel: initScheduler\n");
-    pcbPtr pacientCero = initScheduler("theAllMighty", (uint64_t) theAllMighty);
-    if (!pacientCero)
-    {
-        simple_printf("kernel: ERROR: initScheduler retornó FALSE\n");
-        return 0;
-    }
+
     simple_printf("kernel: initIPCS\n");
     if(!initIPCS())
     {
@@ -144,6 +138,13 @@ int main()
     if(!initKeyboardDriver())
     {
         simple_printf("kernel: ERROR: initKeyboardDriver retornó FALSE\n");
+        return 0;
+    }
+    simple_printf("kernel: initScheduler\n");
+    pcbPtr pacientCero = initScheduler("theAllMighty", (uint64_t) theAllMighty);
+    if (!pacientCero)
+    {
+        simple_printf("kernel: ERROR: initScheduler retornó FALSE\n");
         return 0;
     }
 

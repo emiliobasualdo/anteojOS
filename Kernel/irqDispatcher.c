@@ -22,7 +22,6 @@ void irqDispatcher(uint64_t irq)
 
 void int_20() // todo esto no lo estoy usando, solucionar
 {
-	drawChar('.');
 	timerHandler();
 }
 

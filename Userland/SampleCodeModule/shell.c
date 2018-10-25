@@ -20,6 +20,7 @@ void shell()
     int resp = NULL_CMMD;
     int c;
     cmdBufferLast = viewIndex = 0;
+    //newWindow();
     //turnOnOff();
     while(run)
     {

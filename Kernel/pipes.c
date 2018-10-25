@@ -13,7 +13,7 @@ int initPipes()
 
     int i;
     pipeListMutex = startMutex(0);          /** mutex para cambiar el array de pipes pipeList */
-    simple_printf("pipeListMutex = %d\n", pipeListMutex);
+    //simple_printf("pipeListMutex = %d\n", pipeListMutex);
     pipeList[0] = createPipeInit();            /** el primer pipe es para el stdin */
     if(pipeList[0] == NULL)
     {

@@ -24,11 +24,11 @@ command commands[]={
         {"mutex_test","Performs a mutex test",mutTest},
         {"prod", "Producer Program to test Pipes", producerP},
         {"cons", "Consumer Program to test Pipes", consumerP},
+        {"message_test","Performs a test of Message Passing", messageTesting},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
         //{"digital_clock","Displays a digital clock on screen", digital_clock},
         //{"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
         //{"exception _tester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
-        //{"message_test","Performs a test of Message Passing", messageTesting},
 };
 
 command aux_programs[]={

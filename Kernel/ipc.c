@@ -195,7 +195,7 @@ int lockMutex(int mutex)
         {
 
             enqueue(mutexList[mutex].nextProcessInLine, process);
-            
+
             setProcessState(process, BLOCKED, MUTEX_BLOCK);
 
         }
@@ -249,12 +249,6 @@ int unlockMutex(int mutex)
 //            simple_printf("valor: %d", mutexList[mutex].value);
         }
 
-    }
-    if(mutex == 24)
-    {
-        simple_printf("eeeee");
-
-        simple_printf("valor: %d", mutexList[mutex].value);
     }
     return 0;
 }

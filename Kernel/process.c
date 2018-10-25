@@ -259,7 +259,7 @@ static pPid newProcess(char *name, uint64_t instruction, pPid parentPid, int dem
     if(newPcb->pid > BUSSY_WAITING )
     {
         DEBUG //simple_printf("mm");
-        //newPcb->postBox = createNewMessageQueue();
+        newPcb->postBox = createNewMessageQueue();
         newPcb->fd[STDIN] = createPipeK()->pipeId;
         newPcb->fd[STDOUT] = createPipeK()->pipeId;
         DEBUG //simple_printf("aa");

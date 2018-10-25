@@ -77,7 +77,7 @@ void columnTest(short cantProcs, boolean ageing)
         priority = (short) (i % PRIORITY_LEVELS);
         pPid pid = createAndExecProcess(NULL, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, i);
         if(!ageing)
-            setProcessPriority(pid, priority);
+            setProcessPriority(pid, priority, NICE);
     }
     // agregar que pueda cambiar el cuantum con teclas
     while (getNextChar() != 'q'){}

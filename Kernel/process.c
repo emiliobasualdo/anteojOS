@@ -102,8 +102,8 @@ pcbPtr createProcess(char *name, uint64_t instruction, pPid parentPid, boolean f
         //simple_printf("ERROR: createProcess: newPcb = null\n");
         return NULL;
     }
-    //simple_printf("createProcess: ret=%d, name =%s\n", newPcb, newPcb->name);
-    return &array[newPid];
+    DEBUG //simple_printf("createProcess: pid=%d, name=%s priority=%d prioritiT=%d\n", array[newPid].pid, array[newPid].name, array[newPid].priority, array[newPid].priorityType);
+    return &(array[newPid]);
 }
 
 /**
@@ -224,7 +224,7 @@ static pPid newProcess(char *name, uint64_t instruction, pPid parentPid, int dem
     newPcb->childrenCount = 0;
     initChildVector(newPcb->pid);
 
-    DEBUG //simple_printf("hh");
+    DEBUG //simple_printf("%d", priority);
     if(priority == INTERACTIVE)
     {
         newPcb->priorityType = INTERACTIVE;
@@ -566,7 +566,7 @@ boolean validReason(int reason)
     return reason >= 0 && reason < REASON_COUNT;
 }
 
-boolean setProcessPriority(pPid pid, short newPriority)
+boolean setProcessPriority(pPid pid, short newPriority, pReason reason)
 {
     if(!procExists(pid))
     {
@@ -578,9 +578,14 @@ boolean setProcessPriority(pPid pid, short newPriority)
         simple_printf("Kernel: ERROR invalid priority %d\n", newPriority);
         return FALSE;
     }
-    array[pid].priority = newPriority;
+    if(array[pid].priorityType == INTERACTIVE || array[pid].priority == newPriority )
+        return FALSE;
+
     // si alguien le cambio la prioridad no queremos que decisiones del kernel le bajen la prioridad
-    array[pid].priorityType = DO_NOT_CHANGE;
+    if(reason == NICE)
+        array[pid].priorityType = DO_NOT_CHANGE;
+
+    array[pid].priority = newPriority;
     schedulerNotifyProcessPriorityChange(pid);
     return TRUE;
 }
@@ -598,7 +603,9 @@ boolean reduceProcessPriority(pPid pid)
     if(isValidPid(pid) && array[pid].priority < MIN_PRIORITY)
     {
         // reducimos prioridad
+        //int old =array[pid].priority;
         array[pid].priority++;
+        //simple_printf("reducimos priordad pid=%d old_priority=%d new_priority=%d!!!\n", pid, old, array[pid].priority);
         return TRUE;
     }
     return FALSE;

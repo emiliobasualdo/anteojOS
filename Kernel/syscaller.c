@@ -182,7 +182,6 @@ uint64_t createMutex(uint64_t rdi, uint64_t id, uint64_t rdx, uint64_t rcx, uint
 }
 uint64_t kernelLock(uint64_t rdi, uint64_t resp, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    simple_printf("mutex in kernelLock: %d\n", (int)rdi);
     *((int*)resp) = lockMutex((int)rdi);
     return resp;
 
@@ -203,7 +202,7 @@ uint64_t sysAllocatorTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 }
 uint64_t nice(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) setProcessPriority((pPid) rdi, (short) (int) rsi);
+    return (uint64_t) setProcessPriority((pPid) rdi, (short) (int) rsi, NICE);
 }
 uint64_t kernelColumnTest(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -263,7 +262,6 @@ uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t 
 uint64_t kernelCreateProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     pPid aux = createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
-    simple_printf("pidK: %d\n",aux);
     *(int*)(r8) = aux;
     return (uint64_t) 1;
 }

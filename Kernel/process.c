@@ -20,7 +20,9 @@ static void initChildVector(pPid pid);
 static void initArray();
 
 
-/** arraya de punteros a pcbs */
+/** vector de pcbs, originalmetne este vector era de punteros a pcbs y estos se alocaban en rutime
+ * pero luego de HORAS de debuggar problemas de pisado de memoria, la solución más rápida fue hacer
+ * que el vector sea estático y listo */
 static pcb array[MAX_PROCS]; // dinámica todo
 static unsigned int arrSize;
 static pPid maxPid;

@@ -22,6 +22,7 @@ pcbPtr initScheduler(char *name, uint64_t instruction)
 
     pcbPtr pacientCero = initProcessControl(name, (uint64_t) instruction);
 
+    simple_printf("initScheduler : rrInit \n", name);
     if (rrInit(pacientCero) == FALSE) {
         simple_printf("ERROR: initScheduler : rrInit(pacientCero) == FALSE\n");
         return NULL;
@@ -113,7 +114,7 @@ pPid createNotExecProcess(char *name, uint64_t instruction, pPid parent, boolean
 boolean execProc(pPid pid)
 {
     pcbPtr pcb = getPcbPtr(pid);
-    if(!pcb)
+    if(pcb == NULL)
     {
         simple_printf("execProc: !pcb\n");
         return FALSE;

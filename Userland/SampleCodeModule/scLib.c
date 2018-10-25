@@ -9,12 +9,10 @@ void write(char * string, int length)
 {
     syscall(1,1,(uint64_t) string,(uint64_t)length,0,0);
 }
-
 void read(char * string, int length)
 {
     syscall(2,0,(uint64_t) string,(uint64_t)length,0,0);
 }
-
 int getChar()
 {
     char aux = 0;
@@ -23,7 +21,6 @@ int getChar()
 
     return aux;
 }
-
 int getHour()
 {
     return (int) syscall(3, 0, 0, 0, 0, 0);
@@ -95,7 +92,8 @@ void userPs(char type, int pid)
  */
 int userStartProcess(char *name, uint64_t instruct, char **argv, int argc)
 {
-    int pid  = (int) syscall(19, (uint64_t) name, instruct, (uint64_t) FALSE, (uint64_t) argv, (uint64_t) argc);;
+    int pid;
+    syscall(19, (uint64_t) name, instruct, (uint64_t) &pid, (uint64_t) argv, (uint64_t) argc);;
     return pid;
 }
 int userKill(int fromPid, int toPid)
@@ -108,7 +106,9 @@ int userProcessBomb()
 }
 int userGetCurrentPid()
 {
-    return (int) syscall(22, 0, 0, 0, 0 , 0);
+    int pid;
+    syscall(22, (uint64_t) &pid, 0, 0, 0 , 0);
+    return pid;
 }
 
 int send(int receiver, char * content,  char ** answer, uint8_t flag)
@@ -123,17 +123,23 @@ int receive(char ** message)
 
 int newMutex(int initValue)
 {
-    return (int) syscall(25, (uint64_t) initValue, 0, 0, 0 , 0);
+    int id;
+    syscall(25, (uint64_t) initValue, (uint64_t) &id, 0, 0 , 0);
+    return id ;
 }
 
 int lock(int mutex)
 {
-    return (int) syscall(26,(uint64_t) mutex, 0, 0, 0 , 0);
+    int resp;
+    syscall(26, (uint64_t) mutex, (uint64_t) &resp, 0, 0 , 0);
+    return resp;
 }
 
 int unlock(int mutex)
 {
-    return (int) syscall(27,(uint64_t) mutex, 0, 0, 0 , 0);
+    int resp;
+    syscall(27, (uint64_t) mutex, (uint64_t) &resp, 0, 0 , 0);
+    return resp;
 }
 
 int destroyMutex(int mutex)
@@ -163,7 +169,9 @@ void userKillAllDescendants(int pid)
 
 int semStart(int amount)
 {
-    return (int) syscall(33, (uint64_t) amount, 0, 0, 0,0);
+    int id;
+    syscall(33, (uint64_t) amount, (uint64_t) &id, 0, 0, 0);
+    return id;
 }
 
 int semWait(int sem)
@@ -183,7 +191,9 @@ int semDestroy(int sem)
 
 int userGetQuantum()
 {
-    return (int) syscall(37, 0, 0, 0, 0, 0);
+    int ret;
+    syscall(37, (uint64_t) &ret, 0, 0, 0, 0);
+    return ret;
 }
 
 void userSetQuantum(int pid)
@@ -198,12 +208,14 @@ int pipe(int p1, int p2)
 
 int createProc(char *name, uint64_t instruct, char **argv, int argc)
 {
-    return (int) syscall(42, (uint64_t) name, (uint64_t) instruct, (uint64_t) argv, (uint64_t) argc, 0);
+    int aux;
+    syscall(42, (uint64_t) name, (uint64_t) instruct, (uint64_t) argv, (uint64_t) argc, (uint64_t) &aux);
+    return aux;
 }
 
 int startProc(int pid)
 {
-    return (int) syscall(43, (uint64_t) pid,  0,  0,  0, 0);
+    return (int) syscall(43, (uint64_t) &pid,  0,  0,  0, 0);
 }
 int pipesToStds(int pid, int flag)
 {

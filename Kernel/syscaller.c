@@ -20,7 +20,6 @@ uint64_t syscaller(uint64_t rax, uint64_t rdi, uint64_t rsi, uint64_t rdx, uint6
     function = fList[rax-1];
     return function(rdi,rsi,rdx,rcx,r8);
 }
-
 uint64_t writeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
     int fd = (int)rdi;
@@ -44,11 +43,8 @@ uint64_t readK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t 
         return 0;
     }
     pcbPtr process = getCurrentProc();
-
     pipe_t * pipe = getPipeFromPipeList(process->fd[fd]);
-
     return (uint64_t) readPipeK(pipe, buffer, (uint64_t) length);
-
 }
 uint64_t getHour(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -140,9 +136,9 @@ uint64_t printProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, ui
         printAllProcs();
     return 0;
 }
-uint64_t kernelCreateAndExProcess(uint64_t name, uint64_t inst, uint64_t fore, uint64_t argv, uint64_t argc)
+uint64_t kernelCreateAndExProcess(uint64_t name, uint64_t inst, uint64_t pid, uint64_t argv, uint64_t argc)
 {
-    pPid  pid = createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) fore,
+    *((int*)pid) = createAndExecProcess((char *) name, inst, (pPid) getCurrentProc()->pid, (boolean) FALSE,
             DEFAULT_PRIORITY, (char **) argv, (int) argc);
     //simple_printf("pid %d\n",pid);
     return (uint64_t)pid ;
@@ -168,7 +164,8 @@ uint64_t procBomb(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64
 }
 uint64_t getCurrentPid(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) getCurrentProc()->pid;
+    *((int*)rdi) = getCurrentProc()->pid;
+    return TRUE;
 }
 uint64_t send(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -178,17 +175,22 @@ uint64_t receive(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_
 {
     return receiveMessage((char **) rdi, NULL, 1);
 }
-uint64_t createMutex(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t createMutex(uint64_t rdi, uint64_t id, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t ) startMutex((int) rdi);
+    *((int*)id) = startMutex((int) rdi);
+    return id;
 }
-uint64_t kernelLock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t kernelLock(uint64_t rdi, uint64_t resp, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t ) lockMutex((int)rdi);
+    simple_printf("mutex in kernelLock: %d\n", (int)rdi);
+    *((int*)resp) = lockMutex((int)rdi);
+    return resp;
+
 }
-uint64_t kernelUnlock(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t kernelUnlock(uint64_t rdi, uint64_t resp, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t ) unlockMutex((int)rdi);
+    *((int*)resp) = unlockMutex((int)rdi);
+    return resp;
 }
 uint64_t destroyMutexKernel(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -213,9 +215,10 @@ uint64_t kernelKillAllDescendants(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint
     killAllDescendants((pPid) rdi);
     return 1;
 }
-uint64_t kernelCreateSemaphore(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t kernelCreateSemaphore(uint64_t rdi, uint64_t id, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) semStartK((int)rdi);
+    *((int*)id) = semStartK((int)rdi);
+    return 1;
 }
 uint64_t kernelSemWait(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -229,9 +232,10 @@ uint64_t kernelSemDestroy(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx
 {
     return (uint64_t)semDestroyK((int)rdi);
 }
-uint64_t kernelGetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
+uint64_t kernelGetQuantum(uint64_t ret, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) getQuantum();
+    *((int*)ret) = getQuantum();
+    return 1;
 }
 uint64_t kernelSetQuantum(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
@@ -258,14 +262,14 @@ uint64_t pipeK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t 
 }
 uint64_t kernelCreateProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    //pPid aux = createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
-    //simple_printf("pidK: %d\n",aux);
-    //return (uint64_t) aux;
-    return (uint64_t) createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
+    pPid aux = createNotExecProcess((char *) rdi, rsi, getCurrentProc()->pid, FALSE, DEFAULT_PRIORITY, (char **) rdx, (int) rcx);
+    simple_printf("pidK: %d\n",aux);
+    *(int*)(r8) = aux;
+    return (uint64_t) 1;
 }
 uint64_t kernelStartProcess(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)
 {
-    return (uint64_t) execProc((pPid) rdi);
+    return (uint64_t) execProc(*((int*)rdi));
 }
 
 uint64_t pipesToStdsK(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8)

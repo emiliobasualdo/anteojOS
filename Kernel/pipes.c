@@ -71,8 +71,6 @@ pipe_t * createPipeK()
                 return NULL;
             }
 
-            pipe->buffer = kernelMalloc(PIPEBUFFERSIZE* sizeof(char));
-
             pipe->bufferReadPosition = 0;
 
             pipe->bufferWritePosition = 0;
@@ -242,13 +240,20 @@ int dupProc(pPid pidOut, pPid pidIn)
 
     if(p1 != NULL && p2 != NULL)
     {
-        closePipeK(getPipeFromPipeList(p1->fd[STDOUT]));
-        closePipeK(getPipeFromPipeList(p2->fd[STDIN]));
+        if(p1->fd[STDOUT] == STDOUT)
+        {
+            closePipeK(getPipeFromPipeList(p1->fd[STDOUT]));
+
+        }
+        if(p2->fd[STDIN] == STDIN)
+        {
+            closePipeK(getPipeFromPipeList(p2->fd[STDIN]));
+        }
 
         int aux = addPipeProcess();
         if (aux == -1)
         {
-            return 1;
+            return 0;
         }
         p1->fd[STDOUT] = aux;
         p2->fd[STDIN] = aux;
@@ -358,4 +363,5 @@ int changeToStds(pPid proc, int flag)
             process->fd[STDOUT] = 1;
             break;
     }
+    return 1;
 }

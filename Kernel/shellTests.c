@@ -82,7 +82,19 @@ void columnTest(short cantProcs, boolean ageing)
             setProcessPriority(pid, priority);
     }
     // agregar que pueda cambiar el cuantum con teclas
-    while (getNextChar() != 'q'){}
+    int flag = 1;
+    char c;
+    while (flag)
+    {
+        c = (char) getNextChar();
+        if(c == 'q')
+            flag = 0;
+        else if( c >= '1' && c <= '9')
+        {
+            setQuantum(c - '0');
+            simple_printf("Quantum changed to %d", c-'0');
+        }
+    }
     killAllDescendants(getCurrentProc()->pid);
     clearWindow();
 }

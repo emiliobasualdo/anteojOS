@@ -17,7 +17,7 @@ pipe_t * myStdin;
 
 int initKeyboardDriver()
 {
-    myStdin = getPipeFromPipeList(0);
+    myStdin = getPipeFromPipeList(STDIN);
     return 1;
 }
 

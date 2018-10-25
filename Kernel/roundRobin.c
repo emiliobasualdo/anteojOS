@@ -1,4 +1,5 @@
 #include <roundRobin.h>
+#include <process.h>
 
 static boolean rrIsEmpty(rrQueue *pQueue);
 static boolean changeToRespectiveQueue(rrNodePtr node);
@@ -44,7 +45,7 @@ static rrNodePtr process[MAX_PROCS];
 static rrQueue blockedArr[REASON_COUNT];
 
 /** No es constante porque planeaba hacerlo cambiar en el tiempo*/
-static int rrQuantum = 5;
+static int rrQuantum = 4;
 
 /** El nodo corriendo en este momento*/
 static rrNodePtr current;
@@ -68,11 +69,11 @@ boolean rrInit(pcbPtr pcbPtr)
 
 boolean rrAddProcess(pcbPtr pcbPtr)
 {
-    //simple_printf("rrAddProcess: adding. vamos a imprimir despues de agregar a proc1=%s\n", pcbPtr->name);
+    DEBUG //simple_printf("rrAddProcess: adding. vamos a imprimir despues de agregar a proc1=%s\n", pcbPtr->name);
     rrNodePtr newNode = createNewNode(pcbPtr);
     if(!newNode)
         return FALSE;
-
+    DEBUG //simple_printf("rrAddProcess: adding pid=%d name=%s priority=%d prioritiT=%d\n", pcbPtr->pid,pcbPtr->name, pcbPtr->priority, pcbPtr->priorityType);
     return changeToRespectiveQueue(newNode);
 }
 
@@ -273,6 +274,8 @@ static boolean changeToRespectiveQueue(rrNodePtr node)
         case DEAD:
             removeNode(node);
             return TRUE;
+        default:
+            simple_printf("changeToRespectiveQueue: ERROR default case\n");
     }
     return TRUE;
 }

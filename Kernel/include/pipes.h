@@ -7,7 +7,6 @@
 #include "ipcStructs.h"
 #include "system.h"
 
-
 #define MAXPIPES 100
 
 pipe_t * addPipeK();

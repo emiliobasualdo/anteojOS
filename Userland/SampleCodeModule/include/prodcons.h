@@ -37,6 +37,10 @@ typedef anteojosCDT * anteojOS;
 
 int producerConsumer(int numProducers, int numConsumers);
 
+void producerPipes();
+
+void consumerPipes();
+
 /**
  *    OOOO                       OOOO
  *       OO                     OO

@@ -9,7 +9,7 @@ typedef int pPid;
 typedef struct pipe_t {
 
     int pipeId;
-    char * buffer;
+    char buffer[PIPEBUFFERSIZE];
     int bufferReadPosition;
     int bufferWritePosition;
     int charsToRead;

@@ -66,7 +66,7 @@ static void changeBlockedReceiveArray(pPid pid, int state)
     }
 }
 
-/*static void printMutexList(int mutex)
+static void printMutexList(int mutex)
 {
     if(mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
@@ -79,7 +79,7 @@ static void changeBlockedReceiveArray(pPid pid, int state)
         simple_printf("-> %d ",mutexList[mutex].nextProcessInLine->array[(mutexList[mutex].nextProcessInLine->front+i)%MAXINQUEUE]);
     }
     simple_printf("\n");
-}*/
+}
 /*
 static void printSemList(int sem)
 {
@@ -182,20 +182,26 @@ int tryToLockMutex(int mutex)
 int lockMutex(int mutex)
 {
     pPid process = getCurrentProc()->pid;
+
     if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
+        simple_printf("mutex en if -1: %d", mutex);
         return -1;
     }
-    if(lockMutexASM(&(mutexList[mutex].value)))
+    if(lockMutexASM(&(mutexList[mutex].value))>0)
     {
+
         if(!isFull(mutexList[mutex].nextProcessInLine))
         {
-            enqueue(mutexList[mutex].nextProcessInLine, process);
 
+            enqueue(mutexList[mutex].nextProcessInLine, process);
+            
             setProcessState(process, BLOCKED, MUTEX_BLOCK);
 
         }
     }
+    if(mutexList[mutex].nextProcessInLine->size > 0)
+        setProcessPriority(process, MAX_PRIORITY, MUTEX);
     return 0;
 }
 
@@ -221,25 +227,34 @@ int lockMutexKeyboard(int mutex)
 
 int unlockMutex(int mutex)
 {
-    if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
+    if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1 || mutexList[mutex].value == 0)
     {
+
         return -1;
     }
     else
     {
         if(!isEmpty(mutexList[mutex].nextProcessInLine))
         {
+
             pPid process = dequeue(mutexList[mutex].nextProcessInLine);
 
             setProcessState(process, READY, MUTEX_BLOCK);
 
-            setProcessPriority(process, MAX_PRIORITY);
             //printMutexList(mutex);
         }
         else
         {
             unlockMutexASM(&(mutexList[mutex].value));
+//            simple_printf("valor: %d", mutexList[mutex].value);
         }
+
+    }
+    if(mutex == 24)
+    {
+        simple_printf("eeeee");
+
+        simple_printf("valor: %d", mutexList[mutex].value);
     }
     return 0;
 }
@@ -371,6 +386,7 @@ int semWaitK(int sem)
     return 0;
 }
 
+
 int semPostK(int sem)
 {
     if (sem < 0 || sem > positionSemArray || semList[sem].nextProcessInLine == NULL) {
@@ -387,7 +403,7 @@ int semPostK(int sem)
         pPid process = dequeue(semList[sem].nextProcessInLine);
 
         setProcessState(process, READY, MUTEX_BLOCK);
-        setProcessPriority(process, MAX_PRIORITY);
+        setProcessPriority(process, MAX_PRIORITY, MUTEX);
     }
     semMutexUnlock();
     return 0;

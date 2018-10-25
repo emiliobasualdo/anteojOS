@@ -68,7 +68,6 @@ void columnTest(short cantProcs, boolean ageing)
 
     clearWindow();
 
-    char name[20];
     short priority;
 
     setVariables(cantProcs);
@@ -76,10 +75,9 @@ void columnTest(short cantProcs, boolean ageing)
     for (int i = 0; i < cantProcs; ++i)
     {
         priority = (short) (i % PRIORITY_LEVELS);
-        simple_sprintf(name,"%d-%s-%d", NAME, priority); // la congurencia nunca va a quedar 5
-        pPid pid = createAndExecProcess(name, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, i);
+        pPid pid = createAndExecProcess(NULL, (uint64_t) drawLoop, getCurrentProc()->pid, FALSE, priority, NULL, i);
         if(!ageing)
-            setProcessPriority(pid, priority);
+            setProcessPriority(pid, priority, NICE);
     }
     // agregar que pueda cambiar el cuantum con teclas
     int flag = 1;

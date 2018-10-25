@@ -36,9 +36,9 @@
 
 
 
-typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD}pState;
+typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD, UN_BORN = -5}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;
-
+typedef enum {NICE, MUTEX}pReason;
 typedef int pPid;
 
 
@@ -106,8 +106,6 @@ pcbPtr
 createProcess(char *name, uint64_t instruction, pPid parentPid, boolean foreground, short i, char **argv, int argc);
 pcbPtr initProcessControl(char *name, uint64_t instruction);
 boolean procExists(pPid pid);
-void arrayAddInit(pArray array, pcbPtr init);
-pcbPtr dupProces(pcbPtr oldProcPtr);
 boolean isValidPState(int state);
 boolean setProcessState(pPid pcbPtr, pState newState, reasonT reason);
 pcbPtr getBussyWaitingProcPcb();
@@ -117,7 +115,7 @@ pcbPtr getPcbPtr(pPid pid);
 void printSons(pPid parentPid);
 boolean validReason(int reason);
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason);
-boolean setProcessPriority(pPid pid, short newPriority);
+boolean setProcessPriority(pPid pid, short newPriority, pReason reason);
 boolean reduceProcessPriority(pPid pid);
 void killAllDescendants(pPid pid);
 

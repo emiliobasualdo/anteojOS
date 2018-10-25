@@ -169,6 +169,7 @@ void clearPlate (int index)
     drawCircle(xRes/2, yRes/2, yRes/3, white);
 }
 
+/** source = https://en.m.wikipedia.org/wiki/Midpoint_circle_algorithm */
 static void drawCircle(int x0, int y0, int radius, Colour colour)
 {
     int x = radius-1;

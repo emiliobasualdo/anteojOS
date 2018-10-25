@@ -206,8 +206,8 @@ int lockMutex(int mutex)
 
         }
     }
-
-    setProcessPriority(process, MAX_PRIORITY);
+    if(mutexList[mutex].nextProcessInLine->size > 0)
+        setProcessPriority(process, MAX_PRIORITY, MUTEX);
     return 0;
 }
 
@@ -409,7 +409,7 @@ int semPostK(int sem)
         pPid process = dequeue(semList[sem].nextProcessInLine);
 
         setProcessState(process, READY, MUTEX_BLOCK);
-        setProcessPriority(process, MAX_PRIORITY);
+        setProcessPriority(process, MAX_PRIORITY, MUTEX);
     }
     semMutexUnlock();
     return 0;

@@ -8,7 +8,7 @@
 #include <dinamicMemory.h>
 #include <timer.h>
 
-#define MAX_TURNS_PER_PRIORITY 5
+#define MAX_TURNS_PER_PRIORITY 10
 
 typedef struct rrNode *rrNodePtr;
 

@@ -38,7 +38,7 @@
 
 typedef enum {BORN = 0, READY, RUNNING, BLOCKED, DEAD, UN_BORN = -5}pState;
 typedef enum {KEYBOARD=0, NO_REASON, MESSAGE_PASSING, MUTEX_BLOCK, REASON_COUNT}reasonT;
-
+typedef enum {NICE, MUTEX}pReason;
 typedef int pPid;
 
 
@@ -115,7 +115,7 @@ pcbPtr getPcbPtr(pPid pid);
 void printSons(pPid parentPid);
 boolean validReason(int reason);
 boolean directSetProcessState(pPid pid, pState newState, reasonT reason);
-boolean setProcessPriority(pPid pid, short newPriority);
+boolean setProcessPriority(pPid pid, short newPriority, pReason reason);
 boolean reduceProcessPriority(pPid pid);
 void killAllDescendants(pPid pid);
 

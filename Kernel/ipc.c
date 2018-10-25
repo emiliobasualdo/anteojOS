@@ -182,8 +182,7 @@ int tryToLockMutex(int mutex)
 int lockMutex(int mutex)
 {
     pPid process = getCurrentProc()->pid;
-    if(mutex == 30 || mutex == 31)
-        simple_printf("piddd: %d\n", process);
+
     if (mutex < 0 || mutex > positionMutexArray || mutexList[mutex].value == -1)
     {
         simple_printf("mutex en if -1: %d", mutex);
@@ -194,14 +193,9 @@ int lockMutex(int mutex)
 
         if(!isFull(mutexList[mutex].nextProcessInLine))
         {
-//            if(mutex == 24)
-//            {
-//                printAllProcs();
-//            }
+
             enqueue(mutexList[mutex].nextProcessInLine, process);
-
-            //printMutexList(mutex);
-
+            
             setProcessState(process, BLOCKED, MUTEX_BLOCK);
 
         }

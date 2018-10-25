@@ -9,10 +9,7 @@ command commands[]={
         {"exit", "Exits the terminal.", exitShell},
         {"font_colour", "Changes the font colour.", font_colour},
         {"background_colour", "Changes the background colour.", background_colour},
-        //{"digital_clock","Displays a digital clock on screen", digital_clock},
         {"timezone", "Allows the user to change the current timezone. Usage: timezone [int]",timezone},
-        //{"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
-        //{"exception _tester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
         {"ps", "Prints all process. Usage ps or ps <q> or ps <p pid>", printPs},
         {"proc_bomb", "Starts a process bomb", procBomb},
         {"back_test","Performs a test to prove the background functionality", backgroundTest},
@@ -20,7 +17,6 @@ command commands[]={
         {"kill","Kill process. Usage: kill <pid> or kill <pidFrom pidTo> or kill <p pid>", kill},
         {"prod_cons", "Simulates de Producer Consumer Problem", prodCons},
         {"allocator_test", "Performs a test to prove the physical memory management functionality", allocatorTest},
-        //{"message_test","Performs a test of Message Passing", messageTesting},
         {"nice","Changes the niceness of a process, larger niceness = lower priority. Usage: nice <pid> <0-4>", nice},
         {"column_test","Executes a test to proof scheduling priority.", columnTest},
         {"set_quantum","Sets the scheduler's quantum to your desire.", setQuantum},
@@ -29,6 +25,10 @@ command commands[]={
         {"prod", "Producer Program to test Pipes", producerP},
         {"cons", "Consumer Program to test Pipes", consumerP},
         {NULL, "ESTO NO LO SACAMOS DALE?", NULL} // NOOO SE SACA
+        //{"digital_clock","Displays a digital clock on screen", digital_clock},
+        //{"screen_saver", "Allows user to change screen savers parameters. Input on/off to turn on/off, or a positive integer to change waiting time.", screen_saver},
+        //{"exception _tester", "This command calls an exception,0 for zero division, 1 for Invalid Opcode", exceptionTester},
+        //{"message_test","Performs a test of Message Passing", messageTesting},
 };
 
 command aux_programs[]={
@@ -121,7 +121,7 @@ int echo (int argc, argVector argv)
     if(argv == 0) // leemos de stdin
     {
         char c;
-        while ((c= (char)getChar()) != -1 )
+        while ((c= (char)getChar()) != 0 )
         {
             putChar(c);
         }

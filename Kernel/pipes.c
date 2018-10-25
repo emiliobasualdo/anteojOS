@@ -258,7 +258,7 @@ int readPipeK(pipe_t *pipe, char *buffer, uint64_t sizeP)
 
     if(size == 1 && buffer[0] == EOF)
     {
-        return EOF;
+        return 0;
     }
 
     return size;

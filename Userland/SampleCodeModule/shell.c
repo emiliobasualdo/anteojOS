@@ -23,6 +23,8 @@ void shell()
     //turnOnOff();
     while(run)
     {
+        pipesToStds(userGetCurrentPid(),0);
+
         c = 0;
         RESET_BUFFER;
         printShellLine();

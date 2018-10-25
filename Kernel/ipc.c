@@ -229,6 +229,7 @@ int unlockMutex(int mutex)
     {
         if(!isEmpty(mutexList[mutex].nextProcessInLine))
         {
+
             pPid process = dequeue(mutexList[mutex].nextProcessInLine);
 
             setProcessState(process, READY, MUTEX_BLOCK);

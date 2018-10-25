@@ -59,9 +59,10 @@ int executeCommand(int argc, argVector argv)
                     {
                         return NULL_CMMD;
                     }
-                    int pid2 = createProc(commands[cmd2].name, (uint64_t) commands[cmd2].fn, (char **) (argv + i + 1), argc - (i + 1));
-                    pipe(userGetCurrentPid(),pid2);
                     argc = -1;
+                    int pid2 = createProc(commands[cmd2].name, (uint64_t) commands[cmd2].fn, (char **) (argv + i + 1), argc);
+                    pipe(userGetCurrentPid(),pid2);
+                    pipesToStds(pid2,2);
                     startProc(pid2);
                 }
             }
@@ -118,7 +119,7 @@ int echo (int argc, argVector argv)
     if(argc == -1) // leemos de stdin
     {
         char c;
-        while ((c= (char)getChar()) != 0 )
+        while ((c= (char)getChar()) != -1 )
         {
             putChar(c);
         }
